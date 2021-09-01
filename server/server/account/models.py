@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from server.oracle.models import Asset
+from server.oracle.models import Asset, Service
 
 
 class User(AbstractUser):
@@ -9,10 +9,14 @@ class User(AbstractUser):
 
 class Wallet(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.owner}'s {self.name}"
+        if self.name:
+            return f"{self.name}"
+        else:
+            return f"{self.owner}'s {self.service}"
 
 
 class Holding(models.Model):
@@ -24,6 +28,26 @@ class Holding(models.Model):
         return f"{self.quantity} {self.asset.symbol} ({self.wallet})"
 
 
+class Transaction(models.Model):
+    class TransactionType(models.TextChoices):
+        BUY = "BY", "Buy"
+        SELL = "SL", "Sell"
+        WITHDRAW = "WD", "Withdraw"
+        DEPOSIT = "DP", "Deposit"
+
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    asset = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
+    quantity = models.FloatField(blank=True, null=True)
+    fee = models.FloatField(blank=True, null=True)
+    fee_currency = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
+    type = models.CharField(
+        max_length=2,
+        choices=TransactionType.choices,
+    )
+    related = models.ForeignKey("Transaction", on_delete=models.CASCADE)
+    timestamp = models.DateTimeField()
+
+
 class Portfolio(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -32,21 +56,3 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.owner})"
-
-
-class Strategy(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.portfolio} {self.name} Strategy"
-
-
-class StrategyTarget(models.Model):
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
-    percent = models.FloatField()
-    strategy = models.ForeignKey(Strategy, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.asset} - {self.percent}"

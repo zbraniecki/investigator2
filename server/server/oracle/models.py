@@ -25,3 +25,38 @@ class Price(models.Model):
 
     def __str__(self):
         return f"{self.asset.symbol}/{self.base.symbol} - {self.value}"
+
+
+class Provider(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Service(models.Model):
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.provider.name} {self.name}"
+
+
+class Passive(models.Model):
+    class PassiveType(models.TextChoices):
+        BUY = "ST", "Staking"
+        SELL = "LP", "Liquidity Providing"
+        WITHDRAW = "INT", "Interest"
+
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    min = models.FloatField(blank=True, null=True)
+    max = models.FloatField(blank=True, null=True)
+    apy = models.FloatField()
+    type = models.CharField(
+        max_length=3,
+        choices=PassiveType.choices,
+    )
+
+    def __str__(self):
+        return f"{self.service} {self.asset} {self.type} ({self.min} - {self.max}) - {self.apy}"

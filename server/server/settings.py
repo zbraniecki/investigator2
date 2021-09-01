@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "server.oracle",
     "server.account",
+    "server.strategy",
 ]
 
 MIDDLEWARE = [
