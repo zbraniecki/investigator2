@@ -52,6 +52,8 @@ class Passive(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     min = models.FloatField(blank=True, null=True)
     max = models.FloatField(blank=True, null=True)
+    date_start = models.DateField(blank=True, null=True)
+    date_end = models.DateField(blank=True, null=True)
     apy = models.FloatField()
     type = models.CharField(
         max_length=3,
@@ -59,4 +61,4 @@ class Passive(models.Model):
     )
 
     def __str__(self):
-        return f"{self.service} {self.asset} {self.type} ({self.min} - {self.max}) - {self.apy}"
+        return f"{self.service} {self.asset} {self.type} ({self.date_start} - {self.date_end} | {self.min} - {self.max}) - {self.apy}"

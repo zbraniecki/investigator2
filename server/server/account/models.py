@@ -39,13 +39,20 @@ class Transaction(models.Model):
     asset = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
     quantity = models.FloatField(blank=True, null=True)
     fee = models.FloatField(blank=True, null=True)
-    fee_currency = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
+    fee_currency = models.ForeignKey(
+        Asset, related_name="+", blank=True, null=True, on_delete=models.CASCADE
+    )
     type = models.CharField(
         max_length=2,
         choices=TransactionType.choices,
     )
-    related = models.ForeignKey("Transaction", on_delete=models.CASCADE)
+    related = models.ForeignKey(
+        "Transaction", blank=True, null=True, on_delete=models.CASCADE
+    )
     timestamp = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.timestamp} - {self.get_type_display()} {self.asset} {self.quantity} ({self.wallet})"
 
 
 class Portfolio(models.Model):
