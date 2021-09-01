@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class OracleConfig(AppConfig):
+class AccountConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "server.oracle"
+    name = "server.account"
