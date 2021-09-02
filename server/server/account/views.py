@@ -13,7 +13,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
 
     queryset = Portfolio.objects.all().order_by("-name")
     serializer_class = PortfolioSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 class HoldingViewSet(viewsets.ModelViewSet):

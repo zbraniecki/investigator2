@@ -2,23 +2,19 @@ from .models import Portfolio, Holding, Wallet
 from rest_framework import serializers
 
 
-class SymbolField(serializers.RelatedField):
-    def to_representation(self, value):
-        return value.symbol
-
-
-class WalletField(serializers.RelatedField):
-    def to_representation(self, value):
-        return value.service.provider.name
-
-
 class HoldingSerializer(serializers.HyperlinkedModelSerializer):
-    asset = SymbolField(read_only=True)
-    wallet = WalletField(read_only=True)
+    symbol = serializers.SerializerMethodField("get_symbol")
+    wallet = serializers.SerializerMethodField("get_wallet")
 
     class Meta:
         model = Holding
-        fields = ["asset", "quantity", "wallet"]
+        fields = ["symbol", "quantity", "wallet"]
+
+    def get_symbol(self, obj):
+        return obj.asset.symbol.lower()
+
+    def get_wallet(self, obj):
+        return obj.wallet.service.provider.name
 
 
 class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
