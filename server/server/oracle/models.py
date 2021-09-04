@@ -37,6 +37,10 @@ class Price(models.Model):
     asset = models.ForeignKey(Asset, related_name="price", on_delete=models.CASCADE)
     base = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
     value = models.FloatField()
+    market_cap = models.FloatField(blank=True, null=True)
+    price_change_percentage_24h = models.FloatField(blank=True, null=True)
+    market_cap_change_percentage_24h = models.FloatField(blank=True, null=True)
+    last_updated = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.asset.symbol}/{self.base.symbol} - {self.value}"

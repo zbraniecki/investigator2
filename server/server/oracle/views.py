@@ -33,4 +33,4 @@ class PriceViewSet(viewsets.ModelViewSet):
 
     queryset = Price.objects.all().order_by("-asset__symbol")
     serializer_class = PriceSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]

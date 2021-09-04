@@ -7,7 +7,7 @@ from server.account import views as account_views
 router = routers.DefaultRouter()
 router.register(r"categories", oracle_views.CategoryViewSet)
 router.register(r"assets", oracle_views.AssetViewSet)
-router.register(r"prices", oracle_views.PriceViewSet)
+router.register(r"oracle/prices", oracle_views.PriceViewSet)
 router.register(r"account/portfolio", account_views.PortfolioViewSet)
 router.register(r"account/holding", account_views.HoldingViewSet)
 
