@@ -10,8 +10,16 @@ class AssetAdmin(admin.ModelAdmin):
     ordering = ("symbol",)
 
 
+class PassiveInline(admin.TabularInline):
+    model = Passive
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    inlines = [PassiveInline]
+
+
 admin.site.register(Category)
 admin.site.register(Price)
 admin.site.register(Provider)
-admin.site.register(Service)
 admin.site.register(Passive)

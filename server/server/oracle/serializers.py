@@ -1,5 +1,7 @@
-from .models import Category, Asset, Price
+from .models import Category, Asset, Price, Service, Passive
 from rest_framework import serializers
+from django.db.models import Q
+from datetime import datetime
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
@@ -33,3 +35,38 @@ class PriceSerializer(serializers.HyperlinkedModelSerializer):
             obj.asset.symbol,
             obj.base.symbol.upper(),
         ]
+
+
+class ServiceSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.SerializerMethodField("get_id")
+    name = serializers.SerializerMethodField("get_name")
+    currency = serializers.SerializerMethodField("get_currency")
+
+    class Meta:
+        model = Service
+        fields = ["id", "name", "currency"]
+
+    def get_id(self, obj):
+        return f"{obj.provider.name}"
+
+    def get_name(self, obj):
+        return f"{obj.provider.name} {obj.name}"
+
+    def get_currency(self, obj):
+        today = datetime.today()
+        passives = Passive.objects.filter(
+            Q(service=obj)
+            & (Q(date_start__lte=today) | Q(date_start__isnull=True))
+            & (Q(date_end__gte=today) | Q(date_end__isnull=True))
+        )
+
+        return [
+            {
+                "symbol": passive.asset.symbol,
+                "apy": passive.apy,
+                "yield_type": "interest",
+            }
+            for passive in passives
+        ]
+        print(list(passives))
+        return []
