@@ -9,11 +9,25 @@ class Category(models.Model):
         return self.name
 
 
+class AssetManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(active=True)
+
+
+class InactiveAssetManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(active=False)
+
+
 class Asset(models.Model):
     symbol = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     categories = models.ManyToManyField(Category)
     api_id = models.CharField(max_length=100, blank=True, null=True)
+    active = models.BooleanField(default=False)
+
+    objects = AssetManager()
+    inactive_objects = InactiveAssetManager()
 
     def __str__(self):
         return f"{self.name} ({self.symbol})"
