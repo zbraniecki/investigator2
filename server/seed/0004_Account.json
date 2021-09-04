@@ -1,0 +1,159 @@
+[
+{
+    "model": "account.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$260000$t1UV2oM2LZvG40Br3AAFT7$ckrP8pfewGX2Efd+yUN/1H51t/52EkDLWyAi1uvxLno=",
+        "last_login": "2021-09-01T19:49:19.820Z",
+        "is_superuser": true,
+        "username": "zbraniecki",
+        "first_name": "",
+        "last_name": "",
+        "email": "zibi@braniecki.net",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2021-09-01T19:49:02.155Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "account.wallet",
+    "pk": 1,
+    "fields": {
+        "owner": 1,
+        "name": null,
+        "service": 1
+    }
+},
+{
+    "model": "account.wallet",
+    "pk": 2,
+    "fields": {
+        "owner": 1,
+        "name": null,
+        "service": 2
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 3,
+    "fields": {
+        "asset": 1,
+        "quantity": 0.40430359,
+        "wallet": 1
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 4,
+    "fields": {
+        "asset": 9,
+        "quantity": 59.22028863,
+        "wallet": 1
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 5,
+    "fields": {
+        "asset": 12,
+        "quantity": 5.81526436,
+        "wallet": 1
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 6,
+    "fields": {
+        "asset": 11,
+        "quantity": 22.71914496,
+        "wallet": 1
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 7,
+    "fields": {
+        "asset": 8,
+        "quantity": 170.60582508,
+        "wallet": 2
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 8,
+    "fields": {
+        "asset": 2,
+        "quantity": 2.55877,
+        "wallet": 2
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 9,
+    "fields": {
+        "asset": 3,
+        "quantity": 0.45,
+        "wallet": 2
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 10,
+    "fields": {
+        "asset": 19,
+        "quantity": 132.346032,
+        "wallet": 2
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 11,
+    "fields": {
+        "asset": 27,
+        "quantity": 4.32964844,
+        "wallet": 2
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 12,
+    "fields": {
+        "asset": 36,
+        "quantity": 95.30424,
+        "wallet": 2
+    }
+},
+{
+    "model": "account.holding",
+    "pk": 13,
+    "fields": {
+        "asset": 43,
+        "quantity": 535.53422,
+        "wallet": 2
+    }
+},
+{
+    "model": "account.portfolio",
+    "pk": 1,
+    "fields": {
+        "owner": 1,
+        "name": "Crypto",
+        "holdings": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+        ],
+        "portfolios": []
+    }
+}
+]

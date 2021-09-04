@@ -1,0 +1,895 @@
+[
+{
+    "model": "oracle.category",
+    "pk": 1,
+    "fields": {
+        "name": "crypto"
+    }
+},
+{
+    "model": "oracle.category",
+    "pk": 2,
+    "fields": {
+        "name": "fiat"
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 1,
+    "fields": {
+        "symbol": "BTC",
+        "name": "Bitcoin",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 2,
+    "fields": {
+        "symbol": "ETH",
+        "name": "Ethereum",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 3,
+    "fields": {
+        "symbol": "USD",
+        "name": "US Dollar",
+        "categories": [
+            2
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 4,
+    "fields": {
+        "symbol": "ADA",
+        "name": "Cardano",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 5,
+    "fields": {
+        "symbol": "USDT",
+        "name": "Tether",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 6,
+    "fields": {
+        "symbol": "XRP",
+        "name": "XRP",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 7,
+    "fields": {
+        "symbol": "SOL",
+        "name": "Solana",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 8,
+    "fields": {
+        "symbol": "DOT",
+        "name": "Polkadot",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 9,
+    "fields": {
+        "symbol": "USDC",
+        "name": "USD Coin",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 10,
+    "fields": {
+        "symbol": "UNI",
+        "name": "Uniswap",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 11,
+    "fields": {
+        "symbol": "LINK",
+        "name": "Chainlink",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 12,
+    "fields": {
+        "symbol": "LTC",
+        "name": "Litcoin",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 13,
+    "fields": {
+        "symbol": "ICP",
+        "name": "Internet Computer",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 14,
+    "fields": {
+        "symbol": "MATIC",
+        "name": "Polygon",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 15,
+    "fields": {
+        "symbol": "VET",
+        "name": "VeChain",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 16,
+    "fields": {
+        "symbol": "XLM",
+        "name": "Stellar",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 17,
+    "fields": {
+        "symbol": "AVAX",
+        "name": "Avalanche",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 18,
+    "fields": {
+        "symbol": "THETA",
+        "name": "Theta",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 19,
+    "fields": {
+        "symbol": "ATOM",
+        "name": "Cosmos",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 20,
+    "fields": {
+        "symbol": "DAI",
+        "name": "Dai",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 21,
+    "fields": {
+        "symbol": "XMR",
+        "name": "Monero",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 22,
+    "fields": {
+        "symbol": "AAVE",
+        "name": "Aave",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 23,
+    "fields": {
+        "symbol": "EOS",
+        "name": "Eos",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 24,
+    "fields": {
+        "symbol": "GRT",
+        "name": "The Graph",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 25,
+    "fields": {
+        "symbol": "ALGO",
+        "name": "Algorand",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 26,
+    "fields": {
+        "symbol": "NEO",
+        "name": "Neo",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 27,
+    "fields": {
+        "symbol": "KSM",
+        "name": "Kusama",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 28,
+    "fields": {
+        "symbol": "MIOTA",
+        "name": "IOTA",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 29,
+    "fields": {
+        "symbol": "COMP",
+        "name": "Compound",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 30,
+    "fields": {
+        "symbol": "ZEC",
+        "name": "Zcash",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 31,
+    "fields": {
+        "symbol": "QTUM",
+        "name": "Qtum",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 32,
+    "fields": {
+        "symbol": "BAT",
+        "name": "Basic Attention Token",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 33,
+    "fields": {
+        "symbol": "ONE",
+        "name": "Harmony",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 34,
+    "fields": {
+        "symbol": "XSUSHI",
+        "name": "xSUSHI",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 35,
+    "fields": {
+        "symbol": "ICX",
+        "name": "ICON",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 36,
+    "fields": {
+        "symbol": "NANO",
+        "name": "Nano",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 37,
+    "fields": {
+        "symbol": "UMA",
+        "name": "Uma",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 38,
+    "fields": {
+        "symbol": "CELO",
+        "name": "Celo",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 39,
+    "fields": {
+        "symbol": "DAG",
+        "name": "Constellation",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 40,
+    "fields": {
+        "symbol": "VTHO",
+        "name": "VeThor Token",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 41,
+    "fields": {
+        "symbol": "EWT",
+        "name": "Energy Web Token",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 42,
+    "fields": {
+        "symbol": "OGN",
+        "name": "Origin Protocol",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 43,
+    "fields": {
+        "symbol": "OCEAN",
+        "name": "Ocean Protocol",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 44,
+    "fields": {
+        "symbol": "STMX",
+        "name": "StormX",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 45,
+    "fields": {
+        "symbol": "REEF",
+        "name": "Reef",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 46,
+    "fields": {
+        "symbol": "NMR",
+        "name": "Numeraire",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 47,
+    "fields": {
+        "symbol": "ROSE",
+        "name": "Oasis Network",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 48,
+    "fields": {
+        "symbol": "NU",
+        "name": "NuCypher",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 49,
+    "fields": {
+        "symbol": "POWR",
+        "name": "Powerledger",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 50,
+    "fields": {
+        "symbol": "POLS",
+        "name": "Polkastarter",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 51,
+    "fields": {
+        "symbol": "TRAC",
+        "name": "OriginTrail",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 52,
+    "fields": {
+        "symbol": "DOCK",
+        "name": "Dock",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 53,
+    "fields": {
+        "symbol": "SYLO",
+        "name": "Sylo",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.asset",
+    "pk": 54,
+    "fields": {
+        "symbol": "GS",
+        "name": "Genesis Shards",
+        "categories": [
+            1
+        ]
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 1,
+    "fields": {
+        "name": "BlockFi"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 2,
+    "fields": {
+        "name": "Kraken"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 3,
+    "fields": {
+        "name": "MetaMask"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 4,
+    "fields": {
+        "name": "SolFlare"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 5,
+    "fields": {
+        "name": "Yoroi"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 6,
+    "fields": {
+        "name": "Nexo"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 7,
+    "fields": {
+        "name": "Gemini"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 8,
+    "fields": {
+        "name": "AvaWallet"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 9,
+    "fields": {
+        "name": "KuCoin"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 10,
+    "fields": {
+        "name": "Valora"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 11,
+    "fields": {
+        "name": "Binance,us"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 12,
+    "fields": {
+        "name": "ICP/NNS"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 13,
+    "fields": {
+        "name": "CoinLoan"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 14,
+    "fields": {
+        "name": "MyAlgo"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 15,
+    "fields": {
+        "name": "Pool-X"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 16,
+    "fields": {
+        "name": "MyIcon"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 17,
+    "fields": {
+        "name": "Coinbase Pro"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 18,
+    "fields": {
+        "name": "Coinbase"
+    }
+},
+{
+    "model": "oracle.provider",
+    "pk": 19,
+    "fields": {
+        "name": "Liquid"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 1,
+    "fields": {
+        "provider": 1,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 2,
+    "fields": {
+        "provider": 2,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 3,
+    "fields": {
+        "provider": 3,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 4,
+    "fields": {
+        "provider": 4,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 5,
+    "fields": {
+        "provider": 5,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 6,
+    "fields": {
+        "provider": 6,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 7,
+    "fields": {
+        "provider": 7,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 8,
+    "fields": {
+        "provider": 8,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 9,
+    "fields": {
+        "provider": 9,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 10,
+    "fields": {
+        "provider": 10,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 11,
+    "fields": {
+        "provider": 11,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 12,
+    "fields": {
+        "provider": 12,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 13,
+    "fields": {
+        "provider": 13,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 14,
+    "fields": {
+        "provider": 14,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 15,
+    "fields": {
+        "provider": 15,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 16,
+    "fields": {
+        "provider": 16,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 17,
+    "fields": {
+        "provider": 17,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 18,
+    "fields": {
+        "provider": 18,
+        "name": "Wallet"
+    }
+},
+{
+    "model": "oracle.service",
+    "pk": 19,
+    "fields": {
+        "provider": 19,
+        "name": "Wallet"
+    }
+}
+]
