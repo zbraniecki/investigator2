@@ -63,3 +63,27 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.owner})"
+
+
+# XXX: Should this be shared between Portfolio, Watchlist and Strategy?
+class WatchlistType(models.TextChoices):
+    ASSETS = "AS", "Assets"
+    PORTFOLIO = "PL", "Portfolio"
+    SMART = "SM", "Smart"
+
+
+class Watchlist(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    type = models.CharField(
+        max_length=2,
+        choices=WatchlistType.choices,
+    )
+    assets = models.ManyToManyField(Asset, blank=True)
+    portfolio = models.ForeignKey(
+        Portfolio, on_delete=models.CASCADE, blank=True, null=True
+    )
+    smart = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.owner})"

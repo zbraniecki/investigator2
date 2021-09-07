@@ -1,15 +1,16 @@
 from django.contrib import admin
-from .models import Strategy, StrategyTarget
+from .models import Strategy, StrategyKeyframe, StrategyTarget
 
 
 class StrategyTargetTabularInline(admin.TabularInline):
     model = StrategyTarget
 
 
-class StrategyAdmin(admin.ModelAdmin):
+class StrategyKeyframeAdmin(admin.ModelAdmin):
     inlines = [StrategyTargetTabularInline]
-    model = Strategy
-    list_display = ["owner", "name"]
+    model = StrategyKeyframe
+    list_display = ["strategy", "timestamp"]
 
 
-admin.site.register(Strategy, StrategyAdmin)
+admin.site.register(Strategy)
+admin.site.register(StrategyKeyframe, StrategyKeyframeAdmin)

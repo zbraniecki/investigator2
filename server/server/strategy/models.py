@@ -12,10 +12,28 @@ class Strategy(models.Model):
         return f"{self.portfolio} {self.name} Strategy"
 
 
-class StrategyTarget(models.Model):
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
-    percent = models.FloatField()
-    strategy = models.ForeignKey(Strategy, on_delete=models.CASCADE)
+class StrategyKeyframe(models.Model):
+    strategy = models.ForeignKey(
+        Strategy, related_name="keyframes", on_delete=models.CASCADE
+    )
+    timestamp = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.asset} - {self.percent}"
+        return f"{self.strategy} - {self.timestamp}"
+
+
+class StrategyTarget(models.Model):
+    keyframe = models.ForeignKey(
+        StrategyKeyframe, related_name="targets", on_delete=models.CASCADE
+    )
+    percent = models.FloatField()
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, blank=True, null=True)
+    portfolio = models.ForeignKey(
+        Portfolio, on_delete=models.CASCADE, blank=True, null=True
+    )
+
+    def __str__(self):
+        if self.asset:
+            return f"{self.keyframe} - {self.asset}"
+        else:
+            return f"{self.keyframe} - {self.portfolio}"

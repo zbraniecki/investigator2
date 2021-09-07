@@ -1,4 +1,4 @@
-from .models import Portfolio, Holding, Wallet
+from .models import Portfolio, Holding, Wallet, Watchlist, WatchlistType
 from rest_framework import serializers
 
 
@@ -23,3 +23,24 @@ class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Portfolio
         fields = ["id", "name", "holdings"]
+
+
+class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
+    portfolio = serializers.SerializerMethodField("get_portfolio")
+    assets = serializers.SerializerMethodField("get_assets")
+
+    class Meta:
+        model = Watchlist
+        fields = ["id", "name", "assets", "portfolio", "smart"]
+
+    def get_portfolio(self, obj):
+        if obj.type == WatchlistType.PORTFOLIO:
+            return obj.portfolio.id
+        else:
+            return None
+
+    def get_assets(self, obj):
+        if obj.type == WatchlistType.SMART:
+            return ["eth"]
+        else:
+            return [asset.symbol for asset in obj.assets.all()]
