@@ -1,9 +1,11 @@
 from django.db import models
 from server.account.models import User, Portfolio
 from server.oracle.models import Asset
+import uuid
 
 
 class Strategy(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
@@ -13,6 +15,7 @@ class Strategy(models.Model):
 
 
 class StrategyKeyframe(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     strategy = models.ForeignKey(
         Strategy, related_name="keyframes", on_delete=models.CASCADE
     )
@@ -23,6 +26,7 @@ class StrategyKeyframe(models.Model):
 
 
 class StrategyTarget(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     keyframe = models.ForeignKey(
         StrategyKeyframe, related_name="targets", on_delete=models.CASCADE
     )

@@ -1,15 +1,17 @@
 from django.db import models
+from autoslug import AutoSlugField
 
 
 class Category(models.Model):
     # owner
+    id = AutoSlugField(primary_key=True, populate_from="name", unique=True)
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
 
-class AssetManager(models.Manager):
+class ActiveAssetManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(active=True)
 
@@ -19,15 +21,25 @@ class InactiveAssetManager(models.Manager):
         return super().get_queryset().filter(active=False)
 
 
+class AllAssetManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
+
+
 class Asset(models.Model):
+    objects = ActiveAssetManager()
+    inactive_objects = InactiveAssetManager()
+    all_objects = AllAssetManager()
+
+    id = AutoSlugField(
+        primary_key=True, populate_from="symbol", unique=True, manager=all_objects
+    )
+
     symbol = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     categories = models.ManyToManyField(Category)
     api_id = models.CharField(max_length=100, blank=True, null=True)
     active = models.BooleanField(default=False)
-
-    objects = AssetManager()
-    inactive_objects = InactiveAssetManager()
 
     def __str__(self):
         return f"{self.name} ({self.symbol})"
@@ -47,6 +59,7 @@ class Price(models.Model):
 
 
 class Provider(models.Model):
+    id = AutoSlugField(primary_key=True, populate_from="name", unique=True)
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -54,11 +67,15 @@ class Provider(models.Model):
 
 
 class Service(models.Model):
+    id = AutoSlugField(primary_key=True, populate_from="get_provider_name", unique=True)
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return f"{self.provider.name} {self.name}"
+
+    def get_provider_name(self):
+        return f"{self.provider.id}-{self.name}"
 
 
 class Passive(models.Model):

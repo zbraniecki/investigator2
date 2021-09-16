@@ -1,13 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from server.oracle.models import Asset, Service
+from autoslug import AutoSlugField
+import uuid
 
 
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pass
 
 
 class Wallet(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=True, null=True)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
@@ -20,6 +24,7 @@ class Wallet(models.Model):
 
 
 class Holding(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     quantity = models.FloatField()
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
@@ -35,6 +40,7 @@ class Transaction(models.Model):
         WITHDRAW = "WD", "Withdraw"
         DEPOSIT = "DP", "Deposit"
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     asset = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
     quantity = models.FloatField(blank=True, null=True)
@@ -56,6 +62,7 @@ class Transaction(models.Model):
 
 
 class Portfolio(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     holdings = models.ManyToManyField(Holding, blank=True)
@@ -73,6 +80,7 @@ class WatchlistType(models.TextChoices):
 
 
 class Watchlist(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     type = models.CharField(

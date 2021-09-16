@@ -21,7 +21,7 @@ def fetch_crypto_assets():
             asset.symbol = entry["symbol"]
             asset.name = entry["name"]
         else:
-            print(f"{id}: {entry['id']} (new)")
+            print(f"{id}: {entry['id']}-{entry['symbol']} (new)")
             asset = Asset(
                 symbol=entry["symbol"], name=entry["name"], api_id=entry["id"]
             )
