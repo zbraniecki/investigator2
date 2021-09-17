@@ -2,6 +2,10 @@ from django.db import models
 from autoslug import AutoSlugField
 
 
+def percent(input):
+    return "{:.0%}".format(input)
+
+
 class Category(models.Model):
     # owner
     id = AutoSlugField(primary_key=True, populate_from="name", unique=True)
@@ -61,6 +65,7 @@ class Price(models.Model):
 class Provider(models.Model):
     id = AutoSlugField(primary_key=True, populate_from="name", unique=True)
     name = models.CharField(max_length=100)
+    url = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -70,6 +75,8 @@ class Service(models.Model):
     id = AutoSlugField(primary_key=True, populate_from="get_provider_name", unique=True)
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    url = models.URLField(blank=True, null=True)
+    assets = models.ManyToManyField(Asset, blank=True)
 
     def __str__(self):
         return f"{self.provider.name} {self.name}"
@@ -78,23 +85,73 @@ class Service(models.Model):
         return f"{self.provider.id}-{self.name}"
 
 
-class Passive(models.Model):
-    class PassiveType(models.TextChoices):
-        BUY = "ST", "Staking"
-        SELL = "LP", "Liquidity Providing"
-        WITHDRAW = "INT", "Interest"
+class PassiveType(models.TextChoices):
+    STAKING = "ST", "Staking"
+    LP = "LP", "Liquidity Providing"
+    INTEREST = "INT", "Interest"
 
+
+class Passive(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
-    min = models.FloatField(blank=True, null=True)
-    max = models.FloatField(blank=True, null=True)
-    date_start = models.DateField(blank=True, null=True)
-    date_end = models.DateField(blank=True, null=True)
-    apy = models.FloatField()
     type = models.CharField(
         max_length=3,
         choices=PassiveType.choices,
     )
 
     def __str__(self):
-        return f"{self.service} {self.asset} {self.type} ({self.date_start} - {self.date_end} | {self.min} - {self.max}) - {self.apy}"
+        return (
+            f"{self.service} {self.asset.symbol.upper()} {PassiveType(self.type).label}"
+        )
+
+
+class PassiveValue(models.Model):
+    passive = models.ForeignKey(
+        Passive, related_name="values", on_delete=models.CASCADE, blank=True, null=True
+    )
+    min = models.FloatField(blank=True, null=True)
+    max = models.FloatField(blank=True, null=True)
+    apy_min = models.FloatField()
+    apy_max = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        if self.passive:
+            passive = self.passive
+        else:
+            change = PassiveChange.objects.filter(value=self).first()
+            if change:
+                passive = change.passive
+            else:
+                passive = "(Detached from Passive)"
+
+        if self.min and self.max:
+            rng = f" ({self.min}-{self.max})"
+        elif self.min and not self.max:
+            rng = f" ({self.min}-)"
+        elif self.max and not self.min:
+            rng = f" (-{self.max})"
+        else:
+            rng = ""
+
+        if self.apy_min and self.apy_max:
+            apy = f"{percent(self.apy_min)}-{percent(self.apy_max)}"
+        elif self.apy_min and not self.apy_max:
+            apy = f"{percent(self.apy_min)}"
+        elif self.apy_max and not self.apy_min:
+            apy = f"-{percent(self.apy_max)}"
+        else:
+            apy = ""
+        return f"{passive} - {apy}"
+
+
+class PassiveChange(models.Model):
+    passive = models.ForeignKey(
+        Passive, related_name="history", on_delete=models.CASCADE
+    )
+    date = models.DateField()
+    value = models.ForeignKey(
+        PassiveValue, related_name="change", on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.passive} {self.date} {self.value}"
