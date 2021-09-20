@@ -33,12 +33,14 @@ class Holding(models.Model):
         return f"{self.quantity} {self.asset.symbol} ({self.wallet})"
 
 
+class TransactionType(models.TextChoices):
+    BUY = "BY", "Buy"
+    SELL = "SL", "Sell"
+    WITHDRAW = "WD", "Withdraw"
+    DEPOSIT = "DP", "Deposit"
+
+
 class Transaction(models.Model):
-    class TransactionType(models.TextChoices):
-        BUY = "BY", "Buy"
-        SELL = "SL", "Sell"
-        WITHDRAW = "WD", "Withdraw"
-        DEPOSIT = "DP", "Deposit"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
@@ -51,6 +53,8 @@ class Transaction(models.Model):
     type = models.CharField(
         max_length=2,
         choices=TransactionType.choices,
+        blank=True,
+        null=True,
     )
     related = models.ForeignKey(
         "Transaction", blank=True, null=True, on_delete=models.CASCADE
