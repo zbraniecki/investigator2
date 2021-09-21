@@ -21,6 +21,7 @@ from django.db.models import Q
 from git import Repo
 import datetime
 import toml
+import pprint
 
 SYMBOL_MAP = {"eth2": "eth"}
 
@@ -170,6 +171,8 @@ def match_holding(holdings, input):
     # XXX: We should get all holdings in a given wallet of a given asset
     # and all inputs and match them and then only take the leftovers
     # as remove / add
+    # We also want to cross all assets across wallets, and all assets within a wallet
+    # for transfer vs sell/buy.
     current_holding = None
     current_delta = None
     for holding in holdings:
@@ -180,112 +183,168 @@ def match_holding(holdings, input):
     return current_holding
 
 
+def add_asset_diff(diff, wallet, symbol, type, quantity):
+    if wallet not in diff:
+        diff[wallet] = {}
+    if symbol not in diff[wallet]:
+        diff[wallet][symbol] = {}
+    if type not in diff[wallet][symbol]:
+        diff[wallet][symbol][type] = []
+    diff[wallet][symbol][type].append(quantity)
+
+
 def upload_portfolio_data(data, date, dry=False):
     parsed_toml = toml.loads(data)
     inputs = parsed_toml["holding"]
 
-    potential_moves = {}
+    input_wallets = {}
+    current_wallets = {}
+
+    diff_wallets = {}
 
     for input in inputs:
-        symbol = normalize_symbol(input["symbol"])
-        # if symbol != "eth":
-        #     continue
-        provider = normalize_provider(input["wallet"])
+        name = normalize_provider(input["wallet"]).lower()
+        symbol = normalize_symbol(input["symbol"]).lower()
         quantity = input["quantity"]
-        asset = Asset.objects.filter(symbol__iexact=symbol).first()
-        assert asset
+        if name not in input_wallets:
+            input_wallets[name] = {}
+        if symbol not in input_wallets[name]:
+            input_wallets[name][symbol] = []
+        input_wallets[name][symbol].append(quantity)
+
+    # pprint.pprint(input_wallets)
+
+    user = User.objects.get(username="zbraniecki")
+    assert user
+
+    wallets = Wallet.objects.filter(owner=user)
+
+    for wallet in wallets:
+        name = wallet.service.provider.name.lower()
+        current_wallets[name] = {}
+
+        holdings = wallet.holdings.all()
+        for holding in holdings:
+            symbol = holding.asset.symbol.lower()
+            if symbol not in current_wallets[name]:
+                current_wallets[name][symbol] = []
+            current_wallets[name][symbol].append(holding.quantity)
+
+    # pprint.pprint(current_wallets)
+
+    for provider in input_wallets:
+        if provider not in current_wallets:
+            wallet = input_wallets[provider]
+            for symbol in wallet:
+                for quantity in wallet[symbol]:
+                    add_asset_diff(diff_wallets, provider, symbol, "add", quantity)
+        else:
+            for symbol in input_wallets[provider]:
+                if symbol not in current_wallets[provider]:
+                    for quantity in input_wallets[provider][symbol]:
+                        add_asset_diff(diff_wallets, provider, symbol, "add", quantity)
+                else:
+                    input_asset = input_wallets[provider][symbol]
+                    current_asset = current_wallets[provider][symbol]
+                    for quantity in input_asset:
+                        if quantity in current_asset:
+                            continue
+                        else:
+                            if len(input_asset) == 1 and len(current_asset) == 1:
+                                add_asset_diff(
+                                    diff_wallets,
+                                    provider,
+                                    symbol,
+                                    "change",
+                                    [current_asset[0], input_asset[0]],
+                                )
+                            elif len(input_asset) == len(current_asset):
+                                deltas = [
+                                    abs((q - quantity) / quantity)
+                                    for q in current_asset
+                                ]
+                                val, idx = min(
+                                    (val, idx) for (idx, val) in enumerate(deltas)
+                                )
+                                add_asset_diff(
+                                    diff_wallets,
+                                    provider,
+                                    symbol,
+                                    "change",
+                                    [current_asset[idx], quantity],
+                                )
+                            elif len(input_asset) > len(current_asset):
+                                deltas = [
+                                    abs((q - quantity) / quantity)
+                                    for q in current_asset
+                                ]
+                                val, idx = min(
+                                    (val, idx) for (idx, val) in enumerate(deltas)
+                                )
+                                val = current_asset[idx]
+                                del current_asset[idx]
+                                add_asset_diff(
+                                    diff_wallets, provider, symbol, "add", val
+                                )
+
+                            else:
+                                print(
+                                    f"{provider}, {symbol}, {current_asset} - {input_asset}"
+                                )
+    # Lose xlm in coinbasepro
+
+    pprint.pprint(diff_wallets)
+
+    for provider in diff_wallets:
         service = Service.objects.filter(
             name="Wallet", provider__name__iexact=provider
         ).first()
         assert service
-        user = User.objects.get(username="zbraniecki")
-        assert user
-        wallet = Wallet.objects.filter(
-            owner=user,
-            service=service,
-        ).first()
-        if not wallet:
-            print(f"Adding a wallet for user {user} in {service}")
-            if not dry:
-                wallet = Wallet(
-                    owner=user,
-                    service=service,
-                )
-                wallet.save()
-        holdings = Holding.objects.filter(asset=asset, wallet=wallet)
-        holding = match_holding(holdings, input)
-        if not holding:
-            print(f"Adding holding of {asset} to {wallet}")
-            if not dry:
-                holding = Holding(
-                    asset=asset,
-                    quantity=quantity,
-                    wallet=wallet,
-                )
-                holding.save()
-                transaction = Transaction(
-                    wallet=wallet,
-                    asset=asset,
-                    quantity=quantity,
-                    type=TransactionType.DEPOSIT,
-                    timestamp=date,
-                )
-                transaction.save()
-        else:
-            if holding.quantity == quantity:
-                continue
-            print(
-                f"Quantity of {asset} in {wallet} changed from {holding.quantity} to {quantity}"
-            )
-            if asset.symbol not in potential_moves:
-                potential_moves[asset.symbol] = []
-            potential_moves[asset.symbol].append(
-                {
-                    "provider": service.provider.name,
-                    "delta": quantity - holding.quantity,
-                    "holding": holding,
-                    "wallet": wallet,
-                    "asset": asset,
-                }
-            )
-    for symbol in potential_moves:
-        moves = potential_moves[symbol]
-        for move in moves:
-            # print(move)
-            if not dry:
-                # print(move)
-                move["holding"].quantity += move["delta"]
-                move["holding"].save()
 
-                if move["delta"] < 0:
-                    type = TransactionType.SELL
-                else:
-                    type = TransactionType.BUY
-                transaction = Transaction(
-                    wallet=move["wallet"],
-                    asset=move["asset"],
-                    quantity=abs(move["delta"]),
-                    type=type,
-                    timestamp=date,
-                )
-                transaction.save()
+        wallet = Wallet.objects.filter(owner=user, service=service).first()
+        if not wallet:
+            wallet = Wallet(
+                owner=user,
+                service=service,
+            )
+            wallet.save()
+
+        for symbol in diff_wallets[provider]:
+            asset = Asset.objects.filter(symbol__iexact=symbol).first()
+            assert asset
+
+            if "add" in diff_wallets[provider][symbol]:
+                for quantity in diff_wallets[provider][symbol]["add"]:
+                    holding = Holding(asset=asset, wallet=wallet, quantity=quantity)
+                    holding.save()
+            if "change" in diff_wallets[provider][symbol]:
+                changes = diff_wallets[provider][symbol]["change"]
+                for change in changes:
+                    holding = Holding.objects.get(
+                        asset=asset, wallet=wallet, quantity=change[0]
+                    )
+                    holding.quantity = change[1]
+                    if not dry:
+                        holding.save()
 
 
 class Command(BaseCommand):
     help = "Seed data from git"
 
     def add_arguments(self, parser):
+        parser.add_argument("-d", "--dry", action="store_true", help="Dry run")
         parser.add_argument("path", type=str, help="Path to clone of a git repo")
 
     def handle(self, *args, **kwargs):
         path = kwargs["path"]
+        dry = kwargs["dry"]
         repo = Repo(path)
         commits = list(repo.iter_commits("master"))
         commits.reverse()
         i = 0
         for commit in commits:
             i += 1
-            if i < 2:
+            if i < 5:
                 continue
             repo.head.reference = commit
 
@@ -296,10 +355,10 @@ class Command(BaseCommand):
 
             # file_path = "oracle/wallets.toml"
             # file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
-            # upload_wallet_data(file_contents, date, True)
+            # upload_wallet_data(file_contents, date, dry)
 
             file_path = "account/portfolio.toml"
             file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
-            upload_portfolio_data(file_contents, date, True)
+            upload_portfolio_data(file_contents, date, dry)
             if i >= 5:
                 break

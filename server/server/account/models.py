@@ -27,7 +27,9 @@ class Holding(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     quantity = models.FloatField()
-    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    wallet = models.ForeignKey(
+        Wallet, related_name="holdings", on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return f"{self.quantity} {self.asset.symbol} ({self.wallet})"

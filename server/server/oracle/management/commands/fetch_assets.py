@@ -14,7 +14,7 @@ def fetch_crypto_assets():
     id = 0
     for entry in source:
         id = id + 1
-        asset = Asset.objects.filter(
+        asset = Asset.all_objects.filter(
             api_id=entry["id"], categories__in=[asset_class]
         ).first()
         if asset:
