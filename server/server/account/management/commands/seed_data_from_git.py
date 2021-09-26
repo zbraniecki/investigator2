@@ -22,6 +22,7 @@ from git import Repo
 import datetime
 import toml
 import pprint
+from .helpers import find_matches
 
 SYMBOL_MAP = {"eth2": "eth"}
 
@@ -240,58 +241,54 @@ def upload_portfolio_data(data, date, dry=False):
                     add_asset_diff(diff_wallets, provider, symbol, "add", quantity)
         else:
             for symbol in input_wallets[provider]:
-                if symbol not in current_wallets[provider]:
-                    for quantity in input_wallets[provider][symbol]:
-                        add_asset_diff(diff_wallets, provider, symbol, "add", quantity)
-                else:
-                    input_asset = input_wallets[provider][symbol]
-                    current_asset = current_wallets[provider][symbol]
-                    for quantity in input_asset:
-                        if quantity in current_asset:
+                input_values = input_wallets[provider][symbol]
+                current_values = (
+                    current_wallets[provider][symbol]
+                    if symbol in current_wallets[provider]
+                    else []
+                )
+                matches = find_matches(current_values, input_values)
+                for match in matches:
+                    if match[0] is not None and match[1] is not None:
+                        if current_values[match[0]] == input_values[match[1]]:
                             continue
-                        else:
-                            if len(input_asset) == 1 and len(current_asset) == 1:
-                                add_asset_diff(
-                                    diff_wallets,
-                                    provider,
-                                    symbol,
-                                    "change",
-                                    [current_asset[0], input_asset[0]],
-                                )
-                            elif len(input_asset) == len(current_asset):
-                                deltas = [
-                                    abs((q - quantity) / quantity)
-                                    for q in current_asset
-                                ]
-                                val, idx = min(
-                                    (val, idx) for (idx, val) in enumerate(deltas)
-                                )
-                                add_asset_diff(
-                                    diff_wallets,
-                                    provider,
-                                    symbol,
-                                    "change",
-                                    [current_asset[idx], quantity],
-                                )
-                            elif len(input_asset) > len(current_asset):
-                                deltas = [
-                                    abs((q - quantity) / quantity)
-                                    for q in current_asset
-                                ]
-                                val, idx = min(
-                                    (val, idx) for (idx, val) in enumerate(deltas)
-                                )
-                                val = current_asset[idx]
-                                del current_asset[idx]
-                                add_asset_diff(
-                                    diff_wallets, provider, symbol, "add", val
-                                )
+                        add_asset_diff(
+                            diff_wallets,
+                            provider,
+                            symbol,
+                            "change",
+                            [current_values[match[0]], input_values[match[1]]],
+                        )
+                    elif match[1] is not None:
+                        add_asset_diff(
+                            diff_wallets,
+                            provider,
+                            symbol,
+                            "add",
+                            input_values[match[1]],
+                        )
+                    elif match[0] is not None:
+                        add_asset_diff(
+                            diff_wallets,
+                            provider,
+                            symbol,
+                            "delete",
+                            current_values[match[0]],
+                        )
 
-                            else:
-                                print(
-                                    f"{provider}, {symbol}, {current_asset} - {input_asset}"
-                                )
-    # Lose xlm in coinbasepro
+    for provider in current_wallets:
+        if provider not in input_wallets:
+            wallet = current_wallets[provider]
+            for symbol in wallet:
+                for quantity in wallet[symbol]:
+                    add_asset_diff(diff_wallets, provider, symbol, "delete", quantity)
+        else:
+            for symbol in current_wallets[provider]:
+                if symbol not in input_wallets[provider]:
+                    for quantity in current_wallets[provider][symbol]:
+                        add_asset_diff(
+                            diff_wallets, provider, symbol, "delete", quantity
+                        )
 
     pprint.pprint(diff_wallets)
 
@@ -307,7 +304,8 @@ def upload_portfolio_data(data, date, dry=False):
                 owner=user,
                 service=service,
             )
-            wallet.save()
+            if not dry:
+                wallet.save()
 
         for symbol in diff_wallets[provider]:
             asset = Asset.objects.filter(symbol__iexact=symbol).first()
@@ -316,7 +314,8 @@ def upload_portfolio_data(data, date, dry=False):
             if "add" in diff_wallets[provider][symbol]:
                 for quantity in diff_wallets[provider][symbol]["add"]:
                     holding = Holding(asset=asset, wallet=wallet, quantity=quantity)
-                    holding.save()
+                    if not dry:
+                        holding.save()
             if "change" in diff_wallets[provider][symbol]:
                 changes = diff_wallets[provider][symbol]["change"]
                 for change in changes:
@@ -326,6 +325,14 @@ def upload_portfolio_data(data, date, dry=False):
                     holding.quantity = change[1]
                     if not dry:
                         holding.save()
+
+            if "delete" in diff_wallets[provider][symbol]:
+                for quantity in diff_wallets[provider][symbol]["delete"]:
+                    holding = Holding.objects.get(
+                        asset=asset, wallet=wallet, quantity=quantity
+                    )
+                    if not dry:
+                        holding.delete()
 
 
 class Command(BaseCommand):
@@ -344,7 +351,7 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            if i < 5:
+            if i < 61:
                 continue
             repo.head.reference = commit
 
@@ -360,5 +367,5 @@ class Command(BaseCommand):
             file_path = "account/portfolio.toml"
             file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
             upload_portfolio_data(file_contents, date, dry)
-            if i >= 5:
+            if i >= 61:
                 break
