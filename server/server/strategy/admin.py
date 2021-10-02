@@ -13,4 +13,5 @@ class StrategyAdmin(admin.ModelAdmin):
     # list_display = ["strategy", "timestamp"]
 
 
+admin.site.register(StrategyTarget)
 admin.site.register(StrategyAdjustment)
