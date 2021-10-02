@@ -14,15 +14,11 @@ class StrategySerializer(serializers.HyperlinkedModelSerializer):
         return f"{obj.portfolio.id}"
 
     def get_targets(self, obj):
-        keyframe = obj.keyframes.all().first()
-        if keyframe is None:
-            return []
-        else:
-            return [
-                {
-                    "symbol": target.asset.symbol,
-                    "contains": [],
-                    "percent": target.percent,
-                }
-                for target in keyframe.targets.all()
-            ]
+        return [
+            {
+                "symbol": target.asset.symbol,
+                "contains": [],
+                "percent": target.percent,
+            }
+            for target in obj.targets.all()
+        ]

@@ -1,16 +1,16 @@
 from django.contrib import admin
-from .models import Strategy, StrategyKeyframe, StrategyTarget
+from .models import Strategy, StrategyTarget, StrategyAdjustment
 
 
 class StrategyTargetTabularInline(admin.TabularInline):
     model = StrategyTarget
+    ordering = ("-percent",)
 
 
-class StrategyKeyframeAdmin(admin.ModelAdmin):
+@admin.register(Strategy)
+class StrategyAdmin(admin.ModelAdmin):
     inlines = [StrategyTargetTabularInline]
-    model = StrategyKeyframe
-    list_display = ["strategy", "timestamp"]
+    # list_display = ["strategy", "timestamp"]
 
 
-admin.site.register(Strategy)
-admin.site.register(StrategyKeyframe, StrategyKeyframeAdmin)
+admin.site.register(StrategyAdjustment)

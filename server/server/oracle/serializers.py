@@ -56,17 +56,30 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
         today = datetime.today()
         passives = Passive.objects.filter(
             Q(service=obj)
-            & (Q(date_start__lte=today) | Q(date_start__isnull=True))
-            & (Q(date_end__gte=today) | Q(date_end__isnull=True))
+            # & (Q(date_start__lte=today) | Q(date_start__isnull=True))
+            # & (Q(date_end__gte=today) | Q(date_end__isnull=True))
         )
+        print(passives)
 
-        return [
-            {
-                "symbol": passive.asset.symbol,
-                "apy": passive.apy,
-                "yield_type": "interest",
-            }
-            for passive in passives
-        ]
-        print(list(passives))
-        return []
+        result = []
+
+        for passive in passives:
+            value = passive.values.first()
+            result.append(
+                {
+                    "symbol": passive.asset.symbol,
+                    "apy": value.apy_min,
+                    "yield_type": "interest",
+                }
+            )
+
+        return result
+
+        # return [
+        #     {
+        #         "symbol": passive.asset.symbol,
+        #         "apy": passive.apy,
+        #         "yield_type": "interest",
+        #     }
+        #     for passive in passives
+        # ]

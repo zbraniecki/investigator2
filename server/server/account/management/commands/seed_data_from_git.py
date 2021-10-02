@@ -26,7 +26,11 @@ from .helpers import find_matches
 
 SYMBOL_MAP = {"eth2": "eth"}
 
-PROVIDER_MAP = {"coinbasepro": "Coinbase Pro", "celo": "Valora"}
+PROVIDER_MAP = {
+    "coinbasepro": "Coinbase Pro",
+    "celo": "Valora",
+    "binance.us": "Binance US",
+}
 
 
 def normalize_symbol(input):
@@ -55,6 +59,23 @@ def populate_service_assets(service, data, dry=False):
             print(f"Adding asset {asset.symbol} to {service.name}")
             if not dry:
                 service.assets.add(asset)
+
+
+def get_service(name, url=None, dry=False):
+    name = normalize_provider(name)
+    provider = Provider.objects.filter(name__iexact=name).first()
+    if not provider:
+        print(f"Adding Provider: {name}")
+        if not dry:
+            provider = Provider(name=name, url=url)
+            provider.save()
+    service = Service.objects.filter(provider=provider, name__iexact="Wallet").first()
+    if not service:
+        print(f"Adding Service: {name} Wallet")
+        if not dry:
+            service = Service(provider=provider, name="Wallet")
+            service.save()
+    return service
 
 
 def populate_service_apy(service, data, date, dry=False):
@@ -134,38 +155,10 @@ def upload_wallet_data(data, date, dry=False):
     for wallet in wallets:
         # if wallet["name"] != "Yoroi":
         #     continue
-        provider = Provider.objects.filter(name__iexact=wallet["name"]).first()
-        if not provider:
-            print(f"Adding Provider: {wallet['name']}")
-            if not dry:
-                provider = Provider(name=wallet["name"], url=wallet["url"])
-                provider.save()
-            print(f"Adding Service: {wallet['name']} Wallet")
-            if not dry:
-                service = Service(provider=provider, name="Wallet")
-                service.save()
-        else:
-            if wallet["url"] and not provider.url:
-                if not dry:
-                    provider.url = wallet["url"]
-                    provider.save()
-            service = Service.objects.filter(
-                provider=provider, name__icontains="Wallet"
-            ).first()
-            if not service:
-                print(f"Adding Service: {wallet['name']} Wallet")
-                if not dry:
-                    service = Service(
-                        provider=provider, name="Wallet", url=wallet["url"]
-                    )
-                    service.save()
-            else:
-                if wallet["url"] and not service.url:
-                    if not dry:
-                        service.url = wallet["url"]
-                        service.save()
-            populate_service_assets(service, wallet, dry)
-            populate_service_apy(service, wallet, date, dry)
+        service = get_service(wallet["name"], wallet["url"], dry)
+        assert service
+        populate_service_assets(service, wallet, dry)
+        populate_service_apy(service, wallet, date, dry)
 
 
 def match_holding(holdings, input):
@@ -293,9 +286,7 @@ def upload_portfolio_data(data, date, dry=False):
     pprint.pprint(diff_wallets)
 
     for provider in diff_wallets:
-        service = Service.objects.filter(
-            name="Wallet", provider__name__iexact=provider
-        ).first()
+        service = get_service(provider, None, dry)
         assert service
 
         wallet = Wallet.objects.filter(owner=user, service=service).first()
@@ -351,7 +342,7 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            if i < 61:
+            if i < 3:
                 continue
             repo.head.reference = commit
 
@@ -360,12 +351,12 @@ class Command(BaseCommand):
             date = datetime.date.fromtimestamp(commit.committed_date)
             print(f"{i}: {id} - {msg} - {date}")
 
-            # file_path = "oracle/wallets.toml"
-            # file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
-            # upload_wallet_data(file_contents, date, dry)
+            file_path = "oracle/wallets.toml"
+            file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
+            upload_wallet_data(file_contents, date, dry)
 
             file_path = "account/portfolio.toml"
             file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
             upload_portfolio_data(file_contents, date, dry)
-            if i >= 61:
-                break
+            # if i >= 2:
+            #     break

@@ -27,7 +27,7 @@ COINS = [
     ["xrp", "ripple"],
     ["grt", "the-graph"],
     "sushi",
-    "AVAX",
+    "avax",
     ["one", "harmony"],
     "icx",
     "sol",
@@ -59,11 +59,14 @@ COINS = [
     "qtum",
     ["ogn", "origin-protocol"],
     ["stmx", "storm"],
+    "near",
+    ["hbar", "hedera-hashgraph"],
 ]
 
 
 def activate_crypto_assets():
-    Asset.objects.all().update(active=False)
+    crypto = Category.objects.get(name="crypto")
+    Asset.objects.filter(categories__in=[crypto]).update(active=False)
 
     for key in COINS:
         if type(key) is str:
