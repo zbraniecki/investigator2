@@ -30,6 +30,12 @@ PROVIDER_MAP = {
     "coinbasepro": "Coinbase Pro",
     "celo": "Valora",
     "binance.us": "Binance US",
+    "avawallet": "AVA Wallet",
+    "icp/nns": "ICP Nervous Network System",
+    "myalgo": "My Algo",
+    "oasis_wallet": "Oasis Wallet",
+    "pool-x": "Pool X",
+    "myicon": "MyICON Wallet",
 }
 
 
@@ -41,8 +47,8 @@ def normalize_symbol(input):
 
 
 def normalize_provider(input):
-    if input in PROVIDER_MAP:
-        return PROVIDER_MAP[input]
+    if input.lower() in PROVIDER_MAP:
+        return PROVIDER_MAP[input.lower()]
     else:
         return input
 
@@ -162,11 +168,6 @@ def upload_wallet_data(data, date, dry=False):
 
 
 def match_holding(holdings, input):
-    # XXX: We should get all holdings in a given wallet of a given asset
-    # and all inputs and match them and then only take the leftovers
-    # as remove / add
-    # We also want to cross all assets across wallets, and all assets within a wallet
-    # for transfer vs sell/buy.
     current_holding = None
     current_delta = None
     for holding in holdings:
@@ -342,8 +343,8 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            if i < 3:
-                continue
+            # if i < 3:
+            #     continue
             repo.head.reference = commit
 
             id = commit.hexsha
