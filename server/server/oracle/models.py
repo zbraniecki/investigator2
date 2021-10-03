@@ -98,32 +98,13 @@ class Passive(models.Model):
         max_length=3,
         choices=PassiveType.choices,
     )
-
-    def __str__(self):
-        return (
-            f"{self.service} {self.asset.symbol.upper()} {PassiveType(self.type).label}"
-        )
-
-
-class PassiveValue(models.Model):
-    passive = models.ForeignKey(
-        Passive, related_name="values", on_delete=models.CASCADE, blank=True, null=True
-    )
+    name = models.CharField(max_length=100, blank=True, null=True)
     min = models.FloatField(blank=True, null=True)
     max = models.FloatField(blank=True, null=True)
     apy_min = models.FloatField()
     apy_max = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        if self.passive:
-            passive = self.passive
-        else:
-            change = PassiveChange.objects.filter(value=self).first()
-            if change:
-                passive = change.passive
-            else:
-                passive = "(Detached from Passive)"
-
         if self.min and self.max:
             rng = f" ({self.min}-{self.max})"
         elif self.min and not self.max:
@@ -141,7 +122,13 @@ class PassiveValue(models.Model):
             apy = f"-{percent(self.apy_max)}"
         else:
             apy = ""
-        return f"{passive} - {apy}"
+        return f"{self.service} {self.asset.symbol.upper()} {PassiveType(self.type).label} {rng} - {apy}"
+
+
+class PassiveChangeType(models.TextChoices):
+    ADDED = "ADD", "Added"
+    REMOVED = "REM", "Removed"
+    CHANGED = "CHG", "Changed"
 
 
 class PassiveChange(models.Model):
@@ -149,9 +136,14 @@ class PassiveChange(models.Model):
         Passive, related_name="history", on_delete=models.CASCADE
     )
     date = models.DateField()
-    value = models.ForeignKey(
-        PassiveValue, related_name="change", on_delete=models.CASCADE
+    type = models.CharField(
+        max_length=3,
+        choices=PassiveChangeType.choices,
     )
+    apy_min_change = models.FloatField(blank=True, null=True)
+    apy_max_change = models.FloatField(blank=True, null=True)
+    min_change = models.FloatField(blank=True, null=True)
+    max_change = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.passive} {self.date} {self.value}"
+        return f"{self.passive} {self.date} {self.type}"

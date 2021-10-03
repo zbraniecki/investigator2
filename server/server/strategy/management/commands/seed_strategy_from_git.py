@@ -21,6 +21,7 @@ import datetime
 import toml
 import pprint
 
+
 def upload_strategy_data(data, date, dry=False):
     parsed_toml = toml.loads(data)
     coins = parsed_toml["coin"]
@@ -32,11 +33,7 @@ def upload_strategy_data(data, date, dry=False):
     for coin in coins:
         asset = Asset.objects.get(symbol__iexact=coin["symbol"])
 
-        target = StrategyTarget(
-            strategy=strat,
-            asset=asset,
-            percent=coin["percent"]
-        )
+        target = StrategyTarget(strategy=strat, asset=asset, percent=coin["percent"])
         target.save()
 
 

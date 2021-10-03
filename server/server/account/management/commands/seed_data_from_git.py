@@ -6,7 +6,7 @@ from server.oracle.models import (
     Passive,
     PassiveType,
     PassiveChange,
-    PassiveValue,
+    PassiveChangeType,
 )
 
 from server.account.models import (
@@ -22,7 +22,10 @@ from git import Repo
 import datetime
 import toml
 import pprint
+from decimal import *
 from .helpers import find_matches
+
+getcontext().prec = 2
 
 SYMBOL_MAP = {"eth2": "eth"}
 
@@ -51,6 +54,14 @@ def normalize_provider(input):
         return PROVIDER_MAP[input.lower()]
     else:
         return input
+
+
+def opt2val(opt):
+    return Decimal(0 if opt is None else opt)
+
+
+def val2opt(val):
+    return None if val == 0 else Decimal(val)
 
 
 def populate_service_assets(service, data, dry=False):
@@ -108,51 +119,49 @@ def populate_service_apy(service, data, date, dry=False):
         else:
             type = PassiveType.INTEREST
 
-        passive = Passive.objects.filter(
+        passives = Passive.objects.filter(
             service=service,
             asset=asset,
-        ).first()
+        )
 
-        if passive:
-            if passive.type != type:
-                if not dry:
-                    passive.type = type
-                    passive.save()
-        else:
+        if len(passives) == 0:
             print(f"Adding new passive for service {service} - {asset.symbol}")
             if not dry:
-                passive = Passive(service=service, asset=asset, type=type)
+                passive = Passive(
+                    service=service,
+                    asset=asset,
+                    type=type,
+                    apy_min=apy_min,
+                    apy_max=apy_max,
+                )
                 passive.save()
-
-        previous_passive = (
-            PassiveChange.objects.filter(passive=passive, date__lte=date)
-            .order_by("-date")
-            .first()
-        )
-        if previous_passive:
-            if previous_passive.date == date or (
-                previous_passive.value.apy_min == apy_min
-                and previous_passive.value.apy_max == apy_max
-            ):
-                continue
-        print(
-            f"Adding new passive change for {passive} at {date} for {apy_min}-{apy_max}"
-        )
-
-        if not dry:
-            passive.values.clear()
-
-            passive_value = PassiveValue(
-                passive=passive,
-                apy_min=apy_min,
-                apy_max=apy_max,
-            )
-            passive_value.save()
-
-            passive_change = PassiveChange(
-                passive=passive, date=date, value=passive_value
-            )
-            passive_change.save()
+                change = PassiveChange(
+                    passive=passive, date=date, type=PassiveChangeType.ADDED
+                )
+                change.save()
+        elif len(passives) == 1:
+            passive = passives.first()
+            if passive.apy_min != apy_min or passive.apy_max != apy_max:
+                apy_min_change = opt2val(apy_min) - opt2val(passive.apy_min)
+                apy_max_change = opt2val(apy_max) - opt2val(passive.apy_max)
+                passive.apy_min = apy_min
+                passive.apy_max = apy_max
+                print(
+                    f"Changing passive for service {service} - {asset.symbol} by {apy_min_change}-{apy_max_change}"
+                )
+                if not dry:
+                    passive.save()
+                change = PassiveChange(
+                    passive=passive,
+                    date=date,
+                    type=PassiveChangeType.CHANGED,
+                    apy_min_change=val2opt(apy_min_change),
+                    apy_max_change=val2opt(apy_max_change),
+                )
+                if not dry:
+                    change.save()
+        else:
+            pass
 
 
 def upload_wallet_data(data, date, dry=False):
@@ -352,9 +361,9 @@ class Command(BaseCommand):
             date = datetime.date.fromtimestamp(commit.committed_date)
             print(f"{i}: {id} - {msg} - {date}")
 
-            file_path = "oracle/wallets.toml"
-            file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
-            upload_wallet_data(file_contents, date, dry)
+            # file_path = "oracle/wallets.toml"
+            # file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
+            # upload_wallet_data(file_contents, date, dry)
 
             file_path = "account/portfolio.toml"
             file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))

@@ -32,13 +32,13 @@ class StrategyTarget(models.Model):
             return f"{self.strategy} - {self.portfolio}"
 
 
-class StrategyAdjustment(models.Model):
+class StrategyChange(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     target = models.ForeignKey(
-        StrategyTarget, related_name="adjustments", on_delete=models.CASCADE
+        StrategyTarget, related_name="changes", on_delete=models.CASCADE
     )
-    percent = models.FloatField()
-    timestamp = models.DateTimeField()
+    change = models.FloatField()
+    timestamp = models.DateField()
 
     def __str__(self):
         return f"{self.strategy} - {self.timestamp}"

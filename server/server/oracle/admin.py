@@ -8,7 +8,6 @@ from .models import (
     Service,
     Passive,
     PassiveChange,
-    PassiveValue,
 )
 
 
@@ -33,31 +32,57 @@ class PassiveChangeInline(admin.TabularInline):
     ordering = ("-date",)
 
 
-class PassiveValueInline(admin.TabularInline):
-    model = PassiveValue
-
-
-@admin.register(PassiveValue)
-class PassiveValueAdmin(admin.ModelAdmin):
-    list_display = ("passive", "min", "max", "apy_min", "apy_max")
-    ordering = ("passive",)
-
-
 @admin.register(PassiveChange)
 class PassiveChangeAdmin(admin.ModelAdmin):
-    list_display = ("passive", "date", "value")
-    ordering = (
-        "passive",
-        "-date",
+    list_display = (
+        "service",
+        "symbol",
+        "date",
+        "type",
+        "apy_min_change",
+        "apy_max_change",
+        "min_change",
+        "max_change",
     )
+    ordering = (
+        "-date",
+        "passive__service",
+        "passive__asset__symbol",
+        "apy_min_change",
+    )
+
+    def service(self, obj):
+        return f"{obj.passive.service}"
+
+    def symbol(self, obj):
+        return f"{obj.passive.asset.symbol.upper()}"
 
 
 @admin.register(Passive)
 class PassiveAdmin(admin.ModelAdmin):
-    inlines = [PassiveValueInline, PassiveChangeInline]
-    list_display = ("service", "asset", "type")
+    inlines = [PassiveChangeInline]
+    list_display = (
+        "service",
+        "symbol",
+        "type",
+        "name",
+        "min",
+        "max",
+        "apy_min",
+        "apy_max",
+    )
     list_filter = ("service", "asset")
     search_fields = ["service", "asset"]
+    ordering = (
+        "service",
+        "asset",
+        "name",
+        "min",
+        "max",
+    )
+
+    def symbol(self, obj):
+        return f"{obj.asset.symbol.upper()}"
 
 
 admin.site.register(Category)

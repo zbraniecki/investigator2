@@ -64,11 +64,10 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
         result = []
 
         for passive in passives:
-            value = passive.values.first()
             result.append(
                 {
                     "symbol": passive.asset.symbol,
-                    "apy": value.apy_min,
+                    "apy": passive.apy_min,
                     "yield_type": "interest",
                 }
             )
