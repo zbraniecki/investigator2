@@ -95,7 +95,7 @@ def get_service(name, url=None, dry=False):
     return service
 
 
-def populate_service_apy(service, data, date, dry=False):
+def populate_service_apy(service, data, dt, dry=False):
     registered_assets = Asset.objects.filter(service__in=[service])
     registered_symbols = [asset.symbol for asset in registered_assets]
 
@@ -136,7 +136,7 @@ def populate_service_apy(service, data, date, dry=False):
                 )
                 passive.save()
                 change = PassiveChange(
-                    passive=passive, date=date, type=PassiveChangeType.ADDED
+                    passive=passive, date=dt.date(), type=PassiveChangeType.ADDED
                 )
                 change.save()
         elif len(passives) == 1:
@@ -153,7 +153,7 @@ def populate_service_apy(service, data, date, dry=False):
                     passive.save()
                 change = PassiveChange(
                     passive=passive,
-                    date=date,
+                    date=dt.date(),
                     type=PassiveChangeType.CHANGED,
                     apy_min_change=val2opt(apy_min_change),
                     apy_max_change=val2opt(apy_max_change),
@@ -164,7 +164,7 @@ def populate_service_apy(service, data, date, dry=False):
             pass
 
 
-def upload_wallet_data(data, date, dry=False):
+def upload_wallet_data(data, dt, dry=False):
     parsed_toml = toml.loads(data)
     wallets = parsed_toml["wallet"]
     for wallet in wallets:
@@ -173,7 +173,7 @@ def upload_wallet_data(data, date, dry=False):
         service = get_service(wallet["name"], wallet["url"], dry)
         assert service
         populate_service_assets(service, wallet, dry)
-        populate_service_apy(service, wallet, date, dry)
+        populate_service_apy(service, wallet, dt, dry)
 
 
 def match_holding(holdings, input):
@@ -197,7 +197,7 @@ def add_asset_diff(diff, wallet, symbol, type, quantity):
     diff[wallet][symbol][type].append(quantity)
 
 
-def upload_portfolio_data(data, date, dry=False):
+def upload_portfolio_data(data, dt, dry=False):
     parsed_toml = toml.loads(data)
     inputs = parsed_toml["holding"]
 
@@ -317,15 +317,38 @@ def upload_portfolio_data(data, date, dry=False):
                     holding = Holding(asset=asset, wallet=wallet, quantity=quantity)
                     if not dry:
                         holding.save()
+                    transaction = Transaction(
+                        wallet=wallet,
+                        asset=asset,
+                        quantity=quantity,
+                        type=TransactionType.DEPOSIT,
+                        timestamp=dt,
+                    )
+                    if not dry:
+                        transaction.save()
             if "change" in diff_wallets[provider][symbol]:
                 changes = diff_wallets[provider][symbol]["change"]
                 for change in changes:
                     holding = Holding.objects.get(
                         asset=asset, wallet=wallet, quantity=change[0]
                     )
+                    delta = Decimal(change[1]) - Decimal(change[0])
                     holding.quantity = change[1]
                     if not dry:
                         holding.save()
+
+                    assert delta != 0
+                    transaction = Transaction(
+                        wallet=wallet,
+                        asset=asset,
+                        quantity=abs(delta),
+                        type=TransactionType.DEPOSIT
+                        if delta > 0
+                        else TransactionType.WITHDRAW,
+                        timestamp=dt,
+                    )
+                    if not dry:
+                        transaction.save()
 
             if "delete" in diff_wallets[provider][symbol]:
                 for quantity in diff_wallets[provider][symbol]["delete"]:
@@ -334,6 +357,16 @@ def upload_portfolio_data(data, date, dry=False):
                     )
                     if not dry:
                         holding.delete()
+
+                    transaction = Transaction(
+                        wallet=wallet,
+                        asset=asset,
+                        quantity=quantity,
+                        type=TransactionType.WITHDRAW,
+                        timestamp=dt,
+                    )
+                    if not dry:
+                        transaction.save()
 
 
 class Command(BaseCommand):
@@ -352,21 +385,21 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            # if i < 3:
+            # if i < 5:
             #     continue
             repo.head.reference = commit
 
             id = commit.hexsha
             msg = commit.message
-            date = datetime.date.fromtimestamp(commit.committed_date)
-            print(f"{i}: {id} - {msg} - {date}")
+            dt = datetime.datetime.fromtimestamp(commit.committed_date)
+            print(f"{i}: {id} - {msg} - {dt}")
 
             # file_path = "oracle/wallets.toml"
             # file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
-            # upload_wallet_data(file_contents, date, dry)
+            # upload_wallet_data(file_contents, dt, dry)
 
             file_path = "account/portfolio.toml"
             file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
-            upload_portfolio_data(file_contents, date, dry)
-            # if i >= 2:
+            upload_portfolio_data(file_contents, dt, dry)
+            # if i >= 5:
             #     break

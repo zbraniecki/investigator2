@@ -7,10 +7,15 @@ class HoldingInline(admin.TabularInline):
     model = Holding
 
 
+class TransactionInline(admin.TabularInline):
+    model = Transaction
+
+
 @admin.register(Wallet)
-class AssetAdmin(admin.ModelAdmin):
+class WalletAdmin(admin.ModelAdmin):
     inlines = [
         HoldingInline,
+        TransactionInline,
     ]
     list_display = ("service", "owner")
     list_filter = ("service", "owner")

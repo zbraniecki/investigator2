@@ -54,12 +54,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_currency(self, obj):
         today = datetime.today()
-        passives = Passive.objects.filter(
-            Q(service=obj)
-            # & (Q(date_start__lte=today) | Q(date_start__isnull=True))
-            # & (Q(date_end__gte=today) | Q(date_end__isnull=True))
-        )
-        print(passives)
+        passives = Passive.objects.filter(service=obj)
 
         result = []
 
@@ -73,12 +68,3 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
             )
 
         return result
-
-        # return [
-        #     {
-        #         "symbol": passive.asset.symbol,
-        #         "apy": passive.apy,
-        #         "yield_type": "interest",
-        #     }
-        #     for passive in passives
-        # ]

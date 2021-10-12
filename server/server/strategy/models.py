@@ -41,4 +41,4 @@ class StrategyChange(models.Model):
     timestamp = models.DateField()
 
     def __str__(self):
-        return f"{self.strategy} - {self.timestamp}"
+        return f"{self.target.asset} - {self.change} - {self.timestamp}"
