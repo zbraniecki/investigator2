@@ -14,11 +14,16 @@ class StrategySerializer(serializers.HyperlinkedModelSerializer):
         return f"{obj.portfolio.id}"
 
     def get_targets(self, obj):
-        return [
-            {
-                "symbol": target.asset.symbol,
-                "contains": [],
-                "percent": target.percent,
-            }
-            for target in obj.targets.all()
-        ]
+        result = []
+        for target in obj.targets.all():
+            contains = []
+            for asset in target.contains.all():
+                contains.append(asset.symbol)
+            result.append(
+                {
+                    "symbol": target.asset.symbol,
+                    "contains": contains,
+                    "percent": target.percent,
+                }
+            )
+        return result

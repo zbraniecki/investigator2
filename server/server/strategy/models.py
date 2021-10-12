@@ -21,6 +21,7 @@ class StrategyTarget(models.Model):
     )
     percent = models.FloatField()
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, blank=True, null=True)
+    contains = models.ManyToManyField(Asset, related_name="+", blank=True)
     portfolio = models.ForeignKey(
         Portfolio, on_delete=models.CASCADE, blank=True, null=True
     )

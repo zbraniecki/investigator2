@@ -40,10 +40,10 @@ class TransactionType(models.TextChoices):
     SELL = "SL", "Sell"
     WITHDRAW = "WD", "Withdraw"
     DEPOSIT = "DP", "Deposit"
+    INTEREST = "IN", "Interest"
 
 
 class Transaction(models.Model):
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     asset = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
@@ -78,7 +78,6 @@ class Portfolio(models.Model):
         return f"{self.name} ({self.owner})"
 
 
-# XXX: Should this be shared between Portfolio, Watchlist and Strategy?
 class WatchlistType(models.TextChoices):
     ASSETS = "AS", "Assets"
     PORTFOLIO = "PL", "Portfolio"
