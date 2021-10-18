@@ -394,9 +394,9 @@ class Command(BaseCommand):
             dt = datetime.datetime.fromtimestamp(commit.committed_date)
             print(f"{i}: {id} - {msg} - {dt}")
 
-            # file_path = "oracle/wallets.toml"
-            # file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
-            # upload_wallet_data(file_contents, dt, dry)
+            file_path = "oracle/wallets.toml"
+            file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
+            upload_wallet_data(file_contents, dt, dry)
 
             file_path = "account/portfolio.toml"
             file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))

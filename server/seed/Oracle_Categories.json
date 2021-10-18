@@ -1,1 +1,1 @@
-[{"model": "oracle.category", "pk": "crypto", "fields": {"name": "crypto"}}, {"model": "oracle.category", "pk": "fiat", "fields": {"name": "fiat"}}]
+[{"model": "oracle.category", "pk": "crypto", "fields": {"name": "crypto"}}, {"model": "oracle.category", "pk": "fiat", "fields": {"name": "fiat"}}, {"model": "oracle.asset", "pk": "zec", "fields": {"symbol": "usd", "name": "US Dollar", "api_id": null, "active": true, "categories": ["fiat"]}}]
