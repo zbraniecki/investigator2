@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import (
     Category,
     Asset,
+    InflationChange,
     Price,
     Provider,
     Service,
@@ -83,6 +84,11 @@ class PassiveAdmin(admin.ModelAdmin):
 
     def symbol(self, obj):
         return f"{obj.asset.symbol.upper()}"
+
+
+@admin.register(InflationChange)
+class AssetAdmin(admin.ModelAdmin):
+    pass
 
 
 admin.site.register(Category)

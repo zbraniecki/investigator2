@@ -44,9 +44,21 @@ class Asset(models.Model):
     categories = models.ManyToManyField(Category)
     api_id = models.CharField(max_length=100, blank=True, null=True)
     active = models.BooleanField(default=False)
+    inflation = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} ({self.symbol})"
+
+
+class InflationChange(models.Model):
+    asset = models.ForeignKey(
+        Asset, related_name="inflation_changes", on_delete=models.CASCADE
+    )
+    change = models.FloatField()
+    timestamp = models.DateField()
+
+    def __str__(self):
+        return f"{self.asset} - {self.change} - {self.timestamp}"
 
 
 class Price(models.Model):
