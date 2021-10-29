@@ -8,11 +8,14 @@ from server.strategy import views as strategy_views
 router = routers.DefaultRouter()
 router.register(r"categories", oracle_views.CategoryViewSet)
 router.register(r"assets", oracle_views.AssetViewSet)
-router.register(r"oracle/prices", oracle_views.PriceViewSet)
+router.register(r"oracle/assets", oracle_views.PriceViewSet)
 router.register(r"oracle/wallets", oracle_views.ServiceViewSet)
+router.register(
+    r"oracle/watchlists", oracle_views.PublicWatchlistsViewSet, "public-watchlists"
+)
+router.register(r"account/watchlist", account_views.WatchlistViewSet)
 router.register(r"account/portfolio", account_views.PortfolioViewSet)
 router.register(r"account/holding", account_views.HoldingViewSet)
-router.register(r"account/watchlist", account_views.WatchlistViewSet)
 router.register(r"strategy/list", strategy_views.StrategyViewSet)
 
 urlpatterns = [

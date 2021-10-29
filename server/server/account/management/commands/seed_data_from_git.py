@@ -385,7 +385,7 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            # if i < 5:
+            # if i < 75:
             #     continue
             repo.head.reference = commit
 

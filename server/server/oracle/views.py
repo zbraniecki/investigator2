@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from .models import Category, Asset, Price, Service
+from server.account.models import Watchlist
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import (
@@ -8,6 +9,7 @@ from .serializers import (
     AssetSerializer,
     PriceSerializer,
     ServiceSerializer,
+    PublicWatchlistSerializer,
 )
 
 
@@ -49,3 +51,12 @@ class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all().order_by("-name")
     serializer_class = ServiceSerializer
     # permission_classes = [permissions.IsAuthenticated]
+
+
+class PublicWatchlistsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows public watchlists to be viewed.
+    """
+
+    queryset = Watchlist.objects.filter(owner__isnull=True).order_by("-name")
+    serializer_class = PublicWatchlistSerializer

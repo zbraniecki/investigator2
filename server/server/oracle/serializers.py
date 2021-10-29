@@ -1,4 +1,5 @@
 from .models import Category, Asset, Price, Service, Passive
+from server.account.models import Watchlist, WatchlistType
 from rest_framework import serializers
 from django.db.models import Q
 from datetime import datetime
@@ -68,3 +69,21 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
             )
 
         return result
+
+
+class PublicWatchlistSerializer(serializers.HyperlinkedModelSerializer):
+    assets = serializers.SerializerMethodField("get_assets")
+    type = serializers.SerializerMethodField("get_type")
+
+    class Meta:
+        model = Watchlist
+        fields = ["id", "name", "type", "assets"]
+
+    def get_type(self, obj):
+        return "smart"
+
+    def get_assets(self, obj):
+        if obj.type == WatchlistType.SMART:
+            if obj.smart == "top30":
+                return ["btc", "eth", "ada"]
+        return []

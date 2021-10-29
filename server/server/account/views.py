@@ -31,6 +31,6 @@ class WatchlistViewSet(viewsets.ModelViewSet):
     API endpoint that allows watchlists to be viewed or edited.
     """
 
-    queryset = Watchlist.objects.all().order_by("id")
+    queryset = Watchlist.objects.filter(owner__isnull=False).order_by("id")
     serializer_class = WatchlistSerializer
     # permission_classes = [permissions.IsAuthenticated]

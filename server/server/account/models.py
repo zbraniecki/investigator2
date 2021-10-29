@@ -86,7 +86,7 @@ class WatchlistType(models.TextChoices):
 
 class Watchlist(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=100)
     type = models.CharField(
         max_length=2,
