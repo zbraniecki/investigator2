@@ -26,6 +26,7 @@ class WalletAdmin(admin.ModelAdmin):
 @admin.register(Holding)
 class HoldingAdmin(admin.ModelAdmin):
     list_display = ("wallet", "asset", "quantity")
+    list_filter = ("wallet__service", "asset")
     autocomplete_fields = ["asset"]
     ordering = (
         "wallet",

@@ -30,15 +30,22 @@ getcontext().prec = 2
 SYMBOL_MAP = {"eth2": "eth"}
 
 PROVIDER_MAP = {
+    "icp nervous network system": "ICP NNS",
     "coinbasepro": "Coinbase Pro",
+    "coinbase pro": "Coinbase Pro",
     "celo": "Valora",
     "binance.us": "Binance US",
-    "avawallet": "AVA Wallet",
-    "icp/nns": "ICP Nervous Network System",
-    "myalgo": "My Algo",
-    "oasis_wallet": "Oasis Wallet",
+    "avawallet": "Avalanche",
+    "ava wallet": "Avalanche",
+    "icp/nns": "ICP NNS",
+    "myalgo": "Algorand",
+    "my algo": "Algorand",
+    "oasis_wallet": "Oasis",
     "pool-x": "Pool X",
-    "myicon": "MyICON Wallet",
+    "myicon": "MyIcon",
+    "keplr": "Keplr",
+    "polkadot": "Polkadot",
+    "dockio": "Dock",
 }
 
 
@@ -53,7 +60,10 @@ def normalize_provider(input):
     if input.lower() in PROVIDER_MAP:
         return PROVIDER_MAP[input.lower()]
     else:
-        return input
+        if input.endswith(" Wallet"):
+            return input[:-7].title()
+        else:
+            return input.title()
 
 
 def opt2val(opt):
@@ -73,9 +83,10 @@ def populate_service_assets(service, data, dry=False):
         if symbol not in registered_symbols:
             asset = Asset.objects.filter(symbol__iexact=symbol).first()
             assert asset
-            print(f"Adding asset {asset.symbol} to {service.name}")
+            print(f"Adding asset {asset.symbol} to {service}")
             if not dry:
                 service.assets.add(asset)
+                service.save()
 
 
 def get_service(name, url=None, dry=False):

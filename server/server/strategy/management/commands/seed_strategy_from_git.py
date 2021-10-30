@@ -9,6 +9,7 @@ from server.account.models import (
     User,
     Wallet,
     Holding,
+    Portfolio,
 )
 from server.strategy.models import (
     Strategy,
@@ -31,7 +32,15 @@ def upload_strategy_data(data, dt, dry=False):
     coins = parsed_toml["coin"]
 
     user = User.objects.get(username="zbraniecki")
-    strat = Strategy.objects.get(owner=user)
+    strat = Strategy.objects.filter(owner=user).first()
+    if not strat:
+        portfolio = Portfolio.objects.get(name__iexact="crypto")
+        strat = Strategy(
+            name="crypto",
+            owner=user,
+            portfolio=portfolio,
+        )
+        strat.save()
     assert strat
 
     for coin in coins:

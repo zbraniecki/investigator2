@@ -9,6 +9,7 @@ from django.core.management.base import BaseCommand
 from decimal import *
 import datetime
 import json
+import toml
 
 getcontext().prec = 2
 
@@ -35,4 +36,5 @@ class Command(BaseCommand):
                 "wallet": wallet,
             }
             result.append(entry)
-        print(json.dumps(result, indent=2))
+        # print(json.dumps(result, indent=2))
+        print(toml.dumps({"holding": result}))
