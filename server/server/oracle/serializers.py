@@ -3,6 +3,7 @@ from server.account.models import Watchlist, WatchlistType
 from rest_framework import serializers
 from django.db.models import Q
 from datetime import datetime
+from .dynamic_lists import get_dynamic_assets
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
@@ -84,6 +85,6 @@ class PublicWatchlistSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_assets(self, obj):
         if obj.type == WatchlistType.SMART:
-            if obj.smart == "top30":
-                return ["btc", "eth", "ada"]
-        return []
+            return get_dynamic_assets(obj.smart)
+        else:
+            return []

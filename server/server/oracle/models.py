@@ -61,6 +61,7 @@ class InflationChange(models.Model):
         return f"{self.asset} - {self.change} - {self.timestamp}"
 
 
+# XXX: AssetInfo separate from PricePair?
 class Price(models.Model):
     asset = models.ForeignKey(Asset, related_name="price", on_delete=models.CASCADE)
     base = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)

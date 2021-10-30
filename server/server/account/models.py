@@ -81,7 +81,7 @@ class Portfolio(models.Model):
 class WatchlistType(models.TextChoices):
     ASSETS = "AS", "Assets"
     PORTFOLIO = "PL", "Portfolio"
-    SMART = "SM", "Smart"
+    SMART = "SM", "Smart"  # XXX: Dynamic
 
 
 class Watchlist(models.Model):
