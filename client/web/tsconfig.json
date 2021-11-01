@@ -1,10 +1,11 @@
 {
 "compilerOptions": {
+  "lib": ["es2021", "dom"],
   "noImplicitAny": true,
-  "removeComments": true,
-  "preserveConstEnums": true,
-  "sourceMap": true,
-  "esModuleInterop": true,
+  "noImplicitThis": true,
+  "strictNullChecks": true,
+  "noEmit": true,
+  "allowSyntheticDefaultImports": true,
   "skipLibCheck": true,
   "jsx": "react-jsx"
 },

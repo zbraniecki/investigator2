@@ -1,9 +1,12 @@
-import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+// import Typography from "@mui/material/Typography";
+// import InvestigatorAppBar from "./ui/AppBar";
+// import InvestigatorDrawer from "./ui/Drawer";
+// import Content from "./ui/Content";
 
-function test(input: String) {
-  return input;
-}
-
-export function App() {
-  return <Button variant="contained">{test("Hello World")}</Button>;
+export default function App() {
+  // <InvestigatorDrawer></InvestigatorDrawer>
+  // <InvestigatorAppBar></InvestigatorAppBar>
+  // <Content></Content>
+  return <Box sx={{ display: "flex" }} />;
 }
