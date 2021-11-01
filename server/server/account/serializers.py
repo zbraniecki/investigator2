@@ -55,8 +55,15 @@ class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class AccountSerializer(serializers.HyperlinkedModelSerializer):
+    name = serializers.SerializerMethodField("get_name")
     holdings = HoldingSerializer(many=True, read_only=True)
 
     class Meta:
         model = Account
         fields = ["id", "name", "service", "holdings"]
+
+    def get_name(self, obj):
+        if obj.name:
+            return obj.name
+        else:
+            return obj.service.__str__()
