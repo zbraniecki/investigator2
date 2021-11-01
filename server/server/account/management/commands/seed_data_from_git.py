@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from server.oracle.models import (
     Provider,
     Service,
+    ServiceType,
     Asset,
     Passive,
     PassiveType,
@@ -11,7 +12,7 @@ from server.oracle.models import (
 
 from server.account.models import (
     User,
-    Wallet,
+    Account,
     Holding,
     Transaction,
     TransactionType,
@@ -97,11 +98,11 @@ def get_service(name, url=None, dry=False):
         if not dry:
             provider = Provider(name=name, url=url)
             provider.save()
-    service = Service.objects.filter(provider=provider, name__iexact="Wallet").first()
+    service = Service.objects.filter(provider=provider, type=ServiceType.WALLET).first()
     if not service:
         print(f"Adding Service: {name} Wallet")
         if not dry:
-            service = Service(provider=provider, name="Wallet")
+            service = Service(provider=provider, type=ServiceType.WALLET)
             service.save()
     return service
 
@@ -177,14 +178,14 @@ def populate_service_apy(service, data, dt, dry=False):
 
 def upload_wallet_data(data, dt, dry=False):
     parsed_toml = toml.loads(data)
-    wallets = parsed_toml["wallet"]
-    for wallet in wallets:
-        # if wallet["name"] != "Yoroi":
+    accounts = parsed_toml["wallet"]
+    for account in accounts:
+        # if account["name"] != "Yoroi":
         #     continue
-        service = get_service(wallet["name"], wallet["url"], dry)
+        service = get_service(account["name"], account["url"], dry)
         assert service
-        populate_service_assets(service, wallet, dry)
-        populate_service_apy(service, wallet, dt, dry)
+        populate_service_assets(service, account, dry)
+        populate_service_apy(service, account, dt, dry)
 
 
 def match_holding(holdings, input):
@@ -198,67 +199,67 @@ def match_holding(holdings, input):
     return current_holding
 
 
-def add_asset_diff(diff, wallet, symbol, type, quantity):
-    if wallet not in diff:
-        diff[wallet] = {}
-    if symbol not in diff[wallet]:
-        diff[wallet][symbol] = {}
-    if type not in diff[wallet][symbol]:
-        diff[wallet][symbol][type] = []
-    diff[wallet][symbol][type].append(quantity)
+def add_asset_diff(diff, account, symbol, type, quantity):
+    if account not in diff:
+        diff[account] = {}
+    if symbol not in diff[account]:
+        diff[account][symbol] = {}
+    if type not in diff[account][symbol]:
+        diff[account][symbol][type] = []
+    diff[account][symbol][type].append(quantity)
 
 
 def upload_portfolio_data(data, dt, dry=False):
     parsed_toml = toml.loads(data)
     inputs = parsed_toml["holding"]
 
-    input_wallets = {}
-    current_wallets = {}
+    input_accounts = {}
+    current_accounts = {}
 
-    diff_wallets = {}
+    diff_accounts = {}
 
     for input in inputs:
         name = normalize_provider(input["wallet"]).lower()
         symbol = normalize_symbol(input["symbol"]).lower()
         quantity = input["quantity"]
-        if name not in input_wallets:
-            input_wallets[name] = {}
-        if symbol not in input_wallets[name]:
-            input_wallets[name][symbol] = []
-        input_wallets[name][symbol].append(quantity)
+        if name not in input_accounts:
+            input_accounts[name] = {}
+        if symbol not in input_accounts[name]:
+            input_accounts[name][symbol] = []
+        input_accounts[name][symbol].append(quantity)
 
-    # pprint.pprint(input_wallets)
+    # pprint.pprint(input_accounts)
 
     user = User.objects.get(username="zbraniecki")
     assert user
 
-    wallets = Wallet.objects.filter(owner=user)
+    accounts = Account.objects.filter(owner=user)
 
-    for wallet in wallets:
-        name = wallet.service.provider.name.lower()
-        current_wallets[name] = {}
+    for account in accounts:
+        name = account.service.provider.name.lower()
+        current_accounts[name] = {}
 
-        holdings = wallet.holdings.all()
+        holdings = account.holdings.all()
         for holding in holdings:
             symbol = holding.asset.symbol.lower()
-            if symbol not in current_wallets[name]:
-                current_wallets[name][symbol] = []
-            current_wallets[name][symbol].append(holding.quantity)
+            if symbol not in current_accounts[name]:
+                current_accounts[name][symbol] = []
+            current_accounts[name][symbol].append(holding.quantity)
 
-    # pprint.pprint(current_wallets)
+    # pprint.pprint(current_accounts)
 
-    for provider in input_wallets:
-        if provider not in current_wallets:
-            wallet = input_wallets[provider]
-            for symbol in wallet:
-                for quantity in wallet[symbol]:
-                    add_asset_diff(diff_wallets, provider, symbol, "add", quantity)
+    for provider in input_accounts:
+        if provider not in current_accounts:
+            account = input_accounts[provider]
+            for symbol in account:
+                for quantity in account[symbol]:
+                    add_asset_diff(diff_accounts, provider, symbol, "add", quantity)
         else:
-            for symbol in input_wallets[provider]:
-                input_values = input_wallets[provider][symbol]
+            for symbol in input_accounts[provider]:
+                input_values = input_accounts[provider][symbol]
                 current_values = (
-                    current_wallets[provider][symbol]
-                    if symbol in current_wallets[provider]
+                    current_accounts[provider][symbol]
+                    if symbol in current_accounts[provider]
                     else []
                 )
                 matches = find_matches(current_values, input_values)
@@ -267,7 +268,7 @@ def upload_portfolio_data(data, dt, dry=False):
                         if current_values[match[0]] == input_values[match[1]]:
                             continue
                         add_asset_diff(
-                            diff_wallets,
+                            diff_accounts,
                             provider,
                             symbol,
                             "change",
@@ -275,7 +276,7 @@ def upload_portfolio_data(data, dt, dry=False):
                         )
                     elif match[1] is not None:
                         add_asset_diff(
-                            diff_wallets,
+                            diff_accounts,
                             provider,
                             symbol,
                             "add",
@@ -283,53 +284,53 @@ def upload_portfolio_data(data, dt, dry=False):
                         )
                     elif match[0] is not None:
                         add_asset_diff(
-                            diff_wallets,
+                            diff_accounts,
                             provider,
                             symbol,
                             "delete",
                             current_values[match[0]],
                         )
 
-    for provider in current_wallets:
-        if provider not in input_wallets:
-            wallet = current_wallets[provider]
-            for symbol in wallet:
-                for quantity in wallet[symbol]:
-                    add_asset_diff(diff_wallets, provider, symbol, "delete", quantity)
+    for provider in current_accounts:
+        if provider not in input_accounts:
+            account = current_accounts[provider]
+            for symbol in account:
+                for quantity in account[symbol]:
+                    add_asset_diff(diff_accounts, provider, symbol, "delete", quantity)
         else:
-            for symbol in current_wallets[provider]:
-                if symbol not in input_wallets[provider]:
-                    for quantity in current_wallets[provider][symbol]:
+            for symbol in current_accounts[provider]:
+                if symbol not in input_accounts[provider]:
+                    for quantity in current_accounts[provider][symbol]:
                         add_asset_diff(
-                            diff_wallets, provider, symbol, "delete", quantity
+                            diff_accounts, provider, symbol, "delete", quantity
                         )
 
-    pprint.pprint(diff_wallets)
+    pprint.pprint(diff_accounts)
 
-    for provider in diff_wallets:
+    for provider in diff_accounts:
         service = get_service(provider, None, dry)
         assert service
 
-        wallet = Wallet.objects.filter(owner=user, service=service).first()
-        if not wallet:
-            wallet = Wallet(
+        account = Account.objects.filter(owner=user, service=service).first()
+        if not account:
+            account = Account(
                 owner=user,
                 service=service,
             )
             if not dry:
-                wallet.save()
+                account.save()
 
-        for symbol in diff_wallets[provider]:
+        for symbol in diff_accounts[provider]:
             asset = Asset.objects.filter(symbol__iexact=symbol).first()
             assert asset
 
-            if "add" in diff_wallets[provider][symbol]:
-                for quantity in diff_wallets[provider][symbol]["add"]:
-                    holding = Holding(asset=asset, wallet=wallet, quantity=quantity)
+            if "add" in diff_accounts[provider][symbol]:
+                for quantity in diff_accounts[provider][symbol]["add"]:
+                    holding = Holding(asset=asset, account=account, quantity=quantity)
                     if not dry:
                         holding.save()
                     transaction = Transaction(
-                        wallet=wallet,
+                        account=account,
                         asset=asset,
                         quantity=quantity,
                         type=TransactionType.DEPOSIT,
@@ -337,11 +338,11 @@ def upload_portfolio_data(data, dt, dry=False):
                     )
                     if not dry:
                         transaction.save()
-            if "change" in diff_wallets[provider][symbol]:
-                changes = diff_wallets[provider][symbol]["change"]
+            if "change" in diff_accounts[provider][symbol]:
+                changes = diff_accounts[provider][symbol]["change"]
                 for change in changes:
                     holding = Holding.objects.get(
-                        asset=asset, wallet=wallet, quantity=change[0]
+                        asset=asset, account=account, quantity=change[0]
                     )
                     delta = Decimal(change[1]) - Decimal(change[0])
                     holding.quantity = change[1]
@@ -350,7 +351,7 @@ def upload_portfolio_data(data, dt, dry=False):
 
                     assert delta != 0
                     transaction = Transaction(
-                        wallet=wallet,
+                        account=account,
                         asset=asset,
                         quantity=abs(delta),
                         type=TransactionType.DEPOSIT
@@ -361,16 +362,16 @@ def upload_portfolio_data(data, dt, dry=False):
                     if not dry:
                         transaction.save()
 
-            if "delete" in diff_wallets[provider][symbol]:
-                for quantity in diff_wallets[provider][symbol]["delete"]:
+            if "delete" in diff_accounts[provider][symbol]:
+                for quantity in diff_accounts[provider][symbol]["delete"]:
                     holding = Holding.objects.get(
-                        asset=asset, wallet=wallet, quantity=quantity
+                        asset=asset, account=account, quantity=quantity
                     )
                     if not dry:
                         holding.delete()
 
                     transaction = Transaction(
-                        wallet=wallet,
+                        account=account,
                         asset=asset,
                         quantity=quantity,
                         type=TransactionType.WITHDRAW,

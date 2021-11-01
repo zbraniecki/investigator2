@@ -1,9 +1,14 @@
 from django.shortcuts import render
 
-from .models import Portfolio, Holding, Watchlist
+from .models import Portfolio, Holding, Watchlist, Account
 from rest_framework import viewsets
 from rest_framework import permissions
-from .serializers import PortfolioSerializer, HoldingSerializer, WatchlistSerializer
+from .serializers import (
+    PortfolioSerializer,
+    HoldingSerializer,
+    WatchlistSerializer,
+    AccountSerializer,
+)
 
 
 class PortfolioViewSet(viewsets.ModelViewSet):
@@ -33,4 +38,14 @@ class WatchlistViewSet(viewsets.ModelViewSet):
 
     queryset = Watchlist.objects.filter(owner__isnull=False).order_by("id")
     serializer_class = WatchlistSerializer
+    # permission_classes = [permissions.IsAuthenticated]
+
+
+class AccountViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows accounts to be viewed or edited.
+    """
+
+    queryset = Account.objects.filter(owner__isnull=False).order_by("id")
+    serializer_class = AccountSerializer
     # permission_classes = [permissions.IsAuthenticated]

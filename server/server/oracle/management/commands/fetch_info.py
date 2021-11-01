@@ -1,13 +1,13 @@
 from django.contrib.auth.models import User
-from server.oracle.models import Asset, Category, Price
+from server.oracle.models import Asset, Category, AssetInfo
 from django.core.management.base import BaseCommand
 from django.utils.dateparse import parse_datetime
 import requests
 
-PRICE_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={IDS}&order=market_cap_desc&per_page=100&page=1&sparkline=false"
+INFO_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={IDS}&order=market_cap_desc&per_page=100&page=1&sparkline=false"
 
 # Limit is 50 so we have to loop it
-def fetch_crypto_prices():
+def fetch_crypto_info():
     asset_class = Category.objects.get(name="crypto")
     assets = Asset.objects.filter(categories__in=[asset_class])
 
@@ -20,7 +20,7 @@ def fetch_crypto_prices():
     base_asset = Asset.objects.get(symbol="usd")
 
     while len(ids) > 0:
-        url = PRICE_URL.replace("{IDS}", ",".join(ids))
+        url = INFO_URL.replace("{IDS}", ",".join(ids))
         sub_results = requests.get(url).json()
 
         results.extend(sub_results)
@@ -36,19 +36,19 @@ def fetch_crypto_prices():
     for result in results:
         asset = Asset.objects.get(api_id=result["id"])
 
-        price = Price.objects.filter(asset=asset, base=base_asset).first()
+        info = AssetInfo.objects.filter(asset=asset, base=base_asset).first()
 
-        if price:
-            price.value = result["current_price"]
-            price.market_cap = result["market_cap"]
-            price.price_change_percentage_24h = result["price_change_percentage_24h"]
-            price.market_change_cap_percentage_24h = result[
+        if info:
+            info.value = result["current_price"]
+            info.market_cap = result["market_cap"]
+            info.price_change_percentage_24h = result["price_change_percentage_24h"]
+            info.market_change_cap_percentage_24h = result[
                 "market_cap_change_percentage_24h"
             ]
-            price.last_updated = parse_datetime(result["last_updated"])
-            price.save()
+            info.last_updated = parse_datetime(result["last_updated"])
+            info.save()
         else:
-            price = Price(
+            info = AssetInfo(
                 asset=asset,
                 base=base_asset,
                 value=result["current_price"],
@@ -59,20 +59,20 @@ def fetch_crypto_prices():
                 ],
                 last_updated=parse_datetime(result["last_updated"]),
             )
-            price.save()
+            info.save()
 
 
 class Command(BaseCommand):
-    help = "Fetch prices by asset class"
+    help = "Fetch asset info by asset class"
     classes = ["crypto", "stock"]
 
     def add_arguments(self, parser):
-        parser.add_argument("class", type=str, help="Asset class to fetch prices of")
+        parser.add_argument("class", type=str, help="Asset class to fetch info of")
 
     def handle(self, *args, **kwargs):
         asset_class = kwargs["class"]
 
         if asset_class == "crypto":
-            fetch_crypto_prices()
+            fetch_crypto_info()
         else:
             raise Exception("Unknown asset class")

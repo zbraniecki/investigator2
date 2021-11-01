@@ -1,28 +1,36 @@
-from .models import Portfolio, Holding, Wallet, Watchlist, WatchlistType
+from .models import Portfolio, Holding, Account, Watchlist, WatchlistType
 from rest_framework import serializers
 
 
 class HoldingSerializer(serializers.HyperlinkedModelSerializer):
     symbol = serializers.SerializerMethodField("get_symbol")
-    wallet = serializers.SerializerMethodField("get_wallet")
+    account = serializers.SerializerMethodField("get_account")
 
     class Meta:
         model = Holding
-        fields = ["symbol", "quantity", "wallet"]
+        fields = ["symbol", "quantity", "account"]
 
     def get_symbol(self, obj):
         return obj.asset.symbol.lower()
 
-    def get_wallet(self, obj):
-        return obj.wallet.service.provider.name
+    def get_account(self, obj):
+        return obj.account.service.provider.name
 
 
 class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
     holdings = HoldingSerializer(many=True, read_only=True)
+    portfolios = serializers.SerializerMethodField("get_portfolios")
+    accounts = serializers.SerializerMethodField("get_accounts")
 
     class Meta:
         model = Portfolio
-        fields = ["id", "name", "holdings"]
+        fields = ["id", "name", "holdings", "portfolios", "accounts"]
+
+    def get_portfolios(self, obj):
+        return [p.id for p in obj.portfolios.all()]
+
+    def get_accounts(self, obj):
+        return [p.id for p in obj.accounts.all()]
 
 
 class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,7 +39,7 @@ class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Watchlist
-        fields = ["id", "name", "assets", "portfolio", "smart"]
+        fields = ["id", "name", "assets", "portfolio", "dynamic"]
 
     def get_portfolio(self, obj):
         if obj.type == WatchlistType.PORTFOLIO:
@@ -40,7 +48,15 @@ class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
             return None
 
     def get_assets(self, obj):
-        if obj.type == WatchlistType.SMART:
+        if obj.type == WatchlistType.DYNAMIC:
             return ["eth"]
         else:
             return [asset.symbol for asset in obj.assets.all()]
+
+
+class AccountSerializer(serializers.HyperlinkedModelSerializer):
+    holdings = HoldingSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Account
+        fields = ["id", "name", "service", "holdings"]

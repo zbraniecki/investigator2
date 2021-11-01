@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from server.strategy.models import Portfolio
 from server.account.models import (
     User,
-    Wallet,
     Holding,
 )
 from django.core.management.base import BaseCommand
@@ -43,7 +42,7 @@ def normalize_provider(input):
 
 def sort(obj):
     obj["holding"].sort(
-        key=lambda item: (item["wallet"], item["quantity"], item["symbol"])
+        key=lambda item: (item["account"], item["quantity"], item["symbol"])
     )
 
 
@@ -72,17 +71,17 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         path = kwargs["path"]
         user = User.objects.get(username="zbraniecki")
-        holdings = Holding.objects.filter(wallet__owner=user).order_by(
-            "wallet__service__provider__id", "-quantity", "asset__symbol"
+        holdings = Holding.objects.filter(account__owner=user).order_by(
+            "account__service__provider__id", "-quantity", "asset__symbol"
         )
 
         result = []
         for holding in holdings:
-            wallet = normalize_provider(holding.wallet.service.provider.id)
+            account = normalize_provider(holding.account.service.provider.id)
             entry = {
                 "symbol": normalize_symbol(holding.asset.symbol),
                 "quantity": float(holding.quantity),
-                "wallet": wallet,
+                "wallet": account,
             }
             result.append(entry)
         result = {"holding": result}

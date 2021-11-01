@@ -1,4 +1,4 @@
-from .models import Category, Asset, Price, Service, Passive
+from .models import Category, Asset, AssetInfo, Service, Passive
 from server.account.models import Watchlist, WatchlistType
 from rest_framework import serializers
 from django.db.models import Q
@@ -18,11 +18,11 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["symbol", "name"]
 
 
-class PriceSerializer(serializers.HyperlinkedModelSerializer):
+class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
     pair = serializers.SerializerMethodField("get_pair")
 
     class Meta:
-        model = Price
+        model = AssetInfo
         fields = [
             "value",
             "pair",
@@ -46,7 +46,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Service
-        fields = ["id", "name", "currency"]
+        fields = ["id", "name", "currency", "type"]
 
     def get_id(self, obj):
         return f"{obj.provider.name}"
@@ -81,10 +81,10 @@ class PublicWatchlistSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["id", "name", "type", "assets"]
 
     def get_type(self, obj):
-        return "smart"
+        return "dynamic"
 
     def get_assets(self, obj):
-        if obj.type == WatchlistType.SMART:
-            return get_dynamic_assets(obj.smart)
+        if obj.type == WatchlistType.DYNAMIC:
+            return get_dynamic_assets(obj.dynamic)
         else:
             return []

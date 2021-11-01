@@ -1,13 +1,13 @@
 from django.shortcuts import render
 
-from .models import Category, Asset, Price, Service
+from .models import Category, Asset, AssetInfo, Service
 from server.account.models import Watchlist
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import (
     CategorySerializer,
     AssetSerializer,
-    PriceSerializer,
+    AssetInfoSerializer,
     ServiceSerializer,
     PublicWatchlistSerializer,
 )
@@ -33,13 +33,13 @@ class AssetViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class PriceViewSet(viewsets.ModelViewSet):
+class AssetInfoViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows prices to be viewed or edited.
     """
 
-    queryset = Price.objects.all().order_by("-asset__symbol")
-    serializer_class = PriceSerializer
+    queryset = AssetInfo.objects.all().order_by("-asset__symbol")
+    serializer_class = AssetInfoSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
 

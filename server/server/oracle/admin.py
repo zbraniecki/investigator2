@@ -4,7 +4,7 @@ from .models import (
     Category,
     Asset,
     InflationChange,
-    Price,
+    AssetInfo,
     Provider,
     Service,
     Passive,
@@ -25,6 +25,9 @@ class PassiveInline(admin.TabularInline):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
+    list_display = ("provider", "type", "name")
+    list_filter = ("type", "provider")
+    search_fields = ["provider__name", "name", "type"]
     inlines = [PassiveInline]
 
 
@@ -92,5 +95,5 @@ class AssetAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Category)
-admin.site.register(Price)
+admin.site.register(AssetInfo)
 admin.site.register(Provider)
