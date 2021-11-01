@@ -1,0 +1,47 @@
+{
+  "name": "investigator",
+  "version": "2.0.0",
+  "description": "Investigator",
+  "source": "public/index.html",
+  "scripts": {
+    "start": "npx parcel",
+    "build": "npx parcel build",
+    "lint": "npx eslint 'src/**'",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "npx prettier src --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix"
+  },
+  "repository": "https://github.com/zbraniecki/investigator2",
+  "author": "Zibi Braniecki (zibi@braniecki.net)",
+  "license": "(MIT OR Apache-2.0)",
+  "private": false,
+  "devDependencies": {
+    "@parcel/validator-typescript": "^2.0.0",
+    "@types/react": "^17.0.33",
+    "@types/react-dom": "^17.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.26.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "parcel": "latest",
+    "prettier": "^2.4.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.5.0",
+    "@emotion/styled": "^11.3.0",
+    "@fontsource/roboto": "^4.5.1",
+    "@mui/icons-material": "^5.0.5",
+    "@mui/material": "^5.0.6",
+    "@reduxjs/toolkit": "^1.6.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}
