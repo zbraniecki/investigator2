@@ -20,12 +20,16 @@ class AssetSerializer(serializers.HyperlinkedModelSerializer):
 
 class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
     pair = serializers.SerializerMethodField("get_pair")
+    name = serializers.SerializerMethodField("get_name")
+    symbol = serializers.SerializerMethodField("get_symbol")
 
     class Meta:
         model = AssetInfo
         fields = [
             "value",
             "pair",
+            "name",
+            "symbol",
             "market_cap",
             "price_change_percentage_24h",
             "market_cap_change_percentage_24h",
@@ -37,6 +41,12 @@ class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
             obj.asset.symbol,
             obj.base.symbol.upper(),
         ]
+
+    def get_name(self, obj):
+        return obj.asset.name
+
+    def get_symbol(self, obj):
+        return obj.asset.symbol
 
 
 class ServiceSerializer(serializers.HyperlinkedModelSerializer):

@@ -7,7 +7,7 @@ from server.oracle.models import (
 
 from server.account.models import (
     User,
-    Wallet,
+    Account,
     Holding,
     Portfolio,
 )
@@ -113,8 +113,8 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            if i < 2:
-                continue
+            # if i < 2:
+            #     continue
             repo.head.reference = commit
 
             id = commit.hexsha
