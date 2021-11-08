@@ -10,14 +10,15 @@ module.exports = {
     ],
     "globals": {
         "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
+        "SharedArrayBuffer": "readonly",
+        "React": "readonly",
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
         },
-        "ecmaVersion": 2018,
+        "ecmaVersion": 2021,
         "sourceType": "module"
     },
     "plugins": [
@@ -28,13 +29,16 @@ module.exports = {
       "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],
       "react/react-in-jsx-scope": 0,
       "import/prefer-default-export": 0,
-      'import/extensions': 0,
+      "import/extensions": 0,
+      "no-use-before-define": "off",
+      "@typescript-eslint/no-use-before-define": ["error", { "functions": false }],
     },
   "settings": {
     "import/resolver": {
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
-    }
+    },
+    "react": { "version": "detect" },
   },
 };
