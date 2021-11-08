@@ -1,3 +1,5 @@
+/* eslint camelcase: "off" */
+
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchAssetInfo } from "../api/oracle";
 

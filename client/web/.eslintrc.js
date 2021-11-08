@@ -22,16 +22,22 @@ module.exports = {
         "sourceType": "module"
     },
     "plugins": [
+        "@typescript-eslint",
         "react",
-        "@typescript-eslint"
     ],
     "rules": {
-      "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],
-      "react/react-in-jsx-scope": 0,
+      "no-use-before-define": "off",
+      "no-shadow": "off",
+      "no-param-reassign": ["error", { "props": false }],
+      "no-restricted-syntax": 0,
+      "no-unused-vars": "off",
       "import/prefer-default-export": 0,
       "import/extensions": 0,
-      "no-use-before-define": "off",
+      "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],
+      "react/react-in-jsx-scope": 0,
       "@typescript-eslint/no-use-before-define": ["error", { "functions": false }],
+      "@typescript-eslint/no-shadow": ["error"],
+      "@typescript-eslint/no-unused-vars": "error",
     },
   "settings": {
     "import/resolver": {

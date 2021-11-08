@@ -10,10 +10,11 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { currency, number, symbol } from "../../utils/formatters";
 
 interface DataRowProps {
   cells: {
-    [key: string]: string | number;
+    [key: string]: string | number | undefined;
   };
   subData?: DataRowProps[];
 }
@@ -25,7 +26,8 @@ export interface Props {
       label: string;
       id: string;
       align: "inherit" | "left" | "right" | "center" | "justify" | undefined;
-      width: number;
+      width: number | "auto";
+      formatter?: "percent" | "currency" | "number" | "symbol";
     }[];
   };
   data: DataRowProps[];
@@ -47,7 +49,7 @@ export interface TableProps {
 const tableSettings = {
   columns: {
     collapse: {
-      width: 50,
+      width: 34 + 16 + 16,
     },
   },
 };
@@ -58,9 +60,7 @@ function TableComponent({ id, data, headers, displayHeaders }: TableProps) {
       {displayHeaders && (
         <TableHead>
           <TableRow>
-            <TableCell
-              sx={{ minWidth: tableSettings.columns.collapse.width }}
-            />
+            <TableCell sx={{ width: tableSettings.columns.collapse.width }} />
             {headers.map(({ label, align, width }) => (
               <TableCell
                 key={`${id}-header-${label}`}
@@ -89,7 +89,7 @@ function Row({ id, data, headers }: RowProps) {
   return (
     <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-        <TableCell sx={{ minWidth: tableSettings.columns.collapse.width }}>
+        <TableCell sx={{ width: tableSettings.columns.collapse.width }}>
           {data.subData && (
             <IconButton
               aria-label="expand row"
@@ -100,19 +100,47 @@ function Row({ id, data, headers }: RowProps) {
             </IconButton>
           )}
         </TableCell>
-        {headers.map((header) => (
-          <TableCell
-            key={`${id}-${header.label}`}
-            align={header.align}
-            sx={{ width: header.width }}
-          >
-            {data.cells[header.id]}
-          </TableCell>
-        ))}
+        {headers.map((header) => {
+          const rawValue = data.cells[header.id];
+          let value;
+
+          if (rawValue === undefined) {
+            value = "";
+          } else {
+            switch (header.formatter) {
+              case "currency": {
+                value = currency(rawValue);
+                break;
+              }
+              case "number": {
+                value = number(rawValue);
+                break;
+              }
+              case "symbol": {
+                value = symbol(rawValue);
+                break;
+              }
+              default: {
+                value = rawValue;
+                break;
+              }
+            }
+          }
+
+          return (
+            <TableCell
+              key={`${id}-${header.label}`}
+              align={header.align}
+              sx={{ width: header.width }}
+            >
+              {value}
+            </TableCell>
+          );
+        })}
       </TableRow>
       {data.subData && (
         <TableRow>
-          <TableCell style={{ padding: 0 }} colSpan={4}>
+          <TableCell style={{ padding: 0 }} colSpan={headers.length + 1}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <TableComponent
                 id={`${id}-sub`}

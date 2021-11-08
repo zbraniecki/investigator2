@@ -16,6 +16,7 @@ export interface PortfolioEntry {
   id: string;
   name: string;
   holdings: Holding[];
+  portfolios: string[];
 }
 
 interface AccountState {
