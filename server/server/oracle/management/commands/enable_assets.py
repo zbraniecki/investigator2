@@ -60,6 +60,14 @@ COINS = [
     ["stmx", "storm"],
     "near",
     ["hbar", "hedera-hashgraph"],
+    "osmo",
+    "akt",
+    "iris",
+    "regen",
+    "xprt",
+    "dvpn",
+    "ixo",
+    ["iov", "starname"],
 ]
 
 
