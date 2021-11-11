@@ -1,8 +1,10 @@
 import { useSelector } from "react-redux";
+import Typography from "@mui/material/Typography";
 import { Component as Table, Props as TableProps } from "../components/Table";
 import { preparePortfolioTableData } from "../../utils/portfolio";
-import { getPortfolios } from "../../store/account";
+import { getPortfolios, getPortfolioMeta } from "../../store/account";
 import { getAssetInfo } from "../../store/oracle";
+import { currency } from "../../utils/formatters";
 
 const tableMeta: TableProps["meta"] = {
   id: "portfolio",
@@ -53,6 +55,7 @@ const tableMeta: TableProps["meta"] = {
 export function Portfolios() {
   const portfolios = useSelector(getPortfolios);
   const assetInfo = useSelector(getAssetInfo);
+  const portfolioMeta = useSelector(getPortfolioMeta);
 
   let pid = "uuid";
   if (portfolios.length > 0) {
@@ -60,5 +63,16 @@ export function Portfolios() {
   }
   const tableData = preparePortfolioTableData(pid, portfolios, assetInfo);
 
-  return <Table meta={tableMeta} data={tableData} />;
+  let value = "$--.--";
+  const pMeta = portfolioMeta[pid];
+  if (pMeta !== undefined) {
+    value = currency(pMeta.value);
+  }
+
+  return (
+    <>
+      <Typography align="right">Value: {value}</Typography>
+      <Table meta={tableMeta} data={tableData} />
+    </>
+  );
 }

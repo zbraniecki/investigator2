@@ -13,8 +13,13 @@ import InvestigatorAppBar from "../AppBar";
 import InvestigatorDrawer from "../Drawer";
 import Content from "../Content";
 import { LightMode, getLightMode } from "../../../store/ui";
-import { fetchPortfoliosThunk } from "../../../store/account";
-import { fetchAssetInfoThunk } from "../../../store/oracle";
+import {
+  fetchPortfoliosThunk,
+  getPortfolios,
+  setPortfoliosMeta,
+} from "../../../store/account";
+import { fetchAssetInfoThunk, getAssetInfo } from "../../../store/oracle";
+import { computePortfoliosMeta } from "../../../utils/portfolio";
 
 const menuItems: Array<[string, React.ReactNode]> = [
   ["Watchlists", <AccountBalanceIcon />],
@@ -62,6 +67,14 @@ export function Chrome() {
     dispatch(fetchPortfoliosThunk(USER_ID));
     dispatch(fetchAssetInfoThunk());
   }, [dispatch]);
+
+  const portfolios = useSelector(getPortfolios);
+  const assets = useSelector(getAssetInfo);
+  const meta = computePortfoliosMeta(portfolios, assets);
+
+  useEffect(() => {
+    dispatch(setPortfoliosMeta(meta));
+  }, [dispatch, meta]);
 
   return (
     <ThemeProvider theme={theme}>

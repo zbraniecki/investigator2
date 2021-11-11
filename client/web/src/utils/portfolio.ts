@@ -1,4 +1,4 @@
-import { PortfolioEntry, Holding } from "../store/account";
+import { PortfolioEntry, PortfolioEntryMeta, Holding } from "../store/account";
 import { AssetInfo } from "../store/oracle";
 import { getAsset } from "./asset";
 
@@ -125,4 +125,44 @@ export function getPortfolio(
     }
   }
   return null;
+}
+
+function computePortfolioMeta(
+  portfolio: PortfolioEntry,
+  portfolios: PortfolioEntry[],
+  assetInfo: AssetInfo[]
+): PortfolioEntryMeta {
+  let value = 0;
+  for (const holding of portfolio.holdings) {
+    const asset = getAsset(holding.symbol, assetInfo);
+    if (asset !== null) {
+      value += holding.quantity * asset.value;
+    }
+  }
+  for (const pid of portfolio.portfolios) {
+    const subp = getPortfolio(pid, portfolios);
+    if (subp !== null) {
+      const subMeta = computePortfolioMeta(subp, portfolios, assetInfo);
+      value += subMeta.value;
+    }
+  }
+  return {
+    value,
+    price_change_percentage_24h: 0,
+  };
+}
+
+export function computePortfoliosMeta(
+  portfolios: PortfolioEntry[],
+  assetInfo: AssetInfo[]
+): Record<string, PortfolioEntryMeta> {
+  const result: Record<string, PortfolioEntryMeta> = {};
+  for (const portfolio of portfolios) {
+    result[portfolio.id] = computePortfolioMeta(
+      portfolio,
+      portfolios,
+      assetInfo
+    );
+  }
+  return result;
 }

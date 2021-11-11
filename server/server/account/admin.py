@@ -30,12 +30,17 @@ class AccountAdmin(admin.ModelAdmin):
 class HoldingAdmin(admin.ModelAdmin):
     list_display = ("account", "asset", "quantity")
     list_filter = ("account__service", "asset")
+    search_fields = ["asset__symbol"]
     autocomplete_fields = ["asset"]
     ordering = (
         "account",
         "asset",
         "-quantity",
     )
+
+@admin.register(Portfolio)
+class PortfolioAdmin(admin.ModelAdmin):
+    list_display = ("name", "owner")
 
 
 @admin.register(Transaction)
@@ -50,5 +55,4 @@ class TransactionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(User, UserAdmin)
-admin.site.register(Portfolio)
 admin.site.register(Watchlist)
