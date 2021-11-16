@@ -10,7 +10,7 @@ import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { currency, number, symbol } from "../../utils/formatters";
+import { currency, number, percent, symbol } from "../../utils/formatters";
 
 interface DataRowProps {
   cells: {
@@ -118,6 +118,10 @@ function Row({ id, data, headers }: RowProps) {
               }
               case "symbol": {
                 value = symbol(rawValue);
+                break;
+              }
+              case "percent": {
+                value = percent(rawValue);
                 break;
               }
               default: {

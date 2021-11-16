@@ -50,7 +50,6 @@ class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ServiceSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.SerializerMethodField("get_id")
     name = serializers.SerializerMethodField("get_name")
     currency = serializers.SerializerMethodField("get_currency")
 
@@ -58,11 +57,8 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
         model = Service
         fields = ["id", "name", "currency", "type"]
 
-    def get_id(self, obj):
-        return f"{obj.provider.name}"
-
     def get_name(self, obj):
-        return f"{obj.provider.name} {obj.name}"
+        return obj.provider.__str__()
 
     def get_currency(self, obj):
         today = datetime.today()
@@ -75,7 +71,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
                 {
                     "symbol": passive.asset.symbol,
                     "apy": passive.apy_min,
-                    "yield_type": "interest",
+                    "yield_type": passive.type,
                 }
             )
 

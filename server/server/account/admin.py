@@ -38,6 +38,7 @@ class HoldingAdmin(admin.ModelAdmin):
         "-quantity",
     )
 
+
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
     list_display = ("name", "owner")

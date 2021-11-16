@@ -14,7 +14,7 @@ class HoldingSerializer(serializers.HyperlinkedModelSerializer):
         return obj.asset.symbol.lower()
 
     def get_account(self, obj):
-        return obj.account.service.provider.name
+        return obj.account.service.id
 
 
 class PortfolioSerializer(serializers.HyperlinkedModelSerializer):

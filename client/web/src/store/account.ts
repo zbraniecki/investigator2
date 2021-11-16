@@ -16,6 +16,7 @@ export interface Holding {
 
 export interface PortfolioEntryMeta {
   value: number;
+  yield: number;
   price_change_percentage_24h: number;
 }
 

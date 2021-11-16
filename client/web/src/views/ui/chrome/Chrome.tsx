@@ -18,7 +18,12 @@ import {
   getPortfolios,
   setPortfoliosMeta,
 } from "../../../store/account";
-import { fetchAssetInfoThunk, getAssetInfo } from "../../../store/oracle";
+import {
+  fetchAssetInfoThunk,
+  fetchWalletsThunk,
+  getAssetInfo,
+  getWallets,
+} from "../../../store/oracle";
 import { computePortfoliosMeta } from "../../../utils/portfolio";
 
 const menuItems: Array<[string, React.ReactNode]> = [
@@ -66,11 +71,13 @@ export function Chrome() {
   useEffect(() => {
     dispatch(fetchPortfoliosThunk(USER_ID));
     dispatch(fetchAssetInfoThunk());
+    dispatch(fetchWalletsThunk());
   }, [dispatch]);
 
   const portfolios = useSelector(getPortfolios);
   const assets = useSelector(getAssetInfo);
-  const meta = computePortfoliosMeta(portfolios, assets);
+  const wallets = useSelector(getWallets);
+  const meta = computePortfoliosMeta(portfolios, assets, wallets);
 
   useEffect(() => {
     dispatch(setPortfoliosMeta(meta));
