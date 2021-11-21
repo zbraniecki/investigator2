@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { PaletteMode } from "@mui/material";
@@ -6,6 +6,7 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PieChartIcon from "@mui/icons-material/PieChart";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import cyan from "@mui/material/colors/cyan";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useSelector, useDispatch } from "react-redux";
@@ -24,12 +25,13 @@ import {
   getAssetInfo,
   getWallets,
 } from "../../../store/oracle";
-import { computePortfoliosMeta } from "../../../utils/portfolio";
+import { calculatePortfoliosMeta } from "../../../utils/portfolio";
 
 const menuItems: Array<[string, React.ReactNode]> = [
-  ["Watchlists", <AccountBalanceIcon />],
-  ["Portfolios", <TrendingUpIcon />],
+  ["Watchlists", <TrendingUpIcon />],
+  ["Portfolios", <MonetizationOnIcon />],
   ["Strategies", <PieChartIcon />],
+  ["Wallets", <AccountBalanceIcon />],
 ];
 
 const USER_ID = 1;
@@ -77,19 +79,25 @@ export function Chrome() {
   const portfolios = useSelector(getPortfolios);
   const assets = useSelector(getAssetInfo);
   const wallets = useSelector(getWallets);
-  const meta = computePortfoliosMeta(portfolios, assets, wallets);
+  const meta = calculatePortfoliosMeta(portfolios, assets, wallets);
 
   useEffect(() => {
     dispatch(setPortfoliosMeta(meta));
   }, [dispatch, meta]);
+
+  const [pageState, setPageState] = useState("Portfolios");
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: "flex" }}>
         <InvestigatorAppBar />
-        <InvestigatorDrawer menuItems={menuItems} />
-        <Content />
+        <InvestigatorDrawer
+          menuItems={menuItems}
+          pageState={pageState}
+          setPageState={setPageState}
+        />
+        <Content page={pageState} />
       </Box>
     </ThemeProvider>
   );

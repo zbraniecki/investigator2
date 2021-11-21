@@ -1,153 +1,10 @@
 /* eslint camelcase: "off" */
 
-import { PortfolioEntry, PortfolioEntryMeta, Holding } from "../store/account";
+import { PortfolioEntry, PortfolioEntryMeta } from "../store/account";
 import { AssetInfo, Wallet } from "../store/oracle";
 import { getAsset } from "./asset";
 import { getWallet, getWalletAsset } from "./wallet";
-
-export interface PortfolioTableRow {
-  cells: {
-    symbol: string | undefined;
-    name: string | undefined;
-    price: number | undefined;
-    quantity: number | undefined;
-    value: number;
-    wallet: string | undefined;
-    yield: number | undefined;
-  };
-  subData?: PortfolioTableRow[];
-}
-
-export function preparePortfolioTableData(
-  pid: string,
-  portfolios: PortfolioEntry[],
-  assetInfo: AssetInfo[],
-  wallets: Wallet[]
-): PortfolioTableRow[] {
-  const portfolio = getPortfolio(pid, portfolios);
-  if (portfolio === null || assetInfo.length === 0) {
-    return [];
-  }
-
-  const assets: Record<string, Holding[]> = {};
-
-  for (const holding of portfolio.holdings) {
-    if (!Object.keys(assets).includes(holding.symbol)) {
-      assets[holding.symbol] = [];
-    }
-    assets[holding.symbol].push(holding);
-  }
-
-  const result: PortfolioTableRow[] = [];
-
-  for (const [symbol, holdings] of Object.entries(assets)) {
-    const asset = getAsset(symbol, assetInfo);
-
-    const subData: PortfolioTableRow[] = holdings.map((holding) => {
-      const walletAsset = getWalletAsset(
-        holding.account,
-        holding.symbol,
-        wallets
-      );
-      const wallet = getWallet(holding.account, wallets);
-      const price = asset?.value || 0;
-      const apy = walletAsset?.apy;
-      return {
-        cells: {
-          symbol: undefined,
-          name: undefined,
-          price: undefined,
-          quantity: holding.quantity,
-          value: holding.quantity * price,
-          wallet: wallet?.name || holding.account,
-          yield: apy,
-        },
-      };
-    });
-    subData.sort((a, b) => b.cells.value - a.cells.value);
-    const price = asset?.value;
-    let value = 0;
-    let quantity = 0;
-    let apy = 0;
-    for (const row of subData) {
-      value += row.cells.value;
-      quantity += row.cells.quantity || 0;
-    }
-    for (const row of subData) {
-      const y = row.cells.yield || 0;
-      const perc = row.cells.value / value;
-      apy += y * perc;
-    }
-
-    const row: PortfolioTableRow = {
-      cells: {
-        symbol,
-        name: asset?.name,
-        price,
-        quantity,
-        value,
-        wallet: undefined,
-        yield: apy > 0.0 ? apy : undefined,
-      },
-    };
-    if (subData.length > 1) {
-      row.subData = subData;
-    }
-    result.push(row);
-  }
-
-  portfolio.portfolios.forEach((subPid) => {
-    const subPortfolio = getPortfolio(subPid, portfolios);
-    if (subPortfolio === null) {
-      result.push({
-        cells: {
-          symbol: "",
-          name: subPid,
-          price: undefined,
-          quantity: undefined,
-          value: 0,
-          wallet: undefined,
-          yield: undefined,
-        },
-      });
-    } else {
-      const subData = preparePortfolioTableData(
-        subPid,
-        portfolios,
-        assetInfo,
-        wallets
-      );
-
-      let value = 0;
-      let apy = 0;
-      for (const row of subData) {
-        value += row.cells.value;
-      }
-
-      for (const row of subData) {
-        const y = row.cells.yield || 0;
-        const perc = row.cells.value / value;
-        apy += y * perc;
-      }
-
-      result.push({
-        cells: {
-          symbol: "",
-          name: subPortfolio.name,
-          price: undefined,
-          quantity: undefined,
-          value,
-          wallet: undefined,
-          yield: apy > 0.0 ? apy : undefined,
-        },
-        subData,
-      });
-    }
-  });
-
-  result.sort((a, b) => b.cells.value - a.cells.value);
-  return result;
-}
+import { assert } from "./helpers";
 
 export function getPortfolio(
   id: string,
@@ -161,75 +18,248 @@ export function getPortfolio(
   return null;
 }
 
-function computePortfolioMeta(
-  portfolio: PortfolioEntry,
+export interface PortfolioItem {
+  meta: {
+    type: "asset-group" | "asset" | "portfolio" | "wallet-group";
+    id: string;
+    symbol?: string;
+    name?: string;
+    price?: number;
+    quantity?: number;
+    value: number;
+    wallet?: string;
+    yield?: number;
+    price_change_percentage_24h?: number;
+  };
+  children: PortfolioItem[] | null;
+}
+
+export function calculatePortfolioItems(
+  pid: string,
   portfolios: PortfolioEntry[],
   assetInfo: AssetInfo[],
   wallets: Wallet[]
-): PortfolioEntryMeta {
-  let value = 0;
-  let apy = 0;
-  let price_change_24h = 0;
+): PortfolioItem[] {
+  const items: PortfolioItem[] = [];
 
-  for (const holding of portfolio.holdings) {
-    const asset = getAsset(holding.symbol, assetInfo);
-
-    if (asset !== null) {
-      value += holding.quantity * asset.value;
-    }
+  const portfolio = getPortfolio(pid, portfolios);
+  if (portfolio === null || assetInfo.length === 0) {
+    return [];
   }
 
+  /* Step 1: Collect item meta information */
   for (const holding of portfolio.holdings) {
     const asset = getAsset(holding.symbol, assetInfo);
+    assert(asset);
+
     const walletAsset = getWalletAsset(
       holding.account,
       holding.symbol,
       wallets
     );
-    const y = walletAsset?.apy || 0.0;
-    const v = asset?.value || 0;
-    // XXX: This is wrong, we need to first get total value with sub portfolios
-    apy += y * (v / value);
-    if (asset) {
-      price_change_24h += asset.price_change_percentage_24h * (v / value);
-    }
+
+    const price_change_percentage_24h = asset
+      ? asset.price_change_percentage_24h / 100
+      : undefined;
+
+    items.push({
+      meta: {
+        type: "asset",
+        id: holding.symbol,
+        symbol: holding.symbol,
+        name: asset?.name,
+        price: asset?.value,
+        quantity: holding.quantity,
+        value: holding.quantity * (asset?.value || 0),
+        wallet: holding.account,
+        yield: walletAsset?.apy,
+        price_change_percentage_24h,
+      },
+      children: null,
+    });
   }
 
-  for (const pid of portfolio.portfolios) {
-    const subp = getPortfolio(pid, portfolios);
-    if (subp !== null) {
-      const subMeta = computePortfolioMeta(
-        subp,
-        portfolios,
-        assetInfo,
-        wallets
-      );
-      value += subMeta.value;
-      apy += subMeta.yield;
-      price_change_24h +=
-        subMeta.price_change_percentage_24h * (subMeta.value / value);
-    }
-  }
-  return {
-    value,
-    price_change_percentage_24h: price_change_24h,
-    yield: apy,
-  };
+  return items;
 }
 
-export function computePortfoliosMeta(
+function calculatePortfolioMeta(
+  pid: string,
+  portfolios: PortfolioEntry[],
+  assetInfo: AssetInfo[],
+  wallets: Wallet[]
+): PortfolioEntryMeta {
+  const result: PortfolioEntryMeta = {
+    value: 0,
+    yield: 0,
+    price_change_percentage_24h: 0,
+  };
+  const items = calculatePortfolioItems(pid, portfolios, assetInfo, wallets);
+
+  /* Step 1: Calculate value of the portfolio */
+  for (const item of items) {
+    result.value += item.meta.value;
+  }
+
+  /* Step 2: Calculate other metas about portfolio */
+  for (const item of items) {
+    const itemShare = item.meta.value / result.value;
+
+    if (item.meta.yield) {
+      result.yield += item.meta.yield * itemShare;
+    }
+    if (item.meta.price_change_percentage_24h) {
+      result.price_change_percentage_24h +=
+        item.meta.price_change_percentage_24h * itemShare;
+    }
+  }
+
+  return result;
+}
+
+export function calculatePortfoliosMeta(
   portfolios: PortfolioEntry[],
   assetInfo: AssetInfo[],
   wallets: Wallet[]
 ): Record<string, PortfolioEntryMeta> {
   const result: Record<string, PortfolioEntryMeta> = {};
   for (const portfolio of portfolios) {
-    result[portfolio.id] = computePortfolioMeta(
-      portfolio,
+    result[portfolio.id] = calculatePortfolioMeta(
+      portfolio.id,
       portfolios,
       assetInfo,
       wallets
     );
   }
   return result;
+}
+
+export interface PortfolioTableRow {
+  cells: {
+    symbol?: string;
+    name?: string;
+    price?: number;
+    quantity?: number;
+    value: number;
+    wallet?: string;
+    yield?: number;
+  };
+  children?: PortfolioTableRow[];
+}
+
+function groupItemsByAsset(items: PortfolioItem[]): PortfolioItem[] {
+  const result: PortfolioItem[] = [];
+
+  const combinedItems: Record<string, PortfolioItem[]> = {};
+
+  for (const item of items) {
+    if (!Object.keys(combinedItems).includes(item.meta.id)) {
+      combinedItems[item.meta.id] = [];
+    }
+    combinedItems[item.meta.id].push(item);
+  }
+
+  for (const children of Object.values(combinedItems)) {
+    children.sort((a, b) => b.meta.value - a.meta.value);
+
+    const item = children[0];
+    assert(item);
+
+    if (children.length === 1) {
+      result.push(item);
+      continue;
+    }
+
+    let value = 0;
+    let quantity = 0;
+
+    for (const child of children) {
+      value += child.meta.value;
+      assert(child.meta.quantity);
+      quantity += child.meta.quantity;
+    }
+
+    let apy = 0;
+    for (const child of children) {
+      const itemShare = child.meta.value / value;
+      if (child.meta.yield) {
+        apy += child.meta.yield * itemShare;
+      }
+    }
+
+    result.push({
+      meta: {
+        type: "asset-group",
+        id: item.meta.id,
+        symbol: item.meta.symbol,
+        name: item.meta.name,
+        price: item.meta.price,
+        quantity,
+        value,
+        yield: apy,
+        price_change_percentage_24h: item.meta.price_change_percentage_24h,
+      },
+      children,
+    });
+  }
+
+  return result;
+}
+
+function preparePortfolioTableGroup(
+  items: PortfolioItem[],
+  wallets: Wallet[]
+): PortfolioTableRow[] {
+  const result: PortfolioTableRow[] = [];
+  for (const item of items) {
+    const assetWallets = new Set();
+    if (item.meta.wallet) {
+      const wallet = getWallet(item.meta.wallet, wallets);
+      assert(wallet);
+      assetWallets.add(wallet.name);
+    }
+
+    let children;
+    if (item.children) {
+      children = preparePortfolioTableGroup(item.children, wallets);
+      for (const child of children) {
+        child.cells.symbol = undefined;
+        child.cells.name = undefined;
+        child.cells.price = undefined;
+      }
+    }
+    const row: PortfolioTableRow = {
+      cells: {
+        symbol: item.meta.symbol,
+        name: item.meta.name,
+        price: item.meta.price,
+        quantity: item.meta.quantity,
+        value: item.meta.value,
+        wallet: Array.from(assetWallets).join(", "),
+        yield: item.meta.yield,
+      },
+      children,
+    };
+    result.push(row);
+  }
+
+  return result;
+}
+
+export function preparePortfolioTableData(
+  pid: string,
+  portfolios: PortfolioEntry[],
+  assetInfo: AssetInfo[],
+  wallets: Wallet[]
+): PortfolioTableRow[] {
+  let items: PortfolioItem[] = calculatePortfolioItems(
+    pid,
+    portfolios,
+    assetInfo,
+    wallets
+  );
+  items = groupItemsByAsset(items);
+
+  items.sort((a, b) => b.meta.value - a.meta.value);
+
+  return preparePortfolioTableGroup(items, wallets);
 }

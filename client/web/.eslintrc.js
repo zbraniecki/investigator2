@@ -31,6 +31,7 @@ module.exports = {
       "no-param-reassign": ["error", { "props": false }],
       "no-restricted-syntax": 0,
       "no-unused-vars": "off",
+      "no-continue": 0,
       "import/prefer-default-export": 0,
       "import/extensions": 0,
       "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],

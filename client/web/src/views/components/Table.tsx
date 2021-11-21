@@ -16,7 +16,7 @@ interface DataRowProps {
   cells: {
     [key: string]: string | number | undefined;
   };
-  subData?: DataRowProps[];
+  children?: DataRowProps[];
 }
 
 export interface Props {
@@ -90,7 +90,7 @@ function Row({ id, data, headers }: RowProps) {
     <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell sx={{ width: tableSettings.columns.collapse.width }}>
-          {data.subData && (
+          {data.children && (
             <IconButton
               aria-label="expand row"
               size="small"
@@ -142,13 +142,13 @@ function Row({ id, data, headers }: RowProps) {
           );
         })}
       </TableRow>
-      {data.subData && (
+      {data.children && (
         <TableRow>
           <TableCell style={{ padding: 0 }} colSpan={headers.length + 1}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <TableComponent
                 id={`${id}-sub`}
-                data={data.subData}
+                data={data.children}
                 headers={headers}
                 displayHeaders={false}
               />

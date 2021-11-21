@@ -1,6 +1,6 @@
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 // import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
@@ -9,9 +9,20 @@ const drawerWidth = 60;
 
 interface Props {
   menuItems: Array<[string, React.ReactNode]>;
+  pageState: string;
+  setPageState: any;
 }
 
-export default function InvestigatorDrawer({ menuItems }: Props) {
+export default function InvestigatorDrawer({
+  menuItems,
+  pageState,
+  setPageState,
+}: Props) {
+  const handlePageSelect: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    const { value } = e.currentTarget.dataset;
+    setPageState(value);
+  };
+
   return (
     <Drawer
       variant="permanent"
@@ -24,9 +35,14 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
       <Toolbar />
       <List>
         {menuItems.map(([name, icon]) => (
-          <ListItem button key={`drawer-list-item-${name}`}>
-            <ListItemIcon>{icon}</ListItemIcon>
-          </ListItem>
+          <ListItemButton
+            selected={name === pageState}
+            key={`drawer-list-item-${name}`}
+          >
+            <ListItemIcon data-value={name} onClick={handlePageSelect}>
+              {icon}
+            </ListItemIcon>
+          </ListItemButton>
         ))}
       </List>
     </Drawer>
