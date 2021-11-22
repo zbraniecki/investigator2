@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Box from "@mui/material/Box";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { PaletteMode } from "@mui/material";
@@ -28,10 +28,10 @@ import {
 import { calculatePortfoliosMeta } from "../../../utils/portfolio";
 
 const menuItems: Array<[string, React.ReactNode]> = [
-  ["Watchlists", <TrendingUpIcon />],
-  ["Portfolios", <MonetizationOnIcon />],
-  ["Strategies", <PieChartIcon />],
-  ["Wallets", <AccountBalanceIcon />],
+  ["watchlists", <TrendingUpIcon />],
+  ["portfolios", <MonetizationOnIcon />],
+  ["strategies", <PieChartIcon />],
+  ["wallets", <AccountBalanceIcon />],
 ];
 
 const USER_ID = 1;
@@ -85,20 +85,14 @@ export function Chrome() {
     dispatch(setPortfoliosMeta(meta));
   }, [dispatch, meta]);
 
-  const [pageState, setPageState] = useState("Portfolios");
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: "flex" }}>
         <InvestigatorAppBar />
-        <InvestigatorDrawer
-          menuItems={menuItems}
-          pageState={pageState}
-          setPageState={setPageState}
-        />
-        <Content page={pageState} />
+        <InvestigatorDrawer menuItems={menuItems} />
+        <Content />
       </Box>
     </ThemeProvider>
   );
-};
+}

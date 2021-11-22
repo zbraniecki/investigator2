@@ -4,24 +4,24 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 // import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const drawerWidth = 60;
 
 interface Props {
   menuItems: Array<[string, React.ReactNode]>;
-  pageState: string;
-  setPageState: any;
 }
 
-export default function InvestigatorDrawer({
-  menuItems,
-  pageState,
-  setPageState,
-}: Props) {
+export default function InvestigatorDrawer({ menuItems }: Props) {
+  const navigate = useNavigate();
+
   const handlePageSelect: React.MouseEventHandler<HTMLDivElement> = (e) => {
     const { value } = e.currentTarget.dataset;
-    setPageState(value);
+    navigate(`/${value}`);
   };
+
+  const { pathname } = useLocation();
+  const pageState = pathname.substr(1);
 
   return (
     <Drawer

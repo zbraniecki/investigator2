@@ -1,33 +1,19 @@
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
+import { Routes, Route } from "react-router-dom";
 import { Portfolios } from "../pages/Portfolios";
 import { Wallets } from "../pages/Wallets";
 import { Strategy } from "../pages/Strategy";
 
-interface Props {
-  page: string;
-}
-
-export default function Content({ page }: Props) {
-  let selectedPage;
-
-  switch (page) {
-    case "Wallets":
-      selectedPage = <Wallets />;
-      break;
-    case "Strategies":
-      selectedPage = <Strategy />;
-      break;
-    case "Portfolios":
-    default:
-      selectedPage = <Portfolios />;
-      break;
-  }
-
+export default function Content() {
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       <Toolbar />
-      {selectedPage}
+      <Routes>
+        <Route path="*" element={<Portfolios />} />
+        <Route path="strategies" element={<Strategy />} />
+        <Route path="wallets" element={<Wallets />} />
+      </Routes>
     </Box>
   );
 }
