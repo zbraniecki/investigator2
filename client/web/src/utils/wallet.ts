@@ -81,7 +81,7 @@ export interface WalletTableRow {
   cells: {
     wallet?: string;
     symbol?: string;
-    quantity?: string;
+    quantity?: number;
     yield?: number;
     value: number;
   };
@@ -113,7 +113,7 @@ function prepareWalletTableGroup(
       cells: {
         wallet: wallet.name,
         value: item.meta.value,
-        yield: item.meta.yield,
+        quantity: item.meta.quantity,
         symbol,
       },
       children,

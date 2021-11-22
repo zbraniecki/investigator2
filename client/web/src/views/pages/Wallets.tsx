@@ -23,11 +23,11 @@ const tableMeta: TableProps["meta"] = {
       formatter: "symbol",
     },
     {
-      label: "Yield",
-      id: "yield",
+      label: "Quantity",
+      id: "quantity",
       align: "right",
       width: 0.1,
-      formatter: "percent",
+      formatter: "number",
     },
     {
       label: "Value",
