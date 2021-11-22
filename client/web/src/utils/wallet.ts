@@ -46,8 +46,16 @@ function groupItemsByWallet(items: PortfolioItem[]): PortfolioItem[] {
   }
 
   for (const [wid, children] of Object.entries(combinedItems)) {
+    children.sort((a, b) => b.meta.value - a.meta.value);
+
     const item = children[0];
     assert(item);
+
+    let value = 0;
+
+    for (const child of children) {
+      value += child.meta.value;
+    }
 
     result.push({
       meta: {
@@ -58,7 +66,7 @@ function groupItemsByWallet(items: PortfolioItem[]): PortfolioItem[] {
         // price,
         // quantity,
         wallet: wid,
-        value: 0,
+        value,
         // yield: apy,
         // price_change_percentage_24h: item.meta.price_change_percentage_24h,
       },
@@ -89,13 +97,26 @@ function prepareWalletTableGroup(
     assert(item.meta.wallet);
     const wallet = getWallet(item.meta.wallet, wallets);
     assert(wallet);
+
+    let children;
+    let symbol;
+    if (item.children) {
+      children = prepareWalletTableGroup(item.children, wallets);
+      for (const child of children) {
+        child.cells.wallet = undefined;
+      }
+    } else {
+      symbol = item.meta.symbol;
+    }
+
     const row: WalletTableRow = {
       cells: {
         wallet: wallet.name,
         value: item.meta.value,
         yield: item.meta.yield,
+        symbol,
       },
-      // children,
+      children,
     };
     result.push(row);
   }
@@ -116,6 +137,8 @@ export function prepareWalletTableData(
     wallets
   );
   items = groupItemsByWallet(items);
+
+  items.sort((a, b) => b.meta.value - a.meta.value);
 
   return prepareWalletTableGroup(items, wallets);
 }

@@ -7,39 +7,50 @@ import { getAssetInfo, getWallets } from "../../store/oracle";
 import { currency, percent } from "../../utils/formatters";
 
 const tableMeta: TableProps["meta"] = {
-  id: "wallet",
+  id: "strategy",
   headers: [
-    {
-      label: "Wallet",
-      id: "wallet",
-      align: "left",
-      width: 0.2,
-    },
     {
       label: "Symbol",
       id: "symbol",
       align: "left",
-      width: 0.6,
+      width: 0.1,
       formatter: "symbol",
     },
     {
-      label: "Yield",
-      id: "yield",
+      label: "Target",
+      id: "target",
+      align: "left",
+      width: 0.15,
+    },
+    {
+      label: "Current",
+      id: "current",
+      align: "left",
+      width: "auto",
+    },
+    {
+      label: "Deviation",
+      id: "deviation",
       align: "right",
       width: 0.1,
       formatter: "percent",
     },
     {
-      label: "Value",
-      id: "value",
+      label: "Delta",
+      id: "delta",
       align: "right",
       width: 0.1,
-      formatter: "currency",
+    },
+    {
+      label: "USD Delta",
+      id: "delta_usd",
+      align: "right",
+      width: 0.1,
     },
   ],
 };
 
-export function Wallets() {
+export function Strategy() {
   const portfolios = useSelector(getPortfolios);
   const assetInfo = useSelector(getAssetInfo);
   const portfolioMeta = useSelector(getPortfolioMeta);

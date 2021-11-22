@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import { Portfolios } from "../pages/Portfolios";
 import { Wallets } from "../pages/Wallets";
+import { Strategy } from "../pages/Strategy";
 
 interface Props {
   page: string;
@@ -13,6 +14,9 @@ export default function Content({ page }: Props) {
   switch (page) {
     case "Wallets":
       selectedPage = <Wallets />;
+      break;
+    case "Strategies":
+      selectedPage = <Strategy />;
       break;
     case "Portfolios":
     default:
