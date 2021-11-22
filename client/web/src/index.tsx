@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 
-import App from "./views/App";
+import { App } from "./views/App";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";

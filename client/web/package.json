@@ -16,22 +16,21 @@
   "repository": "https://github.com/zbraniecki/investigator2",
   "author": "Zibi Braniecki (zibi@braniecki.net)",
   "license": "(MIT OR Apache-2.0)",
-  "private": false,
   "devDependencies": {
     "@parcel/validator-typescript": "^2.0.0",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb": "^18.2.1",
+    "eslint": "^8.3.0",
+    "eslint-config-airbnb": "^19.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.26.1",
     "eslint-plugin-react-hooks": "^4.2.0",
     "jest": "^27.3.1",
-    "parcel": "latest",
+    "parcel": "^2.0.1",
     "prettier": "^2.4.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.4.4"
@@ -46,5 +45,6 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6"
-  }
+  },
+  "packageManager": "yarn@3.1.0"
 }

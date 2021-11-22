@@ -65,4 +65,4 @@ export function Wallets() {
       <Table meta={tableMeta} data={tableData} />
     </>
   );
-}
+};

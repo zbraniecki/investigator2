@@ -54,7 +54,12 @@ const tableSettings = {
   },
 };
 
-function TableComponent({ id, data, headers, displayHeaders }: TableProps) {
+function TableComponent({
+  id,
+  data,
+  headers,
+  displayHeaders,
+}: TableProps) {
   return (
     <Table>
       {displayHeaders && (
@@ -81,7 +86,7 @@ function TableComponent({ id, data, headers, displayHeaders }: TableProps) {
       </TableBody>
     </Table>
   );
-}
+};
 
 function Row({ id, data, headers }: RowProps) {
   const [open, setOpen] = React.useState(false);
@@ -158,7 +163,7 @@ function Row({ id, data, headers }: RowProps) {
       )}
     </>
   );
-}
+};
 
 export function Component({ meta: { id, headers }, data }: Props) {
   return (
@@ -166,4 +171,4 @@ export function Component({ meta: { id, headers }, data }: Props) {
       <TableComponent id={id} data={data} headers={headers} displayHeaders />
     </TableContainer>
   );
-}
+};

@@ -39,6 +39,10 @@ module.exports = {
       "@typescript-eslint/no-use-before-define": ["error", { "functions": false }],
       "@typescript-eslint/no-shadow": ["error"],
       "@typescript-eslint/no-unused-vars": "error",
+      "react/function-component-definition": [1, {
+        "namedComponents": "function-declaration",
+        "unnamedComponents": "arrow-function"
+      }]
     },
   "settings": {
     "import/resolver": {

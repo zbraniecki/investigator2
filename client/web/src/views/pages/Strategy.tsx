@@ -76,4 +76,4 @@ export function Strategy() {
       <Table meta={tableMeta} data={tableData} />
     </>
   );
-}
+};

@@ -90,4 +90,4 @@ export function Portfolios() {
       <Table meta={tableMeta} data={tableData} />
     </>
   );
-}
+};

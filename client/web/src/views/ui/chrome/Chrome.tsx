@@ -101,4 +101,4 @@ export function Chrome() {
       </Box>
     </ThemeProvider>
   );
-}
+};
