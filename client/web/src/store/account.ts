@@ -14,10 +14,27 @@ export interface Holding {
   account: string;
 }
 
+export interface PortfolioItem {
+  meta: {
+    type: "asset-group" | "asset" | "portfolio" | "wallet-group";
+    id: string;
+    symbol?: string;
+    name?: string;
+    price?: number;
+    quantity?: number;
+    value: number;
+    wallet?: string;
+    yield?: number;
+    price_change_percentage_24h?: number;
+  };
+  children: PortfolioItem[] | null;
+}
+
 export interface PortfolioEntryMeta {
   value: number;
   yield: number;
   price_change_percentage_24h: number;
+  items: PortfolioItem[];
 }
 
 export interface PortfolioEntry {

@@ -1,6 +1,10 @@
 /* eslint camelcase: "off" */
 
-import { PortfolioEntry, PortfolioEntryMeta } from "../store/account";
+import {
+  PortfolioEntry,
+  PortfolioItem,
+  PortfolioEntryMeta,
+} from "../store/account";
 import { AssetInfo, Wallet } from "../store/oracle";
 import { getAsset } from "./asset";
 import { getWallet, getWalletAsset } from "./wallet";
@@ -18,22 +22,6 @@ export function getPortfolio(
   return null;
 }
 
-export interface PortfolioItem {
-  meta: {
-    type: "asset-group" | "asset" | "portfolio" | "wallet-group";
-    id: string;
-    symbol?: string;
-    name?: string;
-    price?: number;
-    quantity?: number;
-    value: number;
-    wallet?: string;
-    yield?: number;
-    price_change_percentage_24h?: number;
-  };
-  children: PortfolioItem[] | null;
-}
-
 export function calculatePortfolioItems(
   pid: string,
   portfolios: PortfolioEntry[],
@@ -47,7 +35,6 @@ export function calculatePortfolioItems(
     return [];
   }
 
-  /* Step 1: Collect item meta information */
   for (const holding of portfolio.holdings) {
     const asset = getAsset(holding.symbol, assetInfo);
     assert(asset, `Missing asset: ${holding.symbol}`);
@@ -92,6 +79,7 @@ function calculatePortfolioMeta(
     value: 0,
     yield: 0,
     price_change_percentage_24h: 0,
+    items: [],
   };
   const items = calculatePortfolioItems(pid, portfolios, assetInfo, wallets);
 
@@ -112,6 +100,8 @@ function calculatePortfolioMeta(
         item.meta.price_change_percentage_24h * itemShare;
     }
   }
+
+  result.items = items;
 
   return result;
 }
@@ -146,7 +136,7 @@ export interface PortfolioTableRow {
   children?: PortfolioTableRow[];
 }
 
-function groupItemsByAsset(items: PortfolioItem[]): PortfolioItem[] {
+export function groupItemsByAsset(items: PortfolioItem[]): PortfolioItem[] {
   const result: PortfolioItem[] = [];
 
   const combinedItems: Record<string, PortfolioItem[]> = {};
@@ -248,15 +238,15 @@ function preparePortfolioTableGroup(
 export function preparePortfolioTableData(
   pid: string,
   portfolios: PortfolioEntry[],
+  portfoliosMeta: Record<string, PortfolioEntryMeta>,
   assetInfo: AssetInfo[],
   wallets: Wallet[]
 ): PortfolioTableRow[] {
-  let items: PortfolioItem[] = calculatePortfolioItems(
-    pid,
-    portfolios,
-    assetInfo,
-    wallets
-  );
+  const meta = portfoliosMeta[pid];
+  if (!meta) {
+    return [];
+  }
+  let { items } = meta;
   items = groupItemsByAsset(items);
 
   items.sort((a, b) => b.meta.value - a.meta.value);

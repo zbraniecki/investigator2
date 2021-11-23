@@ -1,8 +1,12 @@
 import { Wallet, AssetInfo } from "../store/oracle";
-import { PortfolioEntry, PortfolioEntryMeta } from "../store/account";
+import {
+  PortfolioEntry,
+  PortfolioItem,
+  PortfolioEntryMeta,
+} from "../store/account";
 import { Strategy } from "../store/strategy";
-import { PortfolioItem, calculatePortfolioItems } from "./portfolio";
 import { assert } from "./helpers";
+import { groupItemsByAsset } from "./portfolio";
 
 export function getStrategy(
   id: string,
@@ -20,6 +24,9 @@ export interface StrategyItem {
   asset: string;
   target: number;
   current: number;
+  deviation: number;
+  delta: number;
+  deltaUsd: number;
 }
 
 export interface StrategyTableRow {
@@ -27,14 +34,29 @@ export interface StrategyTableRow {
     symbol: string;
     target: number;
     current: number;
+    deviation: number;
+    delta: number;
+    deltaUsd: number;
   };
   children?: StrategyTableRow[];
+}
+
+function getAssetFromItems(
+  symbol: string,
+  items: PortfolioItem[]
+): PortfolioItem | null {
+  for (const item of items) {
+    if (item.meta.id === symbol) {
+      return item;
+    }
+  }
+  return null;
 }
 
 function calculateStrategyItems(
   sid: string,
   portfolios: PortfolioEntry[],
-  portfolioMeta: Record<string, PortfolioEntryMeta[]>,
+  portfolioMeta: Record<string, PortfolioEntryMeta>,
   assetInfo: AssetInfo[],
   wallets: Wallet[],
   strategies: Strategy[]
@@ -45,13 +67,33 @@ function calculateStrategyItems(
   assert(strategy);
 
   const pmeta = Object.values(portfolioMeta)[0];
-  console.log(pmeta);
+  const items = groupItemsByAsset(pmeta.items);
 
   for (const target of strategy.targets) {
+    const item = getAssetFromItems(target.symbol, items);
+    let currentValue = 0;
+    if (item) {
+      currentValue += item.meta.value;
+    }
+    for (const symbol of target.contains) {
+      const citem = getAssetFromItems(symbol, items);
+      if (citem) {
+        currentValue += citem.meta.value;
+      }
+    }
+    const currentPercent = currentValue / pmeta.value;
+    const targetValue = pmeta.value * target.percent;
+    const deviation = Math.abs(target.percent - currentPercent);
+    const delta = targetValue / currentValue - 1;
+    const deltaUsd = targetValue - currentValue;
+
     result.push({
       asset: target.symbol,
       target: target.percent,
-      current: 0.0,
+      current: currentPercent,
+      deviation,
+      delta,
+      deltaUsd,
     });
   }
 
@@ -66,6 +108,9 @@ function prepareStrategyTableGroup(items: StrategyItem[]): StrategyTableRow[] {
         symbol: item.asset,
         target: item.target,
         current: item.current,
+        deviation: item.deviation,
+        delta: item.delta,
+        deltaUsd: item.deltaUsd,
       },
     });
   }
@@ -76,7 +121,7 @@ function prepareStrategyTableGroup(items: StrategyItem[]): StrategyTableRow[] {
 export function prepareStrategyTableData(
   sid: string,
   portfolios: PortfolioEntry[],
-  portfolioMeta: Record<string, PortfolioEntryMeta[]>,
+  portfolioMeta: Record<string, PortfolioEntryMeta>,
   assetInfo: AssetInfo[],
   wallets: Wallet[],
   strategies: Strategy[]
@@ -93,6 +138,7 @@ export function prepareStrategyTableData(
     wallets,
     strategies
   );
+  items.sort((a, b) => b.target - a.target);
 
   return prepareStrategyTableGroup(items);
 }

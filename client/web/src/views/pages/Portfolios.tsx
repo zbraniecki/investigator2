@@ -72,6 +72,7 @@ export function Portfolios() {
   const tableData = preparePortfolioTableData(
     pid,
     portfolios,
+    portfolioMeta,
     assetInfo,
     wallets
   );

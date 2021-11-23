@@ -49,7 +49,13 @@ export function Wallets() {
   if (portfolios.length > 0) {
     pid = portfolios[0].id;
   }
-  const tableData = prepareWalletTableData(pid, portfolios, assetInfo, wallets);
+  const tableData = prepareWalletTableData(
+    pid,
+    portfolios,
+    portfolioMeta,
+    assetInfo,
+    wallets
+  );
 
   let value = "$--.-- | 24h: -.-% | yield: -.-%";
   const pMeta = portfolioMeta[pid];

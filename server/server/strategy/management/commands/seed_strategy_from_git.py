@@ -26,6 +26,17 @@ import pprint
 
 getcontext().prec = 2
 
+SYMBOL_MAP = {
+    "eth2": "eth",
+    "AVAX": "avax",
+    "nano": "xno",
+}
+
+def normalize_symbol(input):
+    if input in SYMBOL_MAP:
+        return SYMBOL_MAP[input]
+    else:
+        return input
 
 def upload_strategy_data(data, dt, dry=False):
     parsed_toml = toml.loads(data)
@@ -44,7 +55,8 @@ def upload_strategy_data(data, dt, dry=False):
     assert strat
 
     for coin in coins:
-        asset = Asset.objects.get(symbol__iexact=coin["symbol"])
+        symbol = normalize_symbol(coin["symbol"])
+        asset = Asset.objects.get(symbol__iexact=symbol)
         target = StrategyTarget.objects.filter(
             strategy=strat,
             asset=asset,
@@ -81,7 +93,7 @@ def upload_strategy_data(data, dt, dry=False):
     for target in strat.targets.all():
         found = False
         for coin in coins:
-            if coin["symbol"].lower() == target.asset.symbol.lower():
+            if normalize_symbol(coin["symbol"].lower()) == normalize_symbol(target.asset.symbol.lower()):
                 found = True
                 break
         if not found:

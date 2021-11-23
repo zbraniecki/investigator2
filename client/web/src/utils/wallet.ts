@@ -1,6 +1,9 @@
 import { Wallet, WalletAsset, AssetInfo } from "../store/oracle";
-import { PortfolioEntry } from "../store/account";
-import { PortfolioItem, calculatePortfolioItems } from "./portfolio";
+import {
+  PortfolioEntry,
+  PortfolioEntryMeta,
+  PortfolioItem,
+} from "../store/account";
 import { assert } from "./helpers";
 
 export function getWallet(id: string, wallets: Wallet[]): Wallet | null {
@@ -127,15 +130,15 @@ function prepareWalletTableGroup(
 export function prepareWalletTableData(
   pid: string,
   portfolios: PortfolioEntry[],
+  portfoliosMeta: Record<string, PortfolioEntryMeta>,
   assetInfo: AssetInfo[],
   wallets: Wallet[]
 ): WalletTableRow[] {
-  let items: PortfolioItem[] = calculatePortfolioItems(
-    pid,
-    portfolios,
-    assetInfo,
-    wallets
-  );
+  const meta = portfoliosMeta[pid];
+  if (!meta) {
+    return [];
+  }
+  let { items } = meta;
   items = groupItemsByWallet(items);
 
   items.sort((a, b) => b.meta.value - a.meta.value);
