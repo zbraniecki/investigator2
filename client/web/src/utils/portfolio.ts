@@ -50,7 +50,7 @@ export function calculatePortfolioItems(
   /* Step 1: Collect item meta information */
   for (const holding of portfolio.holdings) {
     const asset = getAsset(holding.symbol, assetInfo);
-    assert(asset);
+    assert(asset, `Missing asset: ${holding.symbol}`);
 
     const walletAsset = getWalletAsset(
       holding.account,

@@ -28,7 +28,11 @@ from .helpers import find_matches
 
 getcontext().prec = 2
 
-SYMBOL_MAP = {"eth2": "eth", "AVAX": "avax"}
+SYMBOL_MAP = {
+    "eth2": "eth",
+    "AVAX": "avax",
+    "nano": "xno",
+}
 
 PROVIDER_MAP = {
     "icp nervous network system": "ICP NNS",

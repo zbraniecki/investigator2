@@ -68,6 +68,7 @@ COINS = [
     "dvpn",
     "ixo",
     ["iov", "starname"],
+    "xno",
 ]
 
 
