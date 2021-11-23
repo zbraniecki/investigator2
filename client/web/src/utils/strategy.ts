@@ -1,66 +1,98 @@
 import { Wallet, AssetInfo } from "../store/oracle";
-import { PortfolioEntry } from "../store/account";
+import { PortfolioEntry, PortfolioEntryMeta } from "../store/account";
+import { Strategy } from "../store/strategy";
 import { PortfolioItem, calculatePortfolioItems } from "./portfolio";
+import { assert } from "./helpers";
+
+export function getStrategy(
+  id: string,
+  strategies: Strategy[]
+): Strategy | null {
+  for (const strategy of strategies) {
+    if (strategy.id === id) {
+      return strategy;
+    }
+  }
+  return null;
+}
+
+export interface StrategyItem {
+  asset: string;
+  target: number;
+  current: number;
+}
 
 export interface StrategyTableRow {
   cells: {
-    // wallet?: string;
-    // symbol?: string;
-    // quantity?: string;
-    // yield?: number;
-    // value: number;
+    symbol: string;
+    target: number;
+    current: number;
   };
   children?: StrategyTableRow[];
 }
 
-function prepareStrategyTableGroup(
-  items: PortfolioItem[],
-  wallets: Wallet[]
-): StrategyTableRow[] {
+function calculateStrategyItems(
+  sid: string,
+  portfolios: PortfolioEntry[],
+  portfolioMeta: Record<string, PortfolioEntryMeta[]>,
+  assetInfo: AssetInfo[],
+  wallets: Wallet[],
+  strategies: Strategy[]
+): StrategyItem[] {
+  const result: StrategyItem[] = [];
+
+  const strategy = getStrategy(sid, strategies);
+  assert(strategy);
+
+  const pmeta = Object.values(portfolioMeta)[0];
+  console.log(pmeta);
+
+  for (const target of strategy.targets) {
+    result.push({
+      asset: target.symbol,
+      target: target.percent,
+      current: 0.0,
+    });
+  }
+
+  return result;
+}
+
+function prepareStrategyTableGroup(items: StrategyItem[]): StrategyTableRow[] {
   const result: StrategyTableRow[] = [];
-  // for (const item of items) {
-  //   assert(item.meta.wallet);
-  //   const wallet = getWallet(item.meta.wallet, wallets);
-  //   assert(wallet);
-
-  //   let children;
-  //   let symbol;
-  //   if (item.children) {
-  //     children = prepareWalletTableGroup(item.children, wallets);
-  //     for (const child of children) {
-  //       child.cells.wallet = undefined;
-  //     }
-  //   } else {
-  //     symbol = item.meta.symbol;
-  //   }
-
-  //   const row: WalletTableRow = {
-  //     cells: {
-  //       wallet: wallet.name,
-  //       value: item.meta.value,
-  //       yield: item.meta.yield,
-  //       symbol,
-  //     },
-  //     children,
-  //   };
-  //   result.push(row);
-  // }
+  for (const item of items) {
+    result.push({
+      cells: {
+        symbol: item.asset,
+        target: item.target,
+        current: item.current,
+      },
+    });
+  }
 
   return result;
 }
 
 export function prepareStrategyTableData(
-  pid: string,
+  sid: string,
   portfolios: PortfolioEntry[],
+  portfolioMeta: Record<string, PortfolioEntryMeta[]>,
   assetInfo: AssetInfo[],
-  wallets: Wallet[]
+  wallets: Wallet[],
+  strategies: Strategy[]
 ): StrategyTableRow[] {
-  const items: PortfolioItem[] = calculatePortfolioItems(
-    pid,
+  if (strategies.length === 0 || Object.keys(portfolioMeta).length === 0) {
+    return [];
+  }
+
+  const items: StrategyItem[] = calculateStrategyItems(
+    sid,
     portfolios,
+    portfolioMeta,
     assetInfo,
-    wallets
+    wallets,
+    strategies
   );
 
-  return prepareStrategyTableGroup(items, wallets);
+  return prepareStrategyTableGroup(items);
 }

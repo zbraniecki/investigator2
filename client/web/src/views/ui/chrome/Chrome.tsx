@@ -25,6 +25,7 @@ import {
   getAssetInfo,
   getWallets,
 } from "../../../store/oracle";
+import { fetchStrategiesThunk } from "../../../store/strategy";
 import { calculatePortfoliosMeta } from "../../../utils/portfolio";
 
 const menuItems: Array<[string, React.ReactNode]> = [
@@ -71,9 +72,10 @@ export function Chrome() {
   );
 
   useEffect(() => {
-    dispatch(fetchPortfoliosThunk(USER_ID));
     dispatch(fetchAssetInfoThunk());
     dispatch(fetchWalletsThunk());
+    dispatch(fetchPortfoliosThunk(USER_ID));
+    dispatch(fetchStrategiesThunk(USER_ID));
   }, [dispatch]);
 
   const portfolios = useSelector(getPortfolios);

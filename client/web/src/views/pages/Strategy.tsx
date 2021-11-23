@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
 import Typography from "@mui/material/Typography";
 import { Component as Table, Props as TableProps } from "../components/Table";
-import { prepareWalletTableData } from "../../utils/wallet";
 import { getPortfolios, getPortfolioMeta } from "../../store/account";
 import { getAssetInfo, getWallets } from "../../store/oracle";
-import { currency, percent } from "../../utils/formatters";
+import { getStrategies } from "../../store/strategy";
+import { prepareStrategyTableData } from "../../utils/strategy";
 
 const tableMeta: TableProps["meta"] = {
   id: "strategy",
@@ -55,20 +55,28 @@ export function Strategy() {
   const assetInfo = useSelector(getAssetInfo);
   const portfolioMeta = useSelector(getPortfolioMeta);
   const wallets = useSelector(getWallets);
+  const strategies = useSelector(getStrategies);
 
-  let pid = "uuid";
-  if (portfolios.length > 0) {
-    pid = portfolios[0].id;
+  let sid = "uuid";
+  if (strategies.length > 0) {
+    sid = strategies[0].id;
   }
-  const tableData = prepareWalletTableData(pid, portfolios, assetInfo, wallets);
+  const tableData = prepareStrategyTableData(
+    sid,
+    portfolios,
+    portfolioMeta,
+    assetInfo,
+    wallets,
+    strategies
+  );
 
-  let value = "$--.-- | 24h: -.-% | yield: -.-%";
-  const pMeta = portfolioMeta[pid];
-  if (pMeta !== undefined) {
-    value = `${currency(pMeta.value)} | 24h: ${percent(
-      pMeta.price_change_percentage_24h
-    )} | yield: ${percent(pMeta.yield)}`;
-  }
+  const value = "$--.-- | 24h: -.-% | yield: -.-%";
+  // const pMeta = portfolioMeta[pid];
+  // if (pMeta !== undefined) {
+  //   value = `${currency(pMeta.value)} | 24h: ${percent(
+  //     pMeta.price_change_percentage_24h
+  //   )} | yield: ${percent(pMeta.yield)}`;
+  // }
 
   return (
     <>
