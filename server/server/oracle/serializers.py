@@ -26,13 +26,23 @@ class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = AssetInfo
         fields = [
-            "value",
-            "pair",
-            "name",
             "symbol",
+            "name",
+            "pair",
+            "value",
+            "high_24h",
+            "low_24h",
+            "market_cap_rank",
             "market_cap",
-            "price_change_percentage_24h",
             "market_cap_change_percentage_24h",
+            "price_change_percentage_1h",
+            "price_change_percentage_24h",
+            "price_change_percentage_7d",
+            "price_change_percentage_30d",
+            "circulating_supply",
+            "total_supply",
+            "max_supply",
+            "image",
             "last_updated",
         ]
 

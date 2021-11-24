@@ -1,7 +1,7 @@
 /* eslint camelcase: "off" */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchAssetInfo, fetchWallets } from "../api/oracle";
+import { fetchAssetInfo, fetchWallets, fetchWatchlists } from "../api/oracle";
 
 export const fetchAssetInfoThunk = createAsyncThunk(
   "oracle/fetchAssetInfo",
@@ -13,14 +13,36 @@ export const fetchWalletsThunk = createAsyncThunk(
   fetchWallets
 );
 
+export const fetchWatchlistsThunk = createAsyncThunk(
+  "oracle/fetchWatchlists",
+  fetchWatchlists
+);
+
+export interface Watchlist {
+  id: string;
+  name: string;
+  type: "dynamic";
+  assets: [];
+}
+
 export interface AssetInfo {
   symbol: string;
   name: string;
   pair: [string, string];
   value: number;
+  high_24h: number;
+  low_24h: number;
+  market_cap_rank: number;
   market_cap: number;
-  price_change_percentage_24h: number;
   market_cap_change_percentage_24h: number;
+  price_change_percentage_1h: number;
+  price_change_percentage_24h: number;
+  price_change_percentage_7d: number;
+  price_change_percentage_30d: number;
+  circulating_supply: number;
+  total_supply: number;
+  max_supply: number;
+  image: string;
   last_updated: string;
 }
 
@@ -40,11 +62,13 @@ export interface Wallet {
 interface OracleState {
   assets: AssetInfo[];
   wallets: Wallet[];
+  watchlists: Watchlist[];
 }
 
 const initialState = {
   assets: [],
   wallets: [],
+  watchlists: [],
 } as OracleState;
 
 export const oracleSlice = createSlice({
@@ -58,10 +82,14 @@ export const oracleSlice = createSlice({
     builder.addCase(fetchWalletsThunk.fulfilled, (state, action) => {
       state.wallets = action.payload;
     });
+    builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
+      state.watchlists = action.payload;
+    });
   },
 });
 
 export const getAssetInfo = (state: any) => state.oracle.assets;
 export const getWallets = (state: any) => state.oracle.wallets;
+export const getWatchlists = (state: any) => state.oracle.watchlists;
 
 export default oracleSlice.reducer;

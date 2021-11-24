@@ -22,6 +22,7 @@ import {
 import {
   fetchAssetInfoThunk,
   fetchWalletsThunk,
+  fetchWatchlistsThunk,
   getAssetInfo,
   getWallets,
 } from "../../../store/oracle";
@@ -73,6 +74,7 @@ export function Chrome() {
 
   useEffect(() => {
     dispatch(fetchAssetInfoThunk());
+    dispatch(fetchWatchlistsThunk());
     dispatch(fetchWalletsThunk());
     dispatch(fetchPortfoliosThunk(USER_ID));
     dispatch(fetchStrategiesThunk(USER_ID));

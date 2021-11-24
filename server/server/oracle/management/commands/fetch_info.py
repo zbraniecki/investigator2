@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.utils.dateparse import parse_datetime
 import requests
 
-INFO_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={IDS}&order=market_cap_desc&per_page=100&page=1&sparkline=false"
+INFO_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={IDS}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C7d%2C30d"
 
 # Limit is 50 so we have to loop it
 def fetch_crypto_info():
@@ -40,11 +40,27 @@ def fetch_crypto_info():
 
         if info:
             info.value = result["current_price"]
+            info.high_24h = result["high_24h"]
+            info.low_24h = result["low_24h"]
+            info.market_cap_rank = result["market_cap_rank"]
             info.market_cap = result["market_cap"]
-            info.price_change_percentage_24h = result["price_change_percentage_24h"]
             info.market_change_cap_percentage_24h = result[
                 "market_cap_change_percentage_24h"
             ]
+            info.price_change_percentage_1h = result[
+                "price_change_percentage_1h_in_currency"
+            ]
+            info.price_change_percentage_24h = result["price_change_percentage_24h"]
+            info.price_change_percentage_7d = result[
+                "price_change_percentage_7d_in_currency"
+            ]
+            info.price_change_percentage_30d = result[
+                "price_change_percentage_30d_in_currency"
+            ]
+            info.circulating_supply = result["circulating_supply"]
+            info.total_supply = result["total_supply"]
+            info.max_supply = result["max_supply"]
+            info.image = result["image"]
             info.last_updated = parse_datetime(result["last_updated"])
             info.save()
         else:
@@ -52,11 +68,27 @@ def fetch_crypto_info():
                 asset=asset,
                 base=base_asset,
                 value=result["current_price"],
+                high_24h=result["high_24h"],
+                low_24h=result["low_24h"],
+                market_cap_rank=result["market_cap_rank"],
                 market_cap=result["market_cap"],
-                price_change_percentage_24h=result["price_change_percentage_24h"],
                 market_cap_change_percentage_24h=result[
                     "market_cap_change_percentage_24h"
                 ],
+                price_change_percentage_1h=result[
+                    "price_change_percentage_1h_in_currency"
+                ],
+                price_change_percentage_24h=result["price_change_percentage_24h"],
+                price_change_percentage_7d=result[
+                    "price_change_percentage_7d_in_currency"
+                ],
+                price_change_percentage_30d=result[
+                    "price_change_percentage_30d_in_currency"
+                ],
+                circulating_supply=result["circulating_supply"],
+                total_supply=result["total_supply"],
+                max_supply=result["max_supply"],
+                image=result["image"],
                 last_updated=parse_datetime(result["last_updated"]),
             )
             info.save()

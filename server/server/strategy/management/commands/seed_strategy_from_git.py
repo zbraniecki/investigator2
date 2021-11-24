@@ -32,11 +32,13 @@ SYMBOL_MAP = {
     "nano": "xno",
 }
 
+
 def normalize_symbol(input):
     if input in SYMBOL_MAP:
         return SYMBOL_MAP[input]
     else:
         return input
+
 
 def upload_strategy_data(data, dt, dry=False):
     parsed_toml = toml.loads(data)
@@ -93,7 +95,9 @@ def upload_strategy_data(data, dt, dry=False):
     for target in strat.targets.all():
         found = False
         for coin in coins:
-            if normalize_symbol(coin["symbol"].lower()) == normalize_symbol(target.asset.symbol.lower()):
+            if normalize_symbol(coin["symbol"].lower()) == normalize_symbol(
+                target.asset.symbol.lower()
+            ):
                 found = True
                 break
         if not found:

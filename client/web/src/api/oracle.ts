@@ -9,3 +9,8 @@ export const fetchWallets = async () => {
   const resp = await fetch(`${BASE_URL}oracle/wallets/`);
   return resp.json();
 };
+
+export const fetchWatchlists = async () => {
+  const resp = await fetch(`${BASE_URL}oracle/watchlists/`);
+  return resp.json();
+};

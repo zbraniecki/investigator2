@@ -142,7 +142,7 @@ export function prepareStrategyTableData(
     if (b.target === a.target) {
       return b.current - a.current;
     }
-    return b.target - a.target
+    return b.target - a.target;
   });
 
   return prepareStrategyTableGroup(items);
