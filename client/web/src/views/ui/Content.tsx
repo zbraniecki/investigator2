@@ -1,20 +1,24 @@
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import { Routes, Route } from "react-router-dom";
-import { Portfolios } from "../pages/Portfolios";
-import { Wallets } from "../pages/Wallets";
-import { Strategy } from "../pages/Strategy";
-import { Watchlists } from "../pages/Watchlists";
+import { MenuItem } from "./chrome/Chrome";
 
-export default function Content() {
+interface Props {
+  menuItems: Array<MenuItem>;
+}
+
+export default function Content({ menuItems }: Props) {
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       <Toolbar />
       <Routes>
-        <Route path="*" element={<Portfolios />} />
-        <Route path="watchlists" element={<Watchlists />} />
-        <Route path="strategies" element={<Strategy />} />
-        <Route path="wallets" element={<Wallets />} />
+        {menuItems.map((item) => (
+          <Route
+            key={`route-${item.id}`}
+            path={item.default ? "*" : item.id}
+            element={item.element}
+          />
+        ))}
       </Routes>
     </Box>
   );

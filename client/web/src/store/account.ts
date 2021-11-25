@@ -1,11 +1,17 @@
 /* eslint camelcase: "off" */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchPortfolios } from "../api/account";
+import { fetchPortfolios, fetchWatchlists } from "../api/account";
+import { Watchlist } from "./oracle";
 
 export const fetchPortfoliosThunk = createAsyncThunk(
   "account/fetchPortfolios",
   fetchPortfolios
+);
+
+export const fetchWatchlistsThunk = createAsyncThunk(
+  "account/fetchWatchlists",
+  fetchWatchlists
 );
 
 export interface Holding {
@@ -47,11 +53,13 @@ export interface PortfolioEntry {
 interface AccountState {
   portfolios: PortfolioEntry[];
   meta: Record<string, PortfolioEntryMeta>;
+  watchlists: Watchlist[];
 }
 
 const initialState = {
   portfolios: [],
   meta: {},
+  watchlists: [],
 } as AccountState;
 
 export const accountSlice = createSlice({
@@ -69,11 +77,15 @@ export const accountSlice = createSlice({
     builder.addCase(fetchPortfoliosThunk.fulfilled, (state, action) => {
       state.portfolios = action.payload;
     });
+    builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
+      state.watchlists = action.payload;
+    });
   },
 });
 
 export const getPortfolios = (state: any) => state.account.portfolios;
 export const getPortfolioMeta = (state: any) => state.account.meta;
+export const getWatchlists = (state: any) => state.account.watchlists;
 export const { setPortfoliosMeta } = accountSlice.actions;
 
 export default accountSlice.reducer;

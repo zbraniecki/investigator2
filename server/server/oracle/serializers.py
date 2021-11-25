@@ -89,12 +89,25 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PublicWatchlistSerializer(serializers.HyperlinkedModelSerializer):
+    portfolio = serializers.SerializerMethodField("get_portfolio")
     assets = serializers.SerializerMethodField("get_assets")
     type = serializers.SerializerMethodField("get_type")
 
     class Meta:
         model = Watchlist
-        fields = ["id", "name", "type", "assets"]
+        fields = [
+            "id",
+            "name",
+            "type",
+            "assets",
+            "portfolio",
+        ]
+
+    def get_portfolio(self, obj):
+        if obj.type == WatchlistType.PORTFOLIO:
+            return obj.portfolio.id
+        else:
+            return None
 
     def get_type(self, obj):
         return "dynamic"

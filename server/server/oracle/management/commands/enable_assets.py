@@ -17,7 +17,6 @@ COINS = [
     "miota",
     ["eos", "eos"],
     "ksm",
-    "nano",
     ["comp", "compound-governance-token"],
     "link",
     "zec",
@@ -69,6 +68,7 @@ COINS = [
     "ixo",
     ["iov", "starname"],
     "xno",
+    "kar",
 ]
 
 
@@ -76,19 +76,22 @@ def activate_crypto_assets():
     crypto = Category.objects.get(name="crypto")
     Asset.objects.filter(categories__in=[crypto]).update(active=False)
 
+    top30_assets = Asset.inactive_objects.filter(info__market_cap__gte=30).update(
+        active=True
+    )
+
     for key in COINS:
         if type(key) is str:
-            asset = Asset.inactive_objects.filter(symbol=key).first()
-            if asset and asset.active == False:
-                print(f"Activating {asset}")
-                asset.active = True
-                asset.save()
+            asset = Asset.all_objects.filter(symbol=key).first()
         else:
-            asset = Asset.inactive_objects.filter(api_id=key[1]).first()
-            if asset and asset.active == False:
-                print(f"Activating {asset}")
-                asset.active = True
-                asset.save()
+            asset = Asset.all_objects.filter(api_id=key[1]).first()
+
+        if asset:
+            print(f"Activating {asset}")
+            asset.active = True
+            asset.save()
+        else:
+            print(f"Can't activate asset {key}")
 
 
 class Command(BaseCommand):

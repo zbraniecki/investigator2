@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from server.oracle.models import Asset, Category
 from django.core.management.base import BaseCommand
 import requests
+import json
 
 
 COIN_LIST_URL = "https://api.coingecko.com/api/v3/coins/list?include_platform=false"
@@ -9,6 +10,8 @@ COIN_LIST_URL = "https://api.coingecko.com/api/v3/coins/list?include_platform=fa
 
 def fetch_crypto_assets(dry=False):
     source = requests.get(COIN_LIST_URL).json()
+    with open("coins.json", "w") as f:
+        json.dump(source, f)
 
     asset_class = Category.objects.get(name="crypto")
     id = 0

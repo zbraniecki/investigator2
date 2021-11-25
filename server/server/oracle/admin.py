@@ -14,9 +14,16 @@ from .models import (
 
 @admin.register(Asset)
 class AssetAdmin(admin.ModelAdmin):
+    list_display = ("rank", "symbol", "name")
     list_filter = ("categories", "active")
     search_fields = ["symbol", "name"]
-    ordering = ("symbol",)
+    ordering = (
+        "info__market_cap_rank",
+        "symbol",
+    )
+
+    def rank(self, obj):
+        return obj.info.get().market_cap_rank
 
 
 class PassiveInline(admin.TabularInline):

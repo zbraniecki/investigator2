@@ -1,9 +1,25 @@
+import React from "react";
+import Box from "@mui/material/Box";
 import { useSelector } from "react-redux";
 import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 import { Component as Table, Props as TableProps } from "../components/Table";
-import { prepareWatchlistTableData } from "../../utils/watchlist";
-import { getAssetInfo, getWatchlists } from "../../store/oracle";
-// import { currency, percent } from "../../utils/formatters";
+import {
+  WatchlistTableRow,
+  prepareWatchlistTableData,
+  calculateWatchlistMeta,
+} from "../../utils/watchlist";
+import {
+  getAssetInfo,
+  getWatchlists as getPublicWatchlists,
+  Watchlist,
+} from "../../store/oracle";
+import {
+  getPortfolios,
+  getWatchlists as getUserWatchlists,
+} from "../../store/account";
+import { percent } from "../../utils/formatters";
 
 const tableMeta: TableProps["meta"] = {
   id: "watchlist",
@@ -67,25 +83,56 @@ const tableMeta: TableProps["meta"] = {
 
 export function Watchlists() {
   const assetInfo = useSelector(getAssetInfo);
-  const watchlists = useSelector(getWatchlists);
+  const publicWatchlists = useSelector(getPublicWatchlists);
+  const userWatchlists = useSelector(getUserWatchlists);
+  const portfolios = useSelector(getPortfolios);
 
-  let wid = "uuid";
-  if (watchlists.length > 0) {
-    wid = watchlists[0].id;
+  const [wIdx, setwIdx] = React.useState(0);
+  const handleChange = (event: any, newValue: any) => {
+    setwIdx(newValue);
+  };
+
+  let tableData: Array<WatchlistTableRow> = [];
+  let value = "1h: -.-% | 24h: -.-% | 7d: -.-% | 30d: -.-%";
+
+  const watchlists: Watchlist[] = Array.from(publicWatchlists);
+  watchlists.push(...userWatchlists);
+
+  if (watchlists.length >= wIdx + 1) {
+    const wid = watchlists[wIdx].id;
+    tableData = prepareWatchlistTableData(
+      wid,
+      watchlists,
+      assetInfo,
+      portfolios
+    );
+
+    const meta = calculateWatchlistMeta(wid, watchlists, assetInfo, portfolios);
+    value = `1h: ${percent(meta.value_change_1h)} | 24h: ${percent(
+      meta.value_change_24h
+    )} | 7d: ${percent(meta.value_change_7d)} | 30d: ${percent(
+      meta.value_change_30d
+    )}`;
   }
-  const tableData = prepareWatchlistTableData(wid, watchlists, assetInfo);
 
-  const value = "$--.-- | 24h: -.-% | yield: -.-%";
-  // const pMeta = portfolioMeta[pid];
-  // if (pMeta !== undefined) {
-  //   value = `${currency(pMeta.value)} | 24h: ${percent(
-  //     pMeta.price_change_percentage_24h
-  //   )} | yield: ${percent(pMeta.yield)}`;
-  // }
+  const tabs: Array<string> = watchlists.map((wlist: Watchlist) => wlist.name);
 
   return (
     <>
-      <Typography align="right">Value: {value}</Typography>
+      <Box sx={{ display: "flex", flexDirection: "row" }}>
+        <Box sx={{ flexGrow: 1 }}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs value={wIdx} onChange={handleChange}>
+              {tabs.map((tab) => (
+                <Tab key={`tab-${tab}`} label={tab} />
+              ))}
+            </Tabs>
+          </Box>
+        </Box>
+        <Typography sx={{ display: "flex", alignItems: "center" }}>
+          Value: {value}
+        </Typography>
+      </Box>
       <Table meta={tableMeta} data={tableData} />
     </>
   );

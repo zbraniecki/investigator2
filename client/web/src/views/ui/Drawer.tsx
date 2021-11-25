@@ -5,11 +5,12 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 // import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import { useNavigate, useLocation } from "react-router-dom";
+import { MenuItem } from "./chrome/Chrome";
 
 const drawerWidth = 60;
 
 interface Props {
-  menuItems: Array<[string, React.ReactNode]>;
+  menuItems: Array<MenuItem>;
 }
 
 export default function InvestigatorDrawer({ menuItems }: Props) {
@@ -21,7 +22,11 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
   };
 
   const { pathname } = useLocation();
-  const pageState = pathname.substr(1);
+  let pageState = pathname.substr(1);
+
+  if (!pageState) {
+    pageState = "portfolios";
+  }
 
   return (
     <Drawer
@@ -34,12 +39,12 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
     >
       <Toolbar />
       <List>
-        {menuItems.map(([name, icon]) => (
+        {menuItems.map(({ id, icon }) => (
           <ListItemButton
-            selected={name === pageState}
-            key={`drawer-list-item-${name}`}
+            selected={id === pageState}
+            key={`drawer-list-item-${id}`}
           >
-            <ListItemIcon data-value={name} onClick={handlePageSelect}>
+            <ListItemIcon data-value={id} onClick={handlePageSelect}>
               {icon}
             </ListItemIcon>
           </ListItemButton>

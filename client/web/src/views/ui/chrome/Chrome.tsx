@@ -16,24 +16,53 @@ import Content from "../Content";
 import { LightMode, getLightMode } from "../../../store/ui";
 import {
   fetchPortfoliosThunk,
+  fetchWatchlistsThunk as fetchUserWatchlistsThunk,
   getPortfolios,
   setPortfoliosMeta,
 } from "../../../store/account";
 import {
   fetchAssetInfoThunk,
   fetchWalletsThunk,
-  fetchWatchlistsThunk,
+  fetchWatchlistsThunk as fetchPublicWatchlistsThunk,
   getAssetInfo,
   getWallets,
 } from "../../../store/oracle";
 import { fetchStrategiesThunk } from "../../../store/strategy";
 import { calculatePortfoliosMeta } from "../../../utils/portfolio";
+import { Watchlists } from "../../pages/Watchlists";
+import { Portfolios } from "../../pages/Portfolios";
+import { Wallets } from "../../pages/Wallets";
+import { Strategy } from "../../pages/Strategy";
 
-const menuItems: Array<[string, React.ReactNode]> = [
-  ["watchlists", <TrendingUpIcon />],
-  ["portfolios", <MonetizationOnIcon />],
-  ["strategies", <PieChartIcon />],
-  ["wallets", <AccountBalanceIcon />],
+export interface MenuItem {
+  id: string;
+  icon: React.ReactNode;
+  element: React.ReactElement;
+  default?: boolean;
+}
+
+const menuItems: Array<MenuItem> = [
+  {
+    id: "watchlists",
+    icon: <TrendingUpIcon />,
+    element: <Watchlists />,
+  },
+  {
+    id: "portfolios",
+    icon: <MonetizationOnIcon />,
+    element: <Portfolios />,
+    default: true,
+  },
+  {
+    id: "strategies",
+    icon: <PieChartIcon />,
+    element: <Strategy />,
+  },
+  {
+    id: "wallets",
+    icon: <AccountBalanceIcon />,
+    element: <Wallets />,
+  },
 ];
 
 const USER_ID = 1;
@@ -74,7 +103,8 @@ export function Chrome() {
 
   useEffect(() => {
     dispatch(fetchAssetInfoThunk());
-    dispatch(fetchWatchlistsThunk());
+    dispatch(fetchPublicWatchlistsThunk());
+    dispatch(fetchUserWatchlistsThunk());
     dispatch(fetchWalletsThunk());
     dispatch(fetchPortfoliosThunk(USER_ID));
     dispatch(fetchStrategiesThunk(USER_ID));
@@ -95,7 +125,7 @@ export function Chrome() {
       <Box sx={{ display: "flex" }}>
         <InvestigatorAppBar />
         <InvestigatorDrawer menuItems={menuItems} />
-        <Content />
+        <Content menuItems={menuItems} />
       </Box>
     </ThemeProvider>
   );

@@ -23,6 +23,7 @@ export interface Watchlist {
   name: string;
   type: "dynamic";
   assets: [];
+  portfolio?: string;
 }
 
 export interface AssetInfo {

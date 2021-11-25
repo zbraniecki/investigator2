@@ -6,6 +6,8 @@ import requests
 
 INFO_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={IDS}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C7d%2C30d"
 
+TOP30_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=30&page=1&sparkline=false&price_change_percentage=1h%2C7d%2C30d"
+
 # Limit is 50 so we have to loop it
 def fetch_crypto_info():
     asset_class = Category.objects.get(name="crypto")
@@ -33,8 +35,14 @@ def fetch_crypto_info():
 
     assert len(assets) == len(results)
 
+    sub_results = requests.get(TOP30_URL).json()
+    results.extend(sub_results)
+
     for result in results:
-        asset = Asset.objects.get(api_id=result["id"])
+        asset = Asset.all_objects.get(api_id=result["id"])
+        if not asset.active:
+            asset.active = True
+            asset.save()
 
         info = AssetInfo.objects.filter(asset=asset, base=base_asset).first()
 
