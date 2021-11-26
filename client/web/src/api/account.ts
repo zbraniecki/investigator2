@@ -1,12 +1,12 @@
 import { BASE_URL } from "./main";
 
 export const fetchPortfolios = async (userId: number) => {
-  const resp = await fetch(`${BASE_URL}account/portfolio/?owner=${userId}`);
+  const resp = await fetch(`${BASE_URL}profile/portfolio/?owner=${userId}`);
   return resp.json();
 };
 
 export const fetchWatchlists = async () => {
-  const resp = await fetch(`${BASE_URL}account/watchlist/`);
+  const resp = await fetch(`${BASE_URL}profile/watchlist/`);
   return resp.json();
 };
 

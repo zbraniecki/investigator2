@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "rest_auth.registration",
     "allauth",
     "allauth.account",
-    "allauth.socialaccount",
+    # "allauth.socialaccount",
     "corsheaders",
     "investigator.oracle",
     "investigator.profile",
@@ -141,3 +141,5 @@ AUTH_USER_MODEL = "profile.User"
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
+
+SITE_ID=1
