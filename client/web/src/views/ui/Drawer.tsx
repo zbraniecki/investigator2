@@ -43,10 +43,10 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
           <ListItemButton
             selected={id === pageState}
             key={`drawer-list-item-${id}`}
+            onClick={handlePageSelect}
+            data-value={id}
           >
-            <ListItemIcon data-value={id} onClick={handlePageSelect}>
-              {icon}
-            </ListItemIcon>
+            <ListItemIcon>{icon}</ListItemIcon>
           </ListItemButton>
         ))}
       </List>

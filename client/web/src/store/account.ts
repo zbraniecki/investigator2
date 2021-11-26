@@ -1,7 +1,7 @@
 /* eslint camelcase: "off" */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchPortfolios, fetchWatchlists } from "../api/account";
+import { fetchPortfolios, fetchWatchlists, authenticate } from "../api/account";
 import { Watchlist } from "./oracle";
 
 export const fetchPortfoliosThunk = createAsyncThunk(
@@ -12,6 +12,11 @@ export const fetchPortfoliosThunk = createAsyncThunk(
 export const fetchWatchlistsThunk = createAsyncThunk(
   "account/fetchWatchlists",
   fetchWatchlists
+);
+
+export const authenticateThunk = createAsyncThunk(
+  "account/authenticate",
+  authenticate
 );
 
 export interface Holding {
@@ -50,13 +55,22 @@ export interface PortfolioEntry {
   portfolios: string[];
 }
 
+export enum AuthenticateState {
+  None,
+  Authenticating,
+  Session,
+  Error,
+}
+
 interface AccountState {
+  authenticateState: AuthenticateState;
   portfolios: PortfolioEntry[];
   meta: Record<string, PortfolioEntryMeta>;
   watchlists: Watchlist[];
 }
 
 const initialState = {
+  authenticateState: AuthenticateState.None,
   portfolios: [],
   meta: {},
   watchlists: [],
@@ -72,6 +86,12 @@ export const accountSlice = createSlice({
     ) => {
       state.meta = payload;
     },
+    setAuthenticateState: (
+      state,
+      { payload }: { payload: AuthenticateState }
+    ) => {
+      state.authenticateState = payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPortfoliosThunk.fulfilled, (state, action) => {
@@ -80,12 +100,23 @@ export const accountSlice = createSlice({
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
       state.watchlists = action.payload;
     });
+    builder.addCase(authenticateThunk.fulfilled, (state, action) => {
+      if (action.payload === "error") {
+        state.authenticateState = AuthenticateState.Error;
+      } else if (typeof action.payload === "string") {
+        state.authenticateState = AuthenticateState.Session;
+      } else {
+        state.authenticateState = AuthenticateState.None;
+      }
+    });
   },
 });
 
 export const getPortfolios = (state: any) => state.account.portfolios;
 export const getPortfolioMeta = (state: any) => state.account.meta;
 export const getWatchlists = (state: any) => state.account.watchlists;
-export const { setPortfoliosMeta } = accountSlice.actions;
+export const getAuthenticateState = (state: any) =>
+  state.account.authenticateState;
+export const { setPortfoliosMeta, setAuthenticateState } = accountSlice.actions;
 
 export default accountSlice.reducer;

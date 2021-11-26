@@ -13,7 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 import InvestigatorAppBar from "../AppBar";
 import InvestigatorDrawer from "../Drawer";
 import Content from "../Content";
-import { LightMode, getLightMode } from "../../../store/ui";
+import { LightMode, getLightMode, setLightMode } from "../../../store/ui";
 import {
   fetchPortfoliosThunk,
   fetchWatchlistsThunk as fetchUserWatchlistsThunk,
@@ -123,7 +123,10 @@ export function Chrome() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: "flex" }}>
-        <InvestigatorAppBar />
+        <InvestigatorAppBar
+          setLightMode={setLightMode}
+          lightModeName={lightModeName}
+        />
         <InvestigatorDrawer menuItems={menuItems} />
         <Content menuItems={menuItems} />
       </Box>
