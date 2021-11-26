@@ -20,7 +20,7 @@ import Person from "@mui/icons-material/Person";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import { LoginModal } from "./chrome/Login";
-import { LightMode } from "../../store/ui";
+import { LightMode, InfoDisplayMode, setInfoDisplayMode } from "../../store/ui";
 import {
   AuthenticateState,
   getAuthenticateState,
@@ -119,11 +119,13 @@ function MUISwitch(props: any) {
 interface Props {
   setLightMode: any;
   lightModeName: string;
+  infoDisplayMode: InfoDisplayMode;
 }
 
 export default function InvestigatorAppBar({
   setLightMode,
   lightModeName,
+  infoDisplayMode,
 }: Props) {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -158,6 +160,14 @@ export default function InvestigatorAppBar({
     }, 100);
   };
 
+  function handleInfoDisplayModeChange() {
+    const newState =
+      infoDisplayMode === InfoDisplayMode.ShowAll
+        ? InfoDisplayMode.HideValues
+        : InfoDisplayMode.ShowAll;
+    dispatch(setInfoDisplayMode(newState));
+  }
+
   const authenticateState = useSelector(getAuthenticateState);
 
   return (
@@ -181,7 +191,10 @@ export default function InvestigatorAppBar({
         Wealth Investigator
       </Typography>
       <Toolbar>
-        <MUISwitch defaultChecked />
+        <MUISwitch
+          checked={infoDisplayMode === InfoDisplayMode.ShowAll}
+          onChange={handleInfoDisplayModeChange}
+        />
         <Tooltip title="Account settings">
           <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
             <Avatar sx={{ width: 32, height: 32 }}>

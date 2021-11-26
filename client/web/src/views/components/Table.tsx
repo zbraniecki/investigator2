@@ -28,15 +28,18 @@ export interface Props {
       align: "inherit" | "left" | "right" | "center" | "justify" | undefined;
       width: number | "auto";
       formatter?: "percent" | "currency" | "number" | "symbol";
+      sensitive?: boolean;
     }[];
   };
   data: DataRowProps[];
+  hideSensitive: boolean;
 }
 
 export interface RowProps {
   id: string;
   data: DataRowProps;
   headers: Props["meta"]["headers"];
+  hideSensitive: boolean;
 }
 
 export interface TableProps {
@@ -44,6 +47,7 @@ export interface TableProps {
   data: DataRowProps[];
   headers: Props["meta"]["headers"];
   displayHeaders: boolean;
+  hideSensitive: boolean;
 }
 
 const tableSettings = {
@@ -54,7 +58,13 @@ const tableSettings = {
   },
 };
 
-function TableComponent({ id, data, headers, displayHeaders }: TableProps) {
+function TableComponent({
+  id,
+  data,
+  headers,
+  displayHeaders,
+  hideSensitive,
+}: TableProps) {
   return (
     <Table>
       {displayHeaders && (
@@ -76,14 +86,22 @@ function TableComponent({ id, data, headers, displayHeaders }: TableProps) {
       <TableBody>
         {data.map((row, idx) => {
           const ident: string = `${id}-row${idx}`;
-          return <Row key={ident} id={ident} data={row} headers={headers} />;
+          return (
+            <Row
+              key={ident}
+              id={ident}
+              data={row}
+              headers={headers}
+              hideSensitive={hideSensitive}
+            />
+          );
         })}
       </TableBody>
     </Table>
   );
 }
 
-function Row({ id, data, headers }: RowProps) {
+function Row({ id, data, headers, hideSensitive }: RowProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -106,6 +124,8 @@ function Row({ id, data, headers }: RowProps) {
 
           if (rawValue === undefined) {
             value = "";
+          } else if (header.sensitive && hideSensitive) {
+            value = "*";
           } else {
             switch (header.formatter) {
               case "currency": {
@@ -151,6 +171,7 @@ function Row({ id, data, headers }: RowProps) {
                 data={data.children}
                 headers={headers}
                 displayHeaders={false}
+                hideSensitive={hideSensitive}
               />
             </Collapse>
           </TableCell>
@@ -160,10 +181,20 @@ function Row({ id, data, headers }: RowProps) {
   );
 }
 
-export function Component({ meta: { id, headers }, data }: Props) {
+export function Component({
+  meta: { id, headers },
+  data,
+  hideSensitive,
+}: Props) {
   return (
     <TableContainer component={Paper}>
-      <TableComponent id={id} data={data} headers={headers} displayHeaders />
+      <TableComponent
+        id={id}
+        data={data}
+        headers={headers}
+        displayHeaders
+        hideSensitive={hideSensitive}
+      />
     </TableContainer>
   );
 }

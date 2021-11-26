@@ -19,6 +19,7 @@ import {
   getPortfolios,
   getWatchlists as getUserWatchlists,
 } from "../../store/account";
+import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 import { percent } from "../../utils/formatters";
 
 const tableMeta: TableProps["meta"] = {
@@ -86,6 +87,7 @@ export function Watchlists() {
   const publicWatchlists = useSelector(getPublicWatchlists);
   const userWatchlists = useSelector(getUserWatchlists);
   const portfolios = useSelector(getPortfolios);
+  const infoDisplayMode = useSelector(getInfoDisplayMode);
 
   const [wIdx, setwIdx] = React.useState(0);
   const handleChange = (event: any, newValue: any) => {
@@ -133,7 +135,11 @@ export function Watchlists() {
           Value: {value}
         </Typography>
       </Box>
-      <Table meta={tableMeta} data={tableData} />
+      <Table
+        meta={tableMeta}
+        data={tableData}
+        hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
+      />
     </>
   );
 }

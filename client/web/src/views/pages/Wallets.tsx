@@ -4,6 +4,7 @@ import { Component as Table, Props as TableProps } from "../components/Table";
 import { prepareWalletTableData } from "../../utils/wallet";
 import { getPortfolios, getPortfolioMeta } from "../../store/account";
 import { getAssetInfo, getWallets } from "../../store/oracle";
+import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 import { currency, percent } from "../../utils/formatters";
 
 const tableMeta: TableProps["meta"] = {
@@ -28,6 +29,7 @@ const tableMeta: TableProps["meta"] = {
       align: "right",
       width: 0.1,
       formatter: "number",
+      sensitive: true,
     },
     {
       label: "Value",
@@ -35,6 +37,7 @@ const tableMeta: TableProps["meta"] = {
       align: "right",
       width: 0.1,
       formatter: "currency",
+      sensitive: true,
     },
   ],
 };
@@ -44,6 +47,7 @@ export function Wallets() {
   const assetInfo = useSelector(getAssetInfo);
   const portfolioMeta = useSelector(getPortfolioMeta);
   const wallets = useSelector(getWallets);
+  const infoDisplayMode = useSelector(getInfoDisplayMode);
 
   let pid = "uuid";
   if (portfolios.length > 0) {
@@ -68,7 +72,11 @@ export function Wallets() {
   return (
     <>
       <Typography align="right">Value: {value}</Typography>
-      <Table meta={tableMeta} data={tableData} />
+      <Table
+        meta={tableMeta}
+        data={tableData}
+        hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
+      />
     </>
   );
 }

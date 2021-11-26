@@ -6,6 +6,7 @@ import { getAssetInfo, getWallets } from "../../store/oracle";
 import { getStrategies } from "../../store/strategy";
 import { prepareStrategyTableData } from "../../utils/strategy";
 import { currency, percent } from "../../utils/formatters";
+import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 
 const tableMeta: TableProps["meta"] = {
   id: "strategy",
@@ -30,6 +31,7 @@ const tableMeta: TableProps["meta"] = {
       align: "left",
       width: "auto",
       formatter: "percent",
+      sensitive: true,
     },
     {
       label: "Deviation",
@@ -37,6 +39,7 @@ const tableMeta: TableProps["meta"] = {
       align: "right",
       width: 0.1,
       formatter: "percent",
+      sensitive: true,
     },
     {
       label: "Delta",
@@ -44,6 +47,7 @@ const tableMeta: TableProps["meta"] = {
       align: "right",
       width: 0.1,
       formatter: "percent",
+      sensitive: true,
     },
     {
       label: "USD Delta",
@@ -51,6 +55,7 @@ const tableMeta: TableProps["meta"] = {
       align: "right",
       width: 0.1,
       formatter: "currency",
+      sensitive: true,
     },
   ],
 };
@@ -61,6 +66,7 @@ export function Strategy() {
   const portfolioMeta = useSelector(getPortfolioMeta);
   const wallets = useSelector(getWallets);
   const strategies = useSelector(getStrategies);
+  const infoDisplayMode = useSelector(getInfoDisplayMode);
 
   let sid = "uuid";
   let pid = "uuid";
@@ -91,7 +97,11 @@ export function Strategy() {
   return (
     <>
       <Typography align="right">Value: {value}</Typography>
-      <Table meta={tableMeta} data={tableData} />
+      <Table
+        meta={tableMeta}
+        data={tableData}
+        hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
+      />
     </>
   );
 }

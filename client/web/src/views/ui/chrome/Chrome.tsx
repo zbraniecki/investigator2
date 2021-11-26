@@ -13,7 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 import InvestigatorAppBar from "../AppBar";
 import InvestigatorDrawer from "../Drawer";
 import Content from "../Content";
-import { LightMode, getLightMode, setLightMode } from "../../../store/ui";
+import { LightMode, getLightMode, setLightMode , InfoDisplayMode, getInfoDisplayMode } from "../../../store/ui";
 import {
   fetchPortfoliosThunk,
   fetchWatchlistsThunk as fetchUserWatchlistsThunk,
@@ -71,6 +71,7 @@ export function Chrome() {
   const dispatch = useDispatch();
 
   const storedLightMode = useSelector(getLightMode);
+  const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)", {
     noSsr: true,
@@ -126,6 +127,7 @@ export function Chrome() {
         <InvestigatorAppBar
           setLightMode={setLightMode}
           lightModeName={lightModeName}
+          infoDisplayMode={infoDisplayMode}
         />
         <InvestigatorDrawer menuItems={menuItems} />
         <Content menuItems={menuItems} />
