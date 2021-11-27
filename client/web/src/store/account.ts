@@ -6,6 +6,7 @@ import {
   fetchWatchlists,
   authenticate,
   logout,
+  fetchUserInfo,
 } from "../api/account";
 import { Watchlist } from "./oracle";
 import { getFromLocalStorage } from "./main";
@@ -23,6 +24,11 @@ export const fetchWatchlistsThunk = createAsyncThunk(
 export const authenticateThunk = createAsyncThunk(
   "account/authenticate",
   authenticate
+);
+
+export const fetchUserInfoThunk = createAsyncThunk(
+  "account/user",
+  fetchUserInfo
 );
 
 export const logoutThunk = createAsyncThunk("account/logout", logout);
@@ -84,13 +90,8 @@ interface AccountState {
 
 const initialState = {
   session: {
-    authenticateState: getFromLocalStorage(
-      "authState",
-      "enum",
-      AuthenticateState.None
-    ),
+    authenticateState: AuthenticateState.None,
     token: getFromLocalStorage("token", "string", undefined),
-    username: getFromLocalStorage("username", "string", undefined),
   },
   portfolios: [],
   meta: {},
@@ -139,6 +140,24 @@ export const accountSlice = createSlice({
       state.session.email = undefined;
       state.session.username = undefined;
       state.session.token = undefined;
+      state.portfolios = [];
+      state.meta = {};
+      state.watchlists = [];
+    });
+    builder.addCase(fetchUserInfoThunk.fulfilled, (state, action) => {
+      if (action.payload.email) {
+        state.session.email = action.payload.email;
+        state.session.username = action.payload.username;
+        state.session.authenticateState = AuthenticateState.Session;
+      } else {
+        state.session.authenticateState = AuthenticateState.None;
+        state.session.email = undefined;
+        state.session.username = undefined;
+        state.session.token = undefined;
+        state.portfolios = [];
+        state.meta = {};
+        state.watchlists = [];
+      }
     });
   },
 });

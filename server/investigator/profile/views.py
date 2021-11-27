@@ -18,7 +18,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
 
     queryset = Portfolio.objects.all().order_by("-name")
     serializer_class = PortfolioSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class HoldingViewSet(viewsets.ModelViewSet):
@@ -38,7 +38,7 @@ class WatchlistViewSet(viewsets.ModelViewSet):
 
     queryset = Watchlist.objects.filter(owner__isnull=False).order_by("id")
     serializer_class = WatchlistSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class AccountViewSet(viewsets.ModelViewSet):
@@ -48,4 +48,4 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     queryset = Account.objects.filter(owner__isnull=False).order_by("id")
     serializer_class = AccountSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]

@@ -2,12 +2,11 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-// import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { MenuItem } from "./chrome/Chrome";
 
-const drawerWidth = 60;
+const drawerWidth = 55;
 
 interface Props {
   menuItems: Array<MenuItem>;
@@ -38,7 +37,7 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
       }}
     >
       <Toolbar />
-      <List>
+      <List sx={{ overflow: "hidden" }}>
         {menuItems.map(({ id, icon }) => (
           <ListItemButton
             selected={id === pageState}

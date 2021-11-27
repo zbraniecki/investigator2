@@ -23,7 +23,9 @@ import {
 import {
   fetchPortfoliosThunk,
   fetchWatchlistsThunk as fetchUserWatchlistsThunk,
+  fetchUserInfoThunk,
   getPortfolios,
+  getSession,
   setPortfoliosMeta,
 } from "../../../store/account";
 import {
@@ -77,6 +79,7 @@ export function Chrome() {
   const dispatch = useDispatch();
 
   const storedLightMode = useSelector(getLightMode);
+  const session = useSelector(getSession);
   const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)", {
@@ -111,11 +114,19 @@ export function Chrome() {
   useEffect(() => {
     dispatch(fetchAssetInfoThunk());
     dispatch(fetchPublicWatchlistsThunk());
-    dispatch(fetchUserWatchlistsThunk());
     dispatch(fetchWalletsThunk());
-    dispatch(fetchPortfoliosThunk(USER_ID));
-    dispatch(fetchStrategiesThunk(USER_ID));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (session.token) {
+      if (!session.username) {
+        dispatch(fetchUserInfoThunk({token: session.token}));
+      }
+      dispatch(fetchPortfoliosThunk({token: session.token}));
+      dispatch(fetchStrategiesThunk({token: session.token}));
+      dispatch(fetchUserWatchlistsThunk({token: session.token}));
+    }
+  }, [dispatch, session]);
 
   const portfolios = useSelector(getPortfolios);
   const assets = useSelector(getAssetInfo);

@@ -69,6 +69,8 @@ COINS = [
     ["iov", "starname"],
     "xno",
     "kar",
+    "lit",
+    "rndr",
 ]
 
 

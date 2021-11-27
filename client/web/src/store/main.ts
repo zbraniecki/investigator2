@@ -34,12 +34,8 @@ function saveToLocalStorage(state: any) {
   localStorage.setItem("lightMode", state.ui.lightMode);
   if (state.account.session.token) {
     localStorage.setItem("token", state.account.session.token);
-    localStorage.setItem("username", state.account.session.username);
-    localStorage.setItem("authState", state.account.session.authenticateState);
   } else {
     localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("authState");
   }
 }
 

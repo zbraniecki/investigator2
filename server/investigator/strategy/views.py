@@ -13,4 +13,4 @@ class StrategyViewSet(viewsets.ModelViewSet):
 
     queryset = Strategy.objects.all().order_by("-name")
     serializer_class = StrategySerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]

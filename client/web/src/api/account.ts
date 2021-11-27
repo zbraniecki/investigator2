@@ -1,14 +1,26 @@
 import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
 
-export const fetchPortfolios = async (userId: number) => {
-  const resp = await fetch(`${BASE_URL}profile/portfolio/?owner=${userId}`);
-  return resp.json();
+export const fetchPortfolios = async ({token}: {token: string}) => {
+  const data = await fetch(`${BASE_URL}profile/portfolio/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+  });
+  return data.json();
 };
 
-export const fetchWatchlists = async () => {
-  const resp = await fetch(`${BASE_URL}profile/watchlist/`);
-  return resp.json();
+export const fetchWatchlists = async ({token}: {token: string}) => {
+  const data = await fetch(`${BASE_URL}profile/watchlist/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+  });
+  return data.json();
 };
 
 export const authenticate = async ({
@@ -57,4 +69,16 @@ export const logout = async ({ token }: { token: string }) => {
   });
   const resp = await data.json();
   assert(resp.detail);
+};
+
+export const fetchUserInfo = async ({ token }: { token: string }) => {
+  const data = await fetch(`${BASE_URL}auth/user/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+  });
+  const resp = await data.json();
+  return resp;
 };
