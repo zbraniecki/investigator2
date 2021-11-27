@@ -1,7 +1,7 @@
 import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
 
-export const fetchPortfolios = async ({token}: {token: string}) => {
+export const fetchPortfolios = async ({ token }: { token: string }) => {
   const data = await fetch(`${BASE_URL}profile/portfolio/`, {
     method: "GET",
     headers: {
@@ -12,7 +12,7 @@ export const fetchPortfolios = async ({token}: {token: string}) => {
   return data.json();
 };
 
-export const fetchWatchlists = async ({token}: {token: string}) => {
+export const fetchWatchlists = async ({ token }: { token: string }) => {
   const data = await fetch(`${BASE_URL}profile/watchlist/`, {
     method: "GET",
     headers: {
@@ -52,11 +52,10 @@ export const authenticate = async ({
       username: resp.user.username,
       email: resp.user.email,
     };
-  } 
-    return {
-      error: true,
-    };
-  
+  }
+  return {
+    error: true,
+  };
 };
 
 export const logout = async ({ token }: { token: string }) => {

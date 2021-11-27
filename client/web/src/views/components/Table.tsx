@@ -5,15 +5,16 @@ import TableCell, { SortDirection } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import TableSortLabel from '@mui/material/TableSortLabel';
+import TableSortLabel from "@mui/material/TableSortLabel";
+import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import Box from '@mui/material/Box';
+import Box from "@mui/material/Box";
+import { visuallyHidden } from "@mui/utils";
 import { currency, number, percent, symbol } from "../../utils/formatters";
-import { visuallyHidden } from '@mui/utils';
 
 interface DataRowProps {
   cells: {
@@ -25,6 +26,10 @@ interface DataRowProps {
 export interface Props {
   meta: {
     id: string;
+    sort: {
+      column: string;
+      direction: "desc" | "asc";
+    };
     headers: {
       label: string;
       id: string;
@@ -42,6 +47,10 @@ export interface RowProps {
   id: string;
   data: DataRowProps;
   headers: Props["meta"]["headers"];
+  defaultSort: {
+    column: string;
+    direction: "asc" | "desc";
+  };
   hideSensitive: boolean;
 }
 
@@ -51,7 +60,12 @@ export interface TableProps {
   headers: Props["meta"]["headers"];
   displayHeaders: boolean;
   sortable: boolean;
+  defaultSort: {
+    column: string;
+    direction: "asc" | "desc";
+  };
   hideSensitive: boolean;
+  slice?: [number, number];
 }
 
 const tableSettings = {
@@ -68,31 +82,42 @@ function TableComponent({
   headers,
   displayHeaders,
   sortable,
+  defaultSort,
   hideSensitive,
+  slice,
 }: TableProps) {
-  const [orderBy, setOrderBy] = React.useState("market_cap_rank");
-  const [sortDirection, setSortDirection] = React.useState("desc");
+  const [orderBy, setOrderBy] = React.useState(defaultSort.column);
+  const [sortDirection, setSortDirection] = React.useState(
+    defaultSort.direction
+  );
 
   data.sort((a, b) => {
-    let aval = a.cells[orderBy] || 0;
-    let bval = b.cells[orderBy] || 0;
+    let aval = a.cells[orderBy];
+    if (aval === undefined || aval === null) {
+      aval = Infinity;
+    }
+    let bval = b.cells[orderBy];
+    if (bval === undefined || bval === null) {
+      bval = Infinity;
+    }
     if (sortDirection === "asc") {
       return bval > aval ? 1 : -1;
-    } else {
+    } 
       return bval > aval ? -1 : 1;
-    }
+    
   });
+  if (slice && slice[1] !== -1) {
+    data = data.slice(slice[0], slice[1]);
+  }
 
-  const createSortHandler = (id: any) => {
-    return () => {
+  const createSortHandler = (id: any) => () => {
       if (orderBy !== id) {
         setOrderBy(id);
         setSortDirection("desc");
       } else {
-        setSortDirection(sortDirection === "asc" ? "desc": "asc");
+        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
       }
     };
-  };
 
   return (
     <Table>
@@ -104,18 +129,24 @@ function TableComponent({
               <TableCell
                 key={`${tableId}-header-${label}`}
                 align={align}
-                sortDirection={orderBy === id ? sortDirection as SortDirection : false}
+                sortDirection={
+                  orderBy === id ? (sortDirection as SortDirection) : false
+                }
                 sx={{ width }}
               >
                 <TableSortLabel
-                  direction={orderBy === id && sortDirection === "asc" ? "asc" : "desc"}
+                  direction={
+                    orderBy === id && sortDirection === "asc" ? "asc" : "desc"
+                  }
                   active={orderBy === id}
                   onClick={createSortHandler(id)}
                 >
                   {label}
                   {orderBy === id ? (
                     <Box component="span" sx={visuallyHidden}>
-                      {sortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                      {sortDirection === "desc"
+                        ? "sorted descending"
+                        : "sorted ascending"}
                     </Box>
                   ) : null}
                 </TableSortLabel>
@@ -132,6 +163,7 @@ function TableComponent({
               key={ident}
               id={ident}
               data={row}
+              defaultSort={defaultSort}
               headers={headers}
               hideSensitive={hideSensitive}
             />
@@ -142,7 +174,7 @@ function TableComponent({
   );
 }
 
-function Row({ id, data, headers, hideSensitive }: RowProps) {
+function Row({ id, data, headers, defaultSort, hideSensitive }: RowProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -213,6 +245,7 @@ function Row({ id, data, headers, hideSensitive }: RowProps) {
                 headers={headers}
                 displayHeaders={false}
                 sortable={false}
+                defaultSort={defaultSort}
                 hideSensitive={hideSensitive}
               />
             </Collapse>
@@ -224,20 +257,45 @@ function Row({ id, data, headers, hideSensitive }: RowProps) {
 }
 
 export function Component({
-  meta: { id, headers },
+  meta: { id, sort, headers },
   data,
   hideSensitive,
 }: Props) {
+  const [rowsPerPage, setRowsPerPage] = React.useState(30);
+  const [page, setPage] = React.useState(0);
+
+  const handleChangePage = (event: any, newPage: any) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: any) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return (
-    <TableContainer component={Paper}>
-      <TableComponent
-        tableId={id}
-        data={data}
-        headers={headers}
-        displayHeaders
-        sortable
-        hideSensitive={hideSensitive}
+    <>
+      <TableContainer component={Paper}>
+        <TableComponent
+          tableId={id}
+          data={data}
+          headers={headers}
+          displayHeaders
+          sortable
+          defaultSort={sort}
+          hideSensitive={hideSensitive}
+          slice={[page * rowsPerPage, page * rowsPerPage + rowsPerPage]}
+        />
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 30, 50, { label: "All", value: -1 }]}
+        component="div"
+        count={data.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
       />
-    </TableContainer>
+    </>
   );
 }

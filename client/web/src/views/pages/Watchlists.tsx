@@ -24,6 +24,10 @@ import { percent } from "../../utils/formatters";
 
 const tableMeta: TableProps["meta"] = {
   id: "watchlist",
+  sort: {
+    column: "market_cap_rank",
+    direction: "desc",
+  },
   headers: [
     {
       label: "#",

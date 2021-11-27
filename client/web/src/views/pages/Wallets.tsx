@@ -9,6 +9,10 @@ import { currency, percent } from "../../utils/formatters";
 
 const tableMeta: TableProps["meta"] = {
   id: "wallet",
+  sort: {
+    column: "value",
+    direction: "asc",
+  },
   headers: [
     {
       label: "Wallet",

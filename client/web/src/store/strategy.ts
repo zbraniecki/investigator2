@@ -2,7 +2,7 @@
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchStrategies } from "../api/strategy";
-import { logoutThunk }  from "./account";
+import { logoutThunk } from "./account";
 
 export const fetchStrategiesThunk = createAsyncThunk(
   "account/fetchStrategies",

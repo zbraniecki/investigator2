@@ -9,6 +9,10 @@ import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 
 const tableMeta: TableProps["meta"] = {
   id: "portfolio",
+  sort: {
+    column: "value",
+    direction: "asc",
+  },
   headers: [
     {
       label: "Symbol",

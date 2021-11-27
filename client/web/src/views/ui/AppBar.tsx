@@ -18,7 +18,7 @@ import Divider from "@mui/material/Divider";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import Person from "@mui/icons-material/Person";
 import Logout from "@mui/icons-material/Logout";
-import RefreshIcon from '@mui/icons-material/Refresh';
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { LoginModal } from "./chrome/Login";
 import { LightMode, InfoDisplayMode, setInfoDisplayMode } from "../../store/ui";
 import {
@@ -207,7 +207,11 @@ export default function InvestigatorAppBar({
         />
         <Tooltip title="Refresh values">
           <div>
-            <IconButton disabled={!session.token} sx={{ ml: 2 }} onClick={handleRefresh}>
+            <IconButton
+              disabled={!session.token}
+              sx={{ ml: 2 }}
+              onClick={handleRefresh}
+            >
               <RefreshIcon />
             </IconButton>
           </div>

@@ -120,11 +120,11 @@ export function Chrome() {
   useEffect(() => {
     if (session.token) {
       if (!session.username) {
-        dispatch(fetchUserInfoThunk({token: session.token}));
+        dispatch(fetchUserInfoThunk({ token: session.token }));
       }
-      dispatch(fetchPortfoliosThunk({token: session.token}));
-      dispatch(fetchStrategiesThunk({token: session.token}));
-      dispatch(fetchUserWatchlistsThunk({token: session.token}));
+      dispatch(fetchPortfoliosThunk({ token: session.token }));
+      dispatch(fetchStrategiesThunk({ token: session.token }));
+      dispatch(fetchUserWatchlistsThunk({ token: session.token }));
     }
   }, [dispatch, session]);
 

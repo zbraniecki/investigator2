@@ -149,7 +149,7 @@ export function groupItemsByAsset(items: PortfolioItem[]): PortfolioItem[] {
   }
 
   for (const children of Object.values(combinedItems)) {
-    children.sort((a, b) => b.meta.value - a.meta.value);
+    // children.sort((a, b) => b.meta.value - a.meta.value);
 
     const item = children[0];
     assert(item);
@@ -249,7 +249,7 @@ export function preparePortfolioTableData(
   let { items } = meta;
   items = groupItemsByAsset(items);
 
-  items.sort((a, b) => b.meta.value - a.meta.value);
+  // items.sort((a, b) => b.meta.value - a.meta.value);
 
   return preparePortfolioTableGroup(items, wallets);
 }

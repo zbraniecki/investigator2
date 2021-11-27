@@ -77,18 +77,6 @@ export function calculateWatchlistItems(
     });
   }
 
-  // items.sort((a, b) => {
-  //   const amcap = a.meta.market_cap_rank;
-  //   const bmcap = b.meta.market_cap_rank;
-  //   if (!amcap) {
-  //     return 1;
-  //   }
-  //   if (!bmcap) {
-  //     return -1;
-  //   }
-  //   return a.meta.market_cap_rank - b.meta.market_cap_rank;
-  // });
-
   return items;
 }
 
@@ -124,11 +112,9 @@ function prepareWatchlistTableGroup(
         name: item.meta.name,
         price: item.meta.price,
         price_change_percentage_1h: item.meta.price_change_percentage_1h,
-        price_change_percentage_24h:
-          item.meta.price_change_percentage_24h,
+        price_change_percentage_24h: item.meta.price_change_percentage_24h,
         price_change_percentage_7d: item.meta.price_change_percentage_7d,
-        price_change_percentage_30d:
-          item.meta.price_change_percentage_30d,
+        price_change_percentage_30d: item.meta.price_change_percentage_30d,
       },
     });
   }

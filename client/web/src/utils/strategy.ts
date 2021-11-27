@@ -138,12 +138,12 @@ export function prepareStrategyTableData(
     wallets,
     strategies
   );
-  items.sort((a, b) => {
-    if (b.target === a.target) {
-      return b.current - a.current;
-    }
-    return b.target - a.target;
-  });
+  // items.sort((a, b) => {
+  //   if (b.target === a.target) {
+  //     return b.current - a.current;
+  //   }
+  //   return b.target - a.target;
+  // });
 
   return prepareStrategyTableGroup(items);
 }

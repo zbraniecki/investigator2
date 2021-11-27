@@ -10,6 +10,10 @@ import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 
 const tableMeta: TableProps["meta"] = {
   id: "strategy",
+  sort: {
+    column: "target",
+    direction: "asc",
+  },
   headers: [
     {
       label: "Symbol",
@@ -53,7 +57,7 @@ const tableMeta: TableProps["meta"] = {
       label: "USD Delta",
       id: "deltaUsd",
       align: "right",
-      width: 0.1,
+      width: 0.15,
       formatter: "currency",
       sensitive: true,
     },

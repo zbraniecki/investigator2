@@ -49,7 +49,7 @@ function groupItemsByWallet(items: PortfolioItem[]): PortfolioItem[] {
   }
 
   for (const [wid, children] of Object.entries(combinedItems)) {
-    children.sort((a, b) => b.meta.value - a.meta.value);
+    // children.sort((a, b) => b.meta.value - a.meta.value);
 
     const item = children[0];
     assert(item);
@@ -141,7 +141,7 @@ export function prepareWalletTableData(
   let { items } = meta;
   items = groupItemsByWallet(items);
 
-  items.sort((a, b) => b.meta.value - a.meta.value);
+  // items.sort((a, b) => b.meta.value - a.meta.value);
 
   return prepareWalletTableGroup(items, wallets);
 }
