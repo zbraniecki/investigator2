@@ -25,13 +25,8 @@ interface Props {
 }
 
 export function LoginModal({ open, handleClose, authenticateState }: Props) {
-  const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const dispatch = useDispatch();
-
-  const handlePasswordChange = (event: any) => {
-    setPassword(event.target.value);
-  };
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -86,8 +81,6 @@ export function LoginModal({ open, handleClose, authenticateState }: Props) {
           id="password"
           label="Password"
           type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={handlePasswordChange}
           onFocus={onFieldFocus}
           onKeyDown={onKeyUp}
           error={authenticateState === AuthenticateState.Error}

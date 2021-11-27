@@ -1,16 +1,19 @@
 import React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
+import TableCell, { SortDirection } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import TableSortLabel from '@mui/material/TableSortLabel';
 import Paper from "@mui/material/Paper";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import Box from '@mui/material/Box';
 import { currency, number, percent, symbol } from "../../utils/formatters";
+import { visuallyHidden } from '@mui/utils';
 
 interface DataRowProps {
   cells: {
@@ -43,10 +46,11 @@ export interface RowProps {
 }
 
 export interface TableProps {
-  id: string;
+  tableId: string;
   data: DataRowProps[];
   headers: Props["meta"]["headers"];
   displayHeaders: boolean;
+  sortable: boolean;
   hideSensitive: boolean;
 }
 
@@ -59,25 +63,62 @@ const tableSettings = {
 };
 
 function TableComponent({
-  id,
+  tableId,
   data,
   headers,
   displayHeaders,
+  sortable,
   hideSensitive,
 }: TableProps) {
+  const [orderBy, setOrderBy] = React.useState("market_cap_rank");
+  const [sortDirection, setSortDirection] = React.useState("desc");
+
+  data.sort((a, b) => {
+    let aval = a.cells[orderBy] || 0;
+    let bval = b.cells[orderBy] || 0;
+    if (sortDirection === "asc") {
+      return bval > aval ? 1 : -1;
+    } else {
+      return bval > aval ? -1 : 1;
+    }
+  });
+
+  const createSortHandler = (id: any) => {
+    return () => {
+      if (orderBy !== id) {
+        setOrderBy(id);
+        setSortDirection("desc");
+      } else {
+        setSortDirection(sortDirection === "asc" ? "desc": "asc");
+      }
+    };
+  };
+
   return (
     <Table>
       {displayHeaders && (
         <TableHead>
           <TableRow>
             <TableCell sx={{ width: tableSettings.columns.collapse.width }} />
-            {headers.map(({ label, align, width }) => (
+            {headers.map(({ id, label, align, width }) => (
               <TableCell
-                key={`${id}-header-${label}`}
+                key={`${tableId}-header-${label}`}
                 align={align}
+                sortDirection={orderBy === id ? sortDirection as SortDirection : false}
                 sx={{ width }}
               >
-                {label}
+                <TableSortLabel
+                  direction={orderBy === id && sortDirection === "asc" ? "asc" : "desc"}
+                  active={orderBy === id}
+                  onClick={createSortHandler(id)}
+                >
+                  {label}
+                  {orderBy === id ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {sortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                    </Box>
+                  ) : null}
+                </TableSortLabel>
               </TableCell>
             ))}
           </TableRow>
@@ -85,7 +126,7 @@ function TableComponent({
       )}
       <TableBody>
         {data.map((row, idx) => {
-          const ident: string = `${id}-row${idx}`;
+          const ident: string = `${tableId}-row${idx}`;
           return (
             <Row
               key={ident}
@@ -167,10 +208,11 @@ function Row({ id, data, headers, hideSensitive }: RowProps) {
           <TableCell style={{ padding: 0 }} colSpan={headers.length + 1}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <TableComponent
-                id={`${id}-sub`}
+                tableId={`${id}-sub`}
                 data={data.children}
                 headers={headers}
                 displayHeaders={false}
+                sortable={false}
                 hideSensitive={hideSensitive}
               />
             </Collapse>
@@ -189,10 +231,11 @@ export function Component({
   return (
     <TableContainer component={Paper}>
       <TableComponent
-        id={id}
+        tableId={id}
         data={data}
         headers={headers}
         displayHeaders
+        sortable
         hideSensitive={hideSensitive}
       />
     </TableContainer>

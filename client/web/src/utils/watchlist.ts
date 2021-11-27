@@ -77,21 +77,26 @@ export function calculateWatchlistItems(
     });
   }
 
-  items.sort((a, b) => {
-    const amcap = a.meta.market_cap_rank;
-    const bmcap = b.meta.market_cap_rank;
-    if (!amcap) {
-      return 1;
-    }
-    if (!bmcap) {
-      return -1;
-    }
-    return a.meta.market_cap_rank - b.meta.market_cap_rank;
-  });
+  // items.sort((a, b) => {
+  //   const amcap = a.meta.market_cap_rank;
+  //   const bmcap = b.meta.market_cap_rank;
+  //   if (!amcap) {
+  //     return 1;
+  //   }
+  //   if (!bmcap) {
+  //     return -1;
+  //   }
+  //   return a.meta.market_cap_rank - b.meta.market_cap_rank;
+  // });
 
   return items;
 }
 
+/**
+ * XXX: Should we collapse those two (TableRow and Item)
+ * Should we allow for hidden columns?
+ * Keep raw data for table sorting etc.
+ */
 export interface WatchlistTableRow {
   cells: {
     market_cap_rank: number;
@@ -118,12 +123,12 @@ function prepareWatchlistTableGroup(
         symbol: item.meta.symbol,
         name: item.meta.name,
         price: item.meta.price,
-        price_change_percentage_1h: item.meta.price_change_percentage_1h / 100,
+        price_change_percentage_1h: item.meta.price_change_percentage_1h,
         price_change_percentage_24h:
-          item.meta.price_change_percentage_24h / 100,
-        price_change_percentage_7d: item.meta.price_change_percentage_7d / 100,
+          item.meta.price_change_percentage_24h,
+        price_change_percentage_7d: item.meta.price_change_percentage_7d,
         price_change_percentage_30d:
-          item.meta.price_change_percentage_30d / 100,
+          item.meta.price_change_percentage_30d,
       },
     });
   }

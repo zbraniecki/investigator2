@@ -2,6 +2,7 @@
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchStrategies } from "../api/strategy";
+import { logoutThunk }  from "./account";
 
 export const fetchStrategiesThunk = createAsyncThunk(
   "account/fetchStrategies",
@@ -34,6 +35,9 @@ export const strategySlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchStrategiesThunk.fulfilled, (state, action) => {
       state.strategies = action.payload;
+    });
+    builder.addCase(logoutThunk.fulfilled, (state, action) => {
+      state.strategies = [];
     });
   },
 });
