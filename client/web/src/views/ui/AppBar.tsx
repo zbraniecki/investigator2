@@ -165,6 +165,12 @@ export default function InvestigatorAppBar({
     dispatch(fetchAssetInfoThunk({ refresh: true, token: session.token }));
   };
 
+  const handleAccount = (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  };
+
   function handleInfoDisplayModeChange() {
     const newState =
       infoDisplayMode === InfoDisplayMode.ShowAll
@@ -200,9 +206,11 @@ export default function InvestigatorAppBar({
           onChange={handleInfoDisplayModeChange}
         />
         <Tooltip title="Refresh values">
-          <IconButton disabled={!session.token} sx={{ ml: 2 }} onClick={handleRefresh}>
-            <RefreshIcon />
-          </IconButton>
+          <div>
+            <IconButton disabled={!session.token} sx={{ ml: 2 }} onClick={handleRefresh}>
+              <RefreshIcon />
+            </IconButton>
+          </div>
         </Tooltip>
         <Tooltip title="Account settings">
           <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
@@ -252,7 +260,7 @@ export default function InvestigatorAppBar({
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         {session.username && (
-          <MenuItem>
+          <MenuItem sx={{ cursor: "default" }} onClick={handleAccount}>
             <ListItemIcon>
               <Person fontSize="small" />
             </ListItemIcon>
