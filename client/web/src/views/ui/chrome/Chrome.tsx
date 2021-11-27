@@ -13,7 +13,13 @@ import { useSelector, useDispatch } from "react-redux";
 import InvestigatorAppBar from "../AppBar";
 import InvestigatorDrawer from "../Drawer";
 import Content from "../Content";
-import { LightMode, getLightMode, setLightMode , InfoDisplayMode, getInfoDisplayMode } from "../../../store/ui";
+import {
+  LightMode,
+  getLightMode,
+  setLightMode,
+  InfoDisplayMode,
+  getInfoDisplayMode,
+} from "../../../store/ui";
 import {
   fetchPortfoliosThunk,
   fetchWatchlistsThunk as fetchUserWatchlistsThunk,

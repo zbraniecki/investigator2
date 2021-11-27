@@ -23,8 +23,9 @@ import { LoginModal } from "./chrome/Login";
 import { LightMode, InfoDisplayMode, setInfoDisplayMode } from "../../store/ui";
 import {
   AuthenticateState,
-  getAuthenticateState,
+  getSession,
   setAuthenticateState,
+  logoutThunk,
 } from "../../store/account";
 
 const SwitchRoot = styled("span")`
@@ -130,6 +131,7 @@ export default function InvestigatorAppBar({
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loginModalOpen, setLoginModalOpen] = React.useState(false);
+  const session = useSelector(getSession);
 
   const open = Boolean(anchorEl);
   const handleClick = (event: any) => {
@@ -155,9 +157,7 @@ export default function InvestigatorAppBar({
   };
 
   const handleLogout = () => {
-    setTimeout(() => {
-      dispatch(setAuthenticateState(AuthenticateState.None));
-    }, 100);
+    dispatch(logoutThunk({ token: session.token }));
   };
 
   function handleInfoDisplayModeChange() {
@@ -167,8 +167,6 @@ export default function InvestigatorAppBar({
         : InfoDisplayMode.ShowAll;
     dispatch(setInfoDisplayMode(newState));
   }
-
-  const authenticateState = useSelector(getAuthenticateState);
 
   return (
     <AppBar
@@ -198,7 +196,7 @@ export default function InvestigatorAppBar({
         <Tooltip title="Account settings">
           <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
             <Avatar sx={{ width: 32, height: 32 }}>
-              {authenticateState === AuthenticateState.Session ? (
+              {session.authenticateState === AuthenticateState.Session ? (
                 <Person color="primary" fontSize="small" />
               ) : (
                 <Person fontSize="small" />
@@ -242,6 +240,15 @@ export default function InvestigatorAppBar({
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
+        {session.username && (
+          <MenuItem>
+            <ListItemIcon>
+              <Person fontSize="small" />
+            </ListItemIcon>
+            {session.username}
+          </MenuItem>
+        )}
+        {session.username && <Divider />}
         <MenuItem>
           <ListItemIcon>
             <Settings fontSize="small" />
@@ -255,7 +262,7 @@ export default function InvestigatorAppBar({
           />
         </MenuItem>
         <Divider />
-        {authenticateState === AuthenticateState.Session ? (
+        {session.authenticateState === AuthenticateState.Session ? (
           <MenuItem onClick={handleLogout}>
             <ListItemIcon>
               <Logout fontSize="small" />
@@ -274,7 +281,7 @@ export default function InvestigatorAppBar({
       <LoginModal
         open={loginModalOpen}
         handleClose={handleLoginModalClose}
-        authenticateState={authenticateState}
+        authenticateState={session.authenticateState}
       />
     </AppBar>
   );

@@ -39,13 +39,13 @@ export function LoginModal({ open, handleClose, authenticateState }: Props) {
 
   function handleOk() {
     if (authenticateState === AuthenticateState.None) {
-      const userField = document.getElementById("username");
-      assert(userField instanceof HTMLInputElement);
+      const emailField = document.getElementById("email");
+      assert(emailField instanceof HTMLInputElement);
       const passwordField = document.getElementById("password");
       assert(passwordField instanceof HTMLInputElement);
       dispatch(
         authenticateThunk({
-          username: userField.value,
+          email: emailField.value,
           password: passwordField.value,
           handleClose,
         })
@@ -69,12 +69,12 @@ export function LoginModal({ open, handleClose, authenticateState }: Props) {
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Login</DialogTitle>
       <DialogContent>
-        <DialogContentText>Enter username and password.</DialogContentText>
+        <DialogContentText>Enter email and password.</DialogContentText>
         <TextField
           autoFocus
           margin="dense"
-          id="username"
-          label="Username"
+          id="email"
+          label="Email"
           type="email"
           fullWidth
           error={authenticateState === AuthenticateState.Error}

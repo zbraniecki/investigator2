@@ -1,5 +1,7 @@
+from django.contrib.auth import get_user_model
 from .models import Portfolio, Holding, Account, Watchlist, WatchlistType
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 
 class HoldingSerializer(serializers.HyperlinkedModelSerializer):
@@ -67,3 +69,17 @@ class AccountSerializer(serializers.HyperlinkedModelSerializer):
             return obj.name
         else:
             return obj.service.__str__()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ("id", "username", "email")
+
+
+class MyCustomTokenSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Token
+        fields = ("key", "user")

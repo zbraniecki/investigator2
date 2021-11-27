@@ -1,4 +1,5 @@
 import { BASE_URL } from "./main";
+import { assert } from "../utils/helpers";
 
 export const fetchPortfolios = async (userId: number) => {
   const resp = await fetch(`${BASE_URL}profile/portfolio/?owner=${userId}`);
@@ -11,17 +12,49 @@ export const fetchWatchlists = async () => {
 };
 
 export const authenticate = async ({
-  username,
+  email,
   password,
   handleClose,
 }: {
-  username: string;
+  email: string;
   password: string;
   handleClose: any;
 }) => {
-  if (username === "zibi" && password === "pass") {
+  const user = {
+    email,
+    password,
+  };
+  const data = await fetch(`${BASE_URL}auth/login/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  });
+  const resp = await data.json();
+
+  if (resp.key) {
     handleClose();
-    return "sess5g";
-  }
-  return "error";
+    return {
+      token: resp.key,
+      username: resp.user.username,
+      email: resp.user.email,
+    };
+  } 
+    return {
+      error: true,
+    };
+  
+};
+
+export const logout = async ({ token }: { token: string }) => {
+  const data = await fetch(`${BASE_URL}auth/logout/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+  });
+  const resp = await data.json();
+  assert(resp.detail);
 };

@@ -1,8 +1,14 @@
 /* eslint camelcase: "off" */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchPortfolios, fetchWatchlists, authenticate } from "../api/account";
+import {
+  fetchPortfolios,
+  fetchWatchlists,
+  authenticate,
+  logout,
+} from "../api/account";
 import { Watchlist } from "./oracle";
+import { getFromLocalStorage } from "./main";
 
 export const fetchPortfoliosThunk = createAsyncThunk(
   "account/fetchPortfolios",
@@ -18,6 +24,8 @@ export const authenticateThunk = createAsyncThunk(
   "account/authenticate",
   authenticate
 );
+
+export const logoutThunk = createAsyncThunk("account/logout", logout);
 
 export interface Holding {
   symbol: string;
@@ -63,14 +71,27 @@ export enum AuthenticateState {
 }
 
 interface AccountState {
-  authenticateState: AuthenticateState;
+  session: {
+    authenticateState: AuthenticateState;
+    token?: string;
+    username?: string;
+    email?: string;
+  };
   portfolios: PortfolioEntry[];
   meta: Record<string, PortfolioEntryMeta>;
   watchlists: Watchlist[];
 }
 
 const initialState = {
-  authenticateState: AuthenticateState.None,
+  session: {
+    authenticateState: getFromLocalStorage(
+      "authState",
+      "enum",
+      AuthenticateState.None
+    ),
+    token: getFromLocalStorage("token", "string", undefined),
+    username: getFromLocalStorage("username", "string", undefined),
+  },
   portfolios: [],
   meta: {},
   watchlists: [],
@@ -90,7 +111,7 @@ export const accountSlice = createSlice({
       state,
       { payload }: { payload: AuthenticateState }
     ) => {
-      state.authenticateState = payload;
+      state.session.authenticateState = payload;
     },
   },
   extraReducers: (builder) => {
@@ -101,13 +122,23 @@ export const accountSlice = createSlice({
       state.watchlists = action.payload;
     });
     builder.addCase(authenticateThunk.fulfilled, (state, action) => {
-      if (action.payload === "error") {
-        state.authenticateState = AuthenticateState.Error;
-      } else if (typeof action.payload === "string") {
-        state.authenticateState = AuthenticateState.Session;
+      if (action.payload.error) {
+        state.session.authenticateState = AuthenticateState.Error;
+        state.session.email = undefined;
+        state.session.username = undefined;
+        state.session.token = undefined;
       } else {
-        state.authenticateState = AuthenticateState.None;
+        state.session.authenticateState = AuthenticateState.Session;
+        state.session.email = action.payload.email;
+        state.session.username = action.payload.username;
+        state.session.token = action.payload.token;
       }
+    });
+    builder.addCase(logoutThunk.fulfilled, (state, action) => {
+      state.session.authenticateState = AuthenticateState.None;
+      state.session.email = undefined;
+      state.session.username = undefined;
+      state.session.token = undefined;
     });
   },
 });
@@ -115,8 +146,7 @@ export const accountSlice = createSlice({
 export const getPortfolios = (state: any) => state.account.portfolios;
 export const getPortfolioMeta = (state: any) => state.account.meta;
 export const getWatchlists = (state: any) => state.account.watchlists;
-export const getAuthenticateState = (state: any) =>
-  state.account.authenticateState;
+export const getSession = (state: any) => state.account.session;
 export const { setPortfoliosMeta, setAuthenticateState } = accountSlice.actions;
 
 export default accountSlice.reducer;

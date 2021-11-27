@@ -6,58 +6,58 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('oracle', '0001_initial'),
+        ("oracle", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='assetinfo',
-            name='circulating_supply',
+            model_name="assetinfo",
+            name="circulating_supply",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='high_24h',
+            model_name="assetinfo",
+            name="high_24h",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='image',
+            model_name="assetinfo",
+            name="image",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='low_24h',
+            model_name="assetinfo",
+            name="low_24h",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='market_cap_rank',
+            model_name="assetinfo",
+            name="market_cap_rank",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='max_supply',
+            model_name="assetinfo",
+            name="max_supply",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='price_change_percentage_1h',
+            model_name="assetinfo",
+            name="price_change_percentage_1h",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='price_change_percentage_30d',
+            model_name="assetinfo",
+            name="price_change_percentage_30d",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='price_change_percentage_7d',
+            model_name="assetinfo",
+            name="price_change_percentage_7d",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assetinfo',
-            name='total_supply',
+            model_name="assetinfo",
+            name="total_supply",
             field=models.FloatField(blank=True, null=True),
         ),
     ]
