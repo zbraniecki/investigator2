@@ -17,8 +17,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import Person from "@mui/icons-material/Person";
-import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { LoginModal } from "./chrome/Login";
 import { LightMode, InfoDisplayMode, setInfoDisplayMode } from "../../store/ui";
 import {
@@ -27,6 +27,7 @@ import {
   setAuthenticateState,
   logoutThunk,
 } from "../../store/account";
+import { fetchAssetInfoThunk } from "../../store/oracle";
 
 const SwitchRoot = styled("span")`
   display: inline-block;
@@ -160,6 +161,10 @@ export default function InvestigatorAppBar({
     dispatch(logoutThunk({ token: session.token }));
   };
 
+  const handleRefresh = () => {
+    dispatch(fetchAssetInfoThunk({ refresh: true, token: session.token }));
+  };
+
   function handleInfoDisplayModeChange() {
     const newState =
       infoDisplayMode === InfoDisplayMode.ShowAll
@@ -179,6 +184,7 @@ export default function InvestigatorAppBar({
       }}
     >
       <Typography
+        variant="h5"
         sx={{
           display: "flex",
           alignItems: "center",
@@ -193,6 +199,11 @@ export default function InvestigatorAppBar({
           checked={infoDisplayMode === InfoDisplayMode.ShowAll}
           onChange={handleInfoDisplayModeChange}
         />
+        <Tooltip title="Refresh values">
+          <IconButton disabled={!session.token} sx={{ ml: 2 }} onClick={handleRefresh}>
+            <RefreshIcon />
+          </IconButton>
+        </Tooltip>
         <Tooltip title="Account settings">
           <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
             <Avatar sx={{ width: 32, height: 32 }}>
@@ -249,12 +260,6 @@ export default function InvestigatorAppBar({
           </MenuItem>
         )}
         {session.username && <Divider />}
-        <MenuItem>
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Settings
-        </MenuItem>
         <MenuItem onClick={handleClick2}>
           <FormControlLabel
             control={<Switch checked={lightModeName === "dark"} size="small" />}

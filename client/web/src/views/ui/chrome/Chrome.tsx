@@ -112,7 +112,7 @@ export function Chrome() {
   );
 
   useEffect(() => {
-    dispatch(fetchAssetInfoThunk());
+    dispatch(fetchAssetInfoThunk({}));
     dispatch(fetchPublicWatchlistsThunk());
     dispatch(fetchWalletsThunk());
   }, [dispatch]);

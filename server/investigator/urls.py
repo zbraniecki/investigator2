@@ -8,7 +8,7 @@ from investigator.strategy import views as strategy_views
 router = routers.DefaultRouter()
 router.register(r"categories", oracle_views.CategoryViewSet)
 router.register(r"assets", oracle_views.AssetViewSet)
-router.register(r"oracle/assets", oracle_views.AssetInfoViewSet)
+router.register(r'oracle/assets', oracle_views.AssetInfoViewSet, 'AssetInfo')
 router.register(r"oracle/wallets", oracle_views.ServiceViewSet)
 router.register(
     r"oracle/watchlists", oracle_views.PublicWatchlistsViewSet, "public-watchlists"
