@@ -61,6 +61,7 @@ export interface Wallet {
 }
 
 interface OracleState {
+  assetUpdated?: string;
   assets: AssetInfo[];
   wallets: Wallet[];
   watchlists: Watchlist[];
@@ -78,6 +79,10 @@ export const oracleSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchAssetInfoThunk.fulfilled, (state, action) => {
+      if (action.payload.length > 0) {
+        const item = action.payload[0];
+        state.assetUpdated = item.last_updated;
+      }
       state.assets = action.payload;
     });
     builder.addCase(fetchWalletsThunk.fulfilled, (state, action) => {
@@ -90,6 +95,7 @@ export const oracleSlice = createSlice({
 });
 
 export const getAssetInfo = (state: any) => state.oracle.assets;
+export const getAssetUpdated = (state: any) => state.oracle.assetUpdated;
 export const getWallets = (state: any) => state.oracle.wallets;
 export const getWatchlists = (state: any) => state.oracle.watchlists;
 

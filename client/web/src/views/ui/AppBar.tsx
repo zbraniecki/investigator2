@@ -27,7 +27,7 @@ import {
   setAuthenticateState,
   logoutThunk,
 } from "../../store/account";
-import { fetchAssetInfoThunk } from "../../store/oracle";
+import { fetchAssetInfoThunk, getAssetUpdated } from "../../store/oracle";
 
 const SwitchRoot = styled("span")`
   display: inline-block;
@@ -133,6 +133,13 @@ export default function InvestigatorAppBar({
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loginModalOpen, setLoginModalOpen] = React.useState(false);
   const session = useSelector(getSession);
+  let lastUpdate = useSelector(getAssetUpdated);
+  if (lastUpdate) {
+    lastUpdate = new Date(lastUpdate).toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "medium",
+    });
+  }
 
   const open = Boolean(anchorEl);
   const handleClick = (event: any) => {
@@ -205,7 +212,7 @@ export default function InvestigatorAppBar({
           checked={infoDisplayMode === InfoDisplayMode.ShowAll}
           onChange={handleInfoDisplayModeChange}
         />
-        <Tooltip title="Refresh values">
+        <Tooltip title={`Last updated: ${lastUpdate}\n`}>
           <div>
             <IconButton
               disabled={!session.token}

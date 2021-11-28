@@ -102,22 +102,21 @@ function TableComponent({
     }
     if (sortDirection === "asc") {
       return bval > aval ? 1 : -1;
-    } 
-      return bval > aval ? -1 : 1;
-    
+    }
+    return bval > aval ? -1 : 1;
   });
   if (slice && slice[1] !== -1) {
     data = data.slice(slice[0], slice[1]);
   }
 
   const createSortHandler = (id: any) => () => {
-      if (orderBy !== id) {
-        setOrderBy(id);
-        setSortDirection("desc");
-      } else {
-        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-      }
-    };
+    if (orderBy !== id) {
+      setOrderBy(id);
+      setSortDirection("desc");
+    } else {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    }
+  };
 
   return (
     <Table>
@@ -142,13 +141,6 @@ function TableComponent({
                   onClick={createSortHandler(id)}
                 >
                   {label}
-                  {orderBy === id ? (
-                    <Box component="span" sx={visuallyHidden}>
-                      {sortDirection === "desc"
-                        ? "sorted descending"
-                        : "sorted ascending"}
-                    </Box>
-                  ) : null}
                 </TableSortLabel>
               </TableCell>
             ))}

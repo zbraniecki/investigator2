@@ -22,6 +22,7 @@ class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
     pair = serializers.SerializerMethodField("get_pair")
     name = serializers.SerializerMethodField("get_name")
     symbol = serializers.SerializerMethodField("get_symbol")
+    last_updated = serializers.SerializerMethodField("get_last_updated")
 
     class Meta:
         model = AssetInfo
@@ -57,6 +58,9 @@ class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_symbol(self, obj):
         return obj.asset.symbol
+
+    def get_last_updated(self, obj):
+        return obj.last_updated.isoformat()
 
 
 class ServiceSerializer(serializers.HyperlinkedModelSerializer):
