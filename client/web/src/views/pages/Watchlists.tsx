@@ -28,25 +28,20 @@ const tableMeta: TableProps["meta"] = {
     column: "market_cap_rank",
     direction: "desc",
   },
+  nested: false,
   headers: [
     {
       label: "#",
       id: "market_cap_rank",
-      align: "left",
-      width: 0.1,
+      align: "right",
+      width: 0.01,
     },
     {
       label: "Symbol",
       id: "symbol",
       align: "left",
-      width: 0.1,
+      width: 0.15,
       formatter: "symbol",
-    },
-    {
-      label: "Name",
-      id: "name",
-      align: "left",
-      width: 0.2,
     },
     {
       label: "Price",
@@ -61,6 +56,7 @@ const tableMeta: TableProps["meta"] = {
       align: "left",
       width: 0.1,
       formatter: "percent",
+      colorDiff: true,
     },
     {
       label: "24h",
@@ -68,6 +64,7 @@ const tableMeta: TableProps["meta"] = {
       align: "left",
       width: 0.1,
       formatter: "percent",
+      colorDiff: true,
     },
     {
       label: "7d",
@@ -75,6 +72,7 @@ const tableMeta: TableProps["meta"] = {
       align: "left",
       width: 0.1,
       formatter: "percent",
+      colorDiff: true,
     },
     {
       label: "30d",
@@ -82,6 +80,7 @@ const tableMeta: TableProps["meta"] = {
       align: "left",
       width: 0.1,
       formatter: "percent",
+      colorDiff: true,
     },
   ],
 };

@@ -13,6 +13,7 @@ const tableMeta: TableProps["meta"] = {
     column: "value",
     direction: "asc",
   },
+  nested: true,
   headers: [
     {
       label: "Symbol",
@@ -20,12 +21,6 @@ const tableMeta: TableProps["meta"] = {
       align: "left",
       width: 0.1,
       formatter: "symbol",
-    },
-    {
-      label: "Name",
-      id: "name",
-      align: "left",
-      width: 0.15,
     },
     {
       label: "Price",

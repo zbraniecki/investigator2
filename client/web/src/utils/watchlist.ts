@@ -88,8 +88,10 @@ export function calculateWatchlistItems(
 export interface WatchlistTableRow {
   cells: {
     market_cap_rank: number;
-    symbol: string;
-    name: string;
+    symbol: {
+      symbol: string;
+      name: string;
+    };
     price: number;
     price_change_percentage_1h: number;
     price_change_percentage_24h: number;
@@ -108,8 +110,10 @@ function prepareWatchlistTableGroup(
     result.push({
       cells: {
         market_cap_rank: item.meta.market_cap_rank,
-        symbol: item.meta.symbol,
-        name: item.meta.name,
+        symbol: {
+          symbol: item.meta.symbol,
+          name: item.meta.name,
+        },
         price: item.meta.price,
         price_change_percentage_1h: item.meta.price_change_percentage_1h,
         price_change_percentage_24h: item.meta.price_change_percentage_24h,

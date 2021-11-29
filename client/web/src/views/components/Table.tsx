@@ -13,12 +13,13 @@ import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { visuallyHidden } from "@mui/utils";
 import { currency, number, percent, symbol } from "../../utils/formatters";
 
 interface DataRowProps {
   cells: {
-    [key: string]: string | number | undefined;
+    [key: string]: string | number | undefined | Record<string, string>;
   };
   children?: DataRowProps[];
 }
@@ -30,12 +31,14 @@ export interface Props {
       column: string;
       direction: "desc" | "asc";
     };
+    nested?: boolean;
     headers: {
       label: string;
       id: string;
       align: "inherit" | "left" | "right" | "center" | "justify" | undefined;
       width: number | "auto";
       formatter?: "percent" | "currency" | "number" | "symbol";
+      colorDiff?: boolean;
       sensitive?: boolean;
     }[];
   };
@@ -51,6 +54,7 @@ export interface RowProps {
     column: string;
     direction: "asc" | "desc";
   };
+  nested?: boolean;
   hideSensitive: boolean;
 }
 
@@ -64,6 +68,7 @@ export interface TableProps {
     column: string;
     direction: "asc" | "desc";
   };
+  nested?: boolean;
   hideSensitive: boolean;
   slice?: [number, number];
 }
@@ -84,6 +89,7 @@ function TableComponent({
   sortable,
   defaultSort,
   hideSensitive,
+  nested,
   slice,
 }: TableProps) {
   const [orderBy, setOrderBy] = React.useState(defaultSort.column);
@@ -123,7 +129,9 @@ function TableComponent({
       {displayHeaders && (
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: tableSettings.columns.collapse.width }} />
+            {nested && (
+              <TableCell sx={{ width: tableSettings.columns.collapse.width }} />
+            )}
             {headers.map(({ id, label, align, width }) => (
               <TableCell
                 key={`${tableId}-header-${label}`}
@@ -157,6 +165,7 @@ function TableComponent({
               data={row}
               defaultSort={defaultSort}
               headers={headers}
+              nested={nested}
               hideSensitive={hideSensitive}
             />
           );
@@ -166,26 +175,37 @@ function TableComponent({
   );
 }
 
-function Row({ id, data, headers, defaultSort, hideSensitive }: RowProps) {
+function Row({
+  id,
+  data,
+  headers,
+  defaultSort,
+  nested,
+  hideSensitive,
+}: RowProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
     <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-        <TableCell sx={{ width: tableSettings.columns.collapse.width }}>
-          {data.children && (
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          )}
-        </TableCell>
+        {nested && (
+          <TableCell sx={{ width: tableSettings.columns.collapse.width }}>
+            {data.children && (
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => setOpen(!open)}
+              >
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            )}
+          </TableCell>
+        )}
         {headers.map((header) => {
           const rawValue = data.cells[header.id];
           let value;
+          let color = "inherit";
+          let fontWeight = "regular";
 
           if (rawValue === undefined) {
             value = "";
@@ -202,11 +222,36 @@ function Row({ id, data, headers, defaultSort, hideSensitive }: RowProps) {
                 break;
               }
               case "symbol": {
-                value = symbol(rawValue);
+                // value = symbol(rawValue);
+                const v = rawValue as Record<string, string>;
+                value = (
+                  <>
+                    <Typography>{v.symbol.toUpperCase()}</Typography>
+                    <Typography
+                      sx={{
+                        color: "text.disabled",
+                        fontWeight: "light",
+                        fontSize: "small",
+                      }}
+                    >
+                      {v.name}
+                    </Typography>
+                  </>
+                );
                 break;
               }
               case "percent": {
                 value = percent(rawValue);
+                if (header.colorDiff) {
+                  if (rawValue > 0.01) {
+                    color = "success.main";
+                  } else if (rawValue < -0.01) {
+                    color = "error.main";
+                  }
+                  if (rawValue > 0.1 || rawValue < -0.1) {
+                    fontWeight = "bold";
+                  }
+                }
                 break;
               }
               default: {
@@ -214,6 +259,14 @@ function Row({ id, data, headers, defaultSort, hideSensitive }: RowProps) {
                 break;
               }
             }
+          }
+
+          if (typeof value === "string") {
+            value = (
+              <Typography sx={{ color, fontWeight }}>
+                {value}
+              </Typography>
+            );
           }
 
           return (
@@ -238,6 +291,7 @@ function Row({ id, data, headers, defaultSort, hideSensitive }: RowProps) {
                 displayHeaders={false}
                 sortable={false}
                 defaultSort={defaultSort}
+                nested={nested}
                 hideSensitive={hideSensitive}
               />
             </Collapse>
@@ -249,7 +303,7 @@ function Row({ id, data, headers, defaultSort, hideSensitive }: RowProps) {
 }
 
 export function Component({
-  meta: { id, sort, headers },
+  meta: { id, sort, nested, headers },
   data,
   hideSensitive,
 }: Props) {
@@ -276,6 +330,7 @@ export function Component({
           sortable
           defaultSort={sort}
           hideSensitive={hideSensitive}
+          nested={nested}
           slice={[page * rowsPerPage, page * rowsPerPage + rowsPerPage]}
         />
       </TableContainer>

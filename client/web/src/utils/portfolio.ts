@@ -125,8 +125,10 @@ export function calculatePortfoliosMeta(
 
 export interface PortfolioTableRow {
   cells: {
-    symbol?: string;
-    name?: string;
+    symbol: {
+      symbol?: string;
+      name?: string;
+    };
     price?: number;
     quantity?: number;
     value: number;
@@ -212,15 +214,19 @@ function preparePortfolioTableGroup(
     if (item.children) {
       children = preparePortfolioTableGroup(item.children, wallets);
       for (const child of children) {
-        child.cells.symbol = undefined;
-        child.cells.name = undefined;
+        child.cells.symbol = {
+          symbol: "",
+          name: "",
+        };
         child.cells.price = undefined;
       }
     }
     const row: PortfolioTableRow = {
       cells: {
-        symbol: item.meta.symbol,
-        name: item.meta.name,
+        symbol: {
+          symbol: item.meta.symbol,
+          name: item.meta.name,
+        },
         price: item.meta.price,
         quantity: item.meta.quantity,
         value: item.meta.value,

@@ -26,5 +26,5 @@ export function percent(input: any): string {
   return pfmt.format(input);
 }
 export function symbol(input: any): string {
-  return input.toUpperCase();
+  return input.symbol.toUpperCase();
 }

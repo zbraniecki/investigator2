@@ -31,7 +31,10 @@ export interface StrategyItem {
 
 export interface StrategyTableRow {
   cells: {
-    symbol: string;
+    symbol: {
+      symbol?: string;
+      name?: string;
+    };
     target: number;
     current: number;
     deviation: number;
@@ -105,7 +108,10 @@ function prepareStrategyTableGroup(items: StrategyItem[]): StrategyTableRow[] {
   for (const item of items) {
     result.push({
       cells: {
-        symbol: item.asset,
+        symbol: {
+          symbol: item.asset,
+          name: "",
+        },
         target: item.target,
         current: item.current,
         deviation: item.deviation,

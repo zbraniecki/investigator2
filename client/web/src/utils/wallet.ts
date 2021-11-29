@@ -64,7 +64,8 @@ function groupItemsByWallet(items: PortfolioItem[]): PortfolioItem[] {
       meta: {
         type: "wallet-group",
         id: wid,
-        // symbol,
+        // symbol: "",
+        // name: ""
         // name,
         // price,
         // quantity,
@@ -83,7 +84,10 @@ function groupItemsByWallet(items: PortfolioItem[]): PortfolioItem[] {
 export interface WalletTableRow {
   cells: {
     wallet?: string;
-    symbol?: string;
+    symbol: {
+      symbol?: string;
+      name?: string;
+    };
     quantity?: number;
     yield?: number;
     value: number;
@@ -117,7 +121,10 @@ function prepareWalletTableGroup(
         wallet: wallet.name,
         value: item.meta.value,
         quantity: item.meta.quantity,
-        symbol,
+        symbol: {
+          symbol: item.meta.symbol || "",
+          name: "",
+        },
       },
       children,
     };

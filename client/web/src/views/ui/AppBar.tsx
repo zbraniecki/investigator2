@@ -19,6 +19,7 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Person from "@mui/icons-material/Person";
 import Logout from "@mui/icons-material/Logout";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import CircularProgress from "@mui/material/CircularProgress";
 import { LoginModal } from "./chrome/Login";
 import { LightMode, InfoDisplayMode, setInfoDisplayMode } from "../../store/ui";
 import {
@@ -132,6 +133,7 @@ export default function InvestigatorAppBar({
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loginModalOpen, setLoginModalOpen] = React.useState(false);
+  const [refreshInProgress, setRefreshInProgress] = React.useState(false);
   const session = useSelector(getSession);
   let lastUpdate = useSelector(getAssetUpdated);
   if (lastUpdate) {
@@ -169,7 +171,18 @@ export default function InvestigatorAppBar({
   };
 
   const handleRefresh = () => {
-    dispatch(fetchAssetInfoThunk({ refresh: true, token: session.token }));
+    if (refreshInProgress) {
+      return;
+    }
+
+    setRefreshInProgress(true);
+    const promise: any = dispatch(
+      fetchAssetInfoThunk({ refresh: true, token: session.token })
+    );
+
+    promise.then(() => {
+      setRefreshInProgress(false);
+    });
   };
 
   const handleAccount = (event: any) => {
@@ -215,11 +228,15 @@ export default function InvestigatorAppBar({
         <Tooltip title={`Last updated: ${lastUpdate}\n`}>
           <div>
             <IconButton
-              disabled={!session.token}
+              disabled={!session.token || refreshInProgress}
               sx={{ ml: 2 }}
               onClick={handleRefresh}
             >
-              <RefreshIcon />
+              {refreshInProgress ? (
+                <CircularProgress size="small" />
+              ) : (
+                <RefreshIcon />
+              )}
             </IconButton>
           </div>
         </Tooltip>

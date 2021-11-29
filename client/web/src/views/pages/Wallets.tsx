@@ -13,6 +13,7 @@ const tableMeta: TableProps["meta"] = {
     column: "value",
     direction: "asc",
   },
+  nested: true,
   headers: [
     {
       label: "Wallet",
