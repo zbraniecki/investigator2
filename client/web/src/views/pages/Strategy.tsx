@@ -55,7 +55,7 @@ const tableMeta: TableProps["meta"] = {
       id: "deltaUsd",
       align: "right",
       width: 0.15,
-      formatter: "currency",
+      formatter: "currency-delta",
       sensitive: true,
     },
   ],

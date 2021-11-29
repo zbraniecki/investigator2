@@ -37,7 +37,7 @@ export interface Props {
       id: string;
       align: "inherit" | "left" | "right" | "center" | "justify" | undefined;
       width: number | "auto";
-      formatter?: "percent" | "currency" | "number" | "symbol";
+      formatter?: "percent" | "currency" | "number" | "symbol" | "currency-delta";
       colorDiff?: boolean;
       sensitive?: boolean;
     }[];
@@ -226,6 +226,14 @@ function Row({
           } else {
             switch (header.formatter) {
               case "currency": {
+                value = currency(rawValue);
+                break;
+              }
+              case "currency-delta": {
+                if (rawValue > 1000) {
+                  fontWeight = "bold";
+                  color = "success.main";
+                }
                 value = currency(rawValue);
                 break;
               }
