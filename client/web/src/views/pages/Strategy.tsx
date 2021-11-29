@@ -19,7 +19,7 @@ const tableMeta: TableProps["meta"] = {
       label: "Symbol",
       id: "symbol",
       align: "left",
-      width: 0.1,
+      width: 0.15,
       formatter: "symbol",
     },
     {
