@@ -12,6 +12,14 @@ export enum InfoDisplayMode {
   HideValues,
 }
 
+export enum RowsPerPageOption {
+  Count5,
+  Count10,
+  Count30,
+  Count50,
+  All,
+}
+
 export const uiSlice = createSlice({
   name: "ui",
   initialState: {
@@ -21,6 +29,11 @@ export const uiSlice = createSlice({
       "enum",
       InfoDisplayMode.ShowAll
     ),
+    rowsPerPageOption: getFromLocalStorage(
+      "rows-per-page-option",
+      "enum",
+      RowsPerPageOption.Count30,
+    ),
   },
   reducers: {
     setLightMode: (state, { payload }: { payload: LightMode }) => {
@@ -29,12 +42,16 @@ export const uiSlice = createSlice({
     setInfoDisplayMode: (state, { payload }: { payload: InfoDisplayMode }) => {
       state.infoDisplayMode = payload;
     },
+    setRowsPerPageOption: (state, { payload }: { payload: RowsPerPageOption }) => {
+      state.rowsPerPageOption = payload;
+    },
   },
   extraReducers: {},
 });
 
 export const getLightMode = (state: any) => state.ui.lightMode;
 export const getInfoDisplayMode = (state: any) => state.ui.infoDisplayMode;
+export const getRowsPerPageOption = (state: any) => state.ui.rowsPerPageOption;
 
-export const { setLightMode, setInfoDisplayMode } = uiSlice.actions;
+export const { setLightMode, setInfoDisplayMode, setRowsPerPageOption } = uiSlice.actions;
 export default uiSlice.reducer;

@@ -32,6 +32,8 @@ export function getFromLocalStorage(
 
 function saveToLocalStorage(state: any) {
   localStorage.setItem("lightMode", state.ui.lightMode);
+  localStorage.setItem("info-display-mode", state.ui.infoDisplayMode);
+  localStorage.setItem("rows-per-page-option", state.ui.rowsPerPageOption);
   if (state.account.session.token) {
     localStorage.setItem("token", state.account.session.token);
   } else {

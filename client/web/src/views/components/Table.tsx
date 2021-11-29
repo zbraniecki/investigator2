@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { SortDirection } from "@mui/material/TableCell";
@@ -16,6 +17,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { visuallyHidden } from "@mui/utils";
 import { currency, number, percent, symbol } from "../../utils/formatters";
+import { RowsPerPageOption, getRowsPerPageOption, setRowsPerPageOption } from "../../store/ui";
 
 interface DataRowProps {
   cells: {
@@ -331,7 +333,29 @@ export function Component({
   subHeaderRow,
   hideSensitive,
 }: Props) {
-  const [rowsPerPage, setRowsPerPage] = React.useState(30);
+  const dispatch = useDispatch();
+  let rpp = useSelector(getRowsPerPageOption);
+
+  let rowsPerPage;
+  switch (rpp) {
+    case RowsPerPageOption.Count5:
+      rowsPerPage = 5;
+      break;
+    case RowsPerPageOption.Count10:
+      rowsPerPage = 10;
+      break;
+    case RowsPerPageOption.Count30:
+      rowsPerPage = 30;
+      break;
+    case RowsPerPageOption.Count50:
+      rowsPerPage = 50;
+      break;
+    case RowsPerPageOption.All:
+    default:
+      rowsPerPage = -1;
+      break;
+  }
+
   const [page, setPage] = React.useState(0);
 
   const handleChangePage = (event: any, newPage: any) => {
@@ -339,7 +363,24 @@ export function Component({
   };
 
   const handleChangeRowsPerPage = (event: any) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    let v = parseInt(event.target.value, 10);
+    switch (v) {
+      case 5:
+        dispatch(setRowsPerPageOption(RowsPerPageOption.Count5));
+        break;
+      case 10:
+        dispatch(setRowsPerPageOption(RowsPerPageOption.Count10));
+        break;
+      case 30:
+        dispatch(setRowsPerPageOption(RowsPerPageOption.Count30));
+        break;
+      case 50:
+        dispatch(setRowsPerPageOption(RowsPerPageOption.Count50));
+        break;
+      case -1:
+        dispatch(setRowsPerPageOption(RowsPerPageOption.All));
+        break;
+    }
     setPage(0);
   };
 
