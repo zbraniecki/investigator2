@@ -162,10 +162,10 @@ export function calculateWatchlistMeta(
     assert(asset, `Missing asset: ${item.meta.symbol}`);
 
     const perc = asset.market_cap / totalMcap;
-    result.value_change_1h += (asset.price_change_percentage_1h * perc) / 100;
-    result.value_change_24h += (asset.price_change_percentage_24h * perc) / 100;
-    result.value_change_7d += (asset.price_change_percentage_7d * perc) / 100;
-    result.value_change_30d += (asset.price_change_percentage_30d * perc) / 100;
+    result.value_change_1h += asset.price_change_percentage_1h * perc;
+    result.value_change_24h += asset.price_change_percentage_24h * perc;
+    result.value_change_7d += asset.price_change_percentage_7d * perc;
+    result.value_change_30d += asset.price_change_percentage_30d * perc;
   }
 
   return result;
