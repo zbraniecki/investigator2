@@ -144,7 +144,7 @@ function TableComponent({
                 sortDirection={
                   orderBy === id ? (sortDirection as SortDirection) : false
                 }
-                sx={{ width }}
+                sx={{ borderBottom: 0, width }}
               >
                 <TableSortLabel
                   direction={
@@ -158,18 +158,18 @@ function TableComponent({
               </TableCell>
             ))}
           </TableRow>
+          {subHeaderRow && (
+            <Row
+              id={`${tableId}-sub-header-row`}
+              headers={headers}
+              data={subHeaderRow}
+              defaultSort={defaultSort}
+              hideSensitive={hideSensitive}
+            />
+          )}
         </TableHead>
       )}
       <TableBody>
-        {subHeaderRow && (
-          <Row
-            id={`${tableId}-sub-header-row`}
-            headers={headers}
-            data={subHeaderRow}
-            defaultSort={defaultSort}
-            hideSensitive={hideSensitive}
-          />
-        )}
         {data.map((row, idx) => {
           const ident: string = `${tableId}-row${idx}`;
           return (
@@ -199,6 +199,8 @@ function Row({
 }: RowProps) {
   const [open, setOpen] = React.useState(false);
 
+  const subHeaderRow = id.includes("sub-header-row");
+
   return (
     <>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
@@ -220,6 +222,7 @@ function Row({
           let value;
           let color = "inherit";
           let fontWeight = "regular";
+          let fontSize = undefined;
 
           if (rawValue === undefined) {
             value = "";
@@ -288,11 +291,21 @@ function Row({
           let paddingTop: number | undefined = 0;
           let paddingBottom: number | undefined = 0;
 
+          if (subHeaderRow) {
+            paddingTop = 0;
+            paddingBottom = 0;
+            fontSize = "small";
+            color = "text.disabled";
+          }
+
           if (typeof value === "string") {
-            value = <Typography sx={{ color, fontWeight }}>{value}</Typography>;
-            paddingTop = undefined;
+            value = <Typography sx={{ color, fontWeight, fontSize }}>{value}</Typography>;
+            if (!subHeaderRow) {
+              paddingTop = undefined;
+            }
             paddingBottom = undefined;
           }
+
 
           return (
             <TableCell
