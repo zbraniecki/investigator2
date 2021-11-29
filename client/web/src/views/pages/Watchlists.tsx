@@ -98,10 +98,11 @@ export function Watchlists() {
   };
 
   let tableData: Array<WatchlistTableRow> = [];
-  let value = "1h: -.-% | 24h: -.-% | 7d: -.-% | 30d: -.-%";
 
   const watchlists: Watchlist[] = Array.from(publicWatchlists);
   watchlists.push(...userWatchlists);
+
+  let subHeaderRow;
 
   if (watchlists.length >= wIdx + 1) {
     const wid = watchlists[wIdx].id;
@@ -113,11 +114,23 @@ export function Watchlists() {
     );
 
     const meta = calculateWatchlistMeta(wid, watchlists, assetInfo, portfolios);
-    value = `1h: ${percent(meta.value_change_1h)} | 24h: ${percent(
-      meta.value_change_24h
-    )} | 7d: ${percent(meta.value_change_7d)} | 30d: ${percent(
-      meta.value_change_30d
-    )}`;
+
+    const augumented = [
+      ["price_change_percentage_1h", "value_change_1h"],
+      ["price_change_percentage_24h", "value_change_24h"],
+      ["price_change_percentage_7d", "value_change_7d"],
+      ["price_change_percentage_30d", "value_change_30d"],
+    ];
+
+    const cells: Record<string, number> = {};
+    for (const key of augumented) {
+      const mkey: string = key[1];
+      cells[key[0]] = meta[mkey];
+    }
+
+    subHeaderRow = {
+      cells,
+    };
   }
 
   const tabs: Array<string> = watchlists.map((wlist: Watchlist) => wlist.name);
@@ -134,13 +147,11 @@ export function Watchlists() {
             </Tabs>
           </Box>
         </Box>
-        <Typography sx={{ display: "flex", alignItems: "center" }}>
-          Value: {value}
-        </Typography>
       </Box>
       <Table
         meta={tableMeta}
         data={tableData}
+        subHeaderRow={subHeaderRow}
         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
       />
     </>

@@ -87,7 +87,7 @@ export function calculateWatchlistItems(
  */
 export interface WatchlistTableRow {
   cells: {
-    market_cap_rank: number;
+    market_cap_rank?: number;
     symbol: {
       symbol: string;
       name: string;
@@ -126,7 +126,7 @@ function prepareWatchlistTableGroup(
   return result;
 }
 
-export interface WatchlistMeta {
+export interface WatchlistMeta extends Record<string, number> {
   value_change_1h: number;
   value_change_24h: number;
   value_change_7d: number;

@@ -5,6 +5,7 @@ import {
   PortfolioItem,
 } from "../store/account";
 import { assert } from "./helpers";
+import { getAsset } from "./asset";
 
 export function getWallet(id: string, wallets: Wallet[]): Wallet | null {
   for (const wallet of wallets) {
@@ -123,7 +124,7 @@ function prepareWalletTableGroup(
         quantity: item.meta.quantity,
         symbol: {
           symbol: item.meta.symbol || "",
-          name: "",
+          name: item.meta.name || "",
         },
       },
       children,

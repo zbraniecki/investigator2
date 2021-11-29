@@ -42,6 +42,7 @@ export interface Props {
       sensitive?: boolean;
     }[];
   };
+  subHeaderRow?: DataRowProps;
   data: DataRowProps[];
   hideSensitive: boolean;
 }
@@ -70,6 +71,7 @@ export interface TableProps {
   };
   nested?: boolean;
   hideSensitive: boolean;
+  subHeaderRow?: DataRowProps;
   slice?: [number, number];
 }
 
@@ -90,6 +92,7 @@ function TableComponent({
   defaultSort,
   hideSensitive,
   nested,
+  subHeaderRow,
   slice,
 }: TableProps) {
   const [orderBy, setOrderBy] = React.useState(defaultSort.column);
@@ -156,6 +159,15 @@ function TableComponent({
         </TableHead>
       )}
       <TableBody>
+        {subHeaderRow && (
+          <Row
+            id={`${tableId}-sub-header-row`}
+            headers={headers}
+            data={subHeaderRow}
+            defaultSort={defaultSort}
+            hideSensitive={hideSensitive}
+          />
+        )}
         {data.map((row, idx) => {
           const ident: string = `${tableId}-row${idx}`;
           return (
@@ -226,7 +238,9 @@ function Row({
                 const v = rawValue as Record<string, string>;
                 value = (
                   <>
-                    <Typography>{v.symbol.toUpperCase()}</Typography>
+                    <Typography sx={{ fontSize: "small" }}>
+                      {v.symbol.toUpperCase()}
+                    </Typography>
                     <Typography
                       sx={{
                         color: "text.disabled",
@@ -261,19 +275,20 @@ function Row({
             }
           }
 
+          let paddingTop: number | undefined = 0;
+          let paddingBottom: number | undefined = 0;
+
           if (typeof value === "string") {
-            value = (
-              <Typography sx={{ color, fontWeight }}>
-                {value}
-              </Typography>
-            );
+            value = <Typography sx={{ color, fontWeight }}>{value}</Typography>;
+            paddingTop = undefined;
+            paddingBottom = undefined;
           }
 
           return (
             <TableCell
               key={`${id}-${header.label}`}
               align={header.align}
-              sx={{ width: header.width }}
+              sx={{ width: header.width, paddingTop, paddingBottom }}
             >
               {value}
             </TableCell>
@@ -305,6 +320,7 @@ function Row({
 export function Component({
   meta: { id, sort, nested, headers },
   data,
+  subHeaderRow,
   hideSensitive,
 }: Props) {
   const [rowsPerPage, setRowsPerPage] = React.useState(30);
@@ -330,6 +346,7 @@ export function Component({
           sortable
           defaultSort={sort}
           hideSensitive={hideSensitive}
+          subHeaderRow={subHeaderRow}
           nested={nested}
           slice={[page * rowsPerPage, page * rowsPerPage + rowsPerPage]}
         />

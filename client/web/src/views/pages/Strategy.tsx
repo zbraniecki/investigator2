@@ -35,7 +35,6 @@ const tableMeta: TableProps["meta"] = {
       align: "left",
       width: "auto",
       formatter: "percent",
-      sensitive: true,
     },
     {
       label: "Deviation",
@@ -43,7 +42,6 @@ const tableMeta: TableProps["meta"] = {
       align: "right",
       width: 0.1,
       formatter: "percent",
-      sensitive: true,
     },
     {
       label: "Delta",
@@ -51,7 +49,6 @@ const tableMeta: TableProps["meta"] = {
       align: "right",
       width: 0.1,
       formatter: "percent",
-      sensitive: true,
     },
     {
       label: "USD Delta",

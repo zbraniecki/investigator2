@@ -7,6 +7,7 @@ import {
 import { Strategy } from "../store/strategy";
 import { assert } from "./helpers";
 import { groupItemsByAsset } from "./portfolio";
+import { getAsset } from "./asset";
 
 export function getStrategy(
   id: string,
@@ -21,7 +22,8 @@ export function getStrategy(
 }
 
 export interface StrategyItem {
-  asset: string;
+  symbol: string;
+  name: string;
   target: number;
   current: number;
   deviation: number;
@@ -84,6 +86,10 @@ function calculateStrategyItems(
         currentValue += citem.meta.value;
       }
     }
+
+    const asset = getAsset(target.symbol, assetInfo);
+    assert(asset);
+
     const currentPercent = currentValue / pmeta.value;
     const targetValue = pmeta.value * target.percent;
     const deviation = Math.abs(target.percent - currentPercent);
@@ -91,7 +97,8 @@ function calculateStrategyItems(
     const deltaUsd = targetValue - currentValue;
 
     result.push({
-      asset: target.symbol,
+      symbol: asset.symbol,
+      name: asset.name,
       target: target.percent,
       current: currentPercent,
       deviation,
@@ -109,8 +116,8 @@ function prepareStrategyTableGroup(items: StrategyItem[]): StrategyTableRow[] {
     result.push({
       cells: {
         symbol: {
-          symbol: item.asset,
-          name: "",
+          symbol: item.symbol,
+          name: item.name,
         },
         target: item.target,
         current: item.current,
