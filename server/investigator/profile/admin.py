@@ -1,6 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Portfolio, Account, Holding, Transaction, Watchlist, Holding
+from .models import (
+    User,
+    Portfolio,
+    Account,
+    Holding,
+    Transaction,
+    Watchlist,
+    Holding,
+    PortfolioUI,
+    WatchlistUI,
+)
+from investigator.oracle.models import AssetInfo
 
 
 class HoldingInline(admin.TabularInline):
@@ -38,6 +49,17 @@ class HoldingAdmin(admin.ModelAdmin):
         "-quantity",
     )
 
+    def get_fields(self, request, obj=None, **kwargs):
+        info_fields = AssetInfo._meta.get_fields()
+        fields = super().get_fields(request, obj, **kwargs)
+
+        for field in info_fields:
+            fields.remove(field.name)
+
+        for field in info_fields:
+            fields.append(field.name)
+        return fields
+
 
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
@@ -55,5 +77,22 @@ class TransactionAdmin(admin.ModelAdmin):
         return obj.asset.symbol.upper()
 
 
-admin.site.register(User, UserAdmin)
+class PortfolioUIInline(admin.TabularInline):
+    model = PortfolioUI
+
+
+class WatchlistUIInline(admin.TabularInline):
+    model = WatchlistUI
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    inlines = [
+        PortfolioUIInline,
+        WatchlistUIInline,
+    ]
+
+
 admin.site.register(Watchlist)
+admin.site.register(PortfolioUI)
+admin.site.register(WatchlistUI)

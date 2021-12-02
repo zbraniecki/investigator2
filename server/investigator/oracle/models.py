@@ -1,5 +1,6 @@
 from django.db import models
 from autoslug import AutoSlugField
+import uuid
 
 
 def percent(input):
@@ -7,12 +8,41 @@ def percent(input):
 
 
 class Category(models.Model):
-    # owner
-    id = AutoSlugField(primary_key=True, populate_from="name", unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey(
+        "profile.User", on_delete=models.CASCADE, blank=True, null=True
+    )
     name = models.CharField(max_length=100)
+    slug = AutoSlugField(populate_from="name")
+    parent = models.ForeignKey(
+        "Category", on_delete=models.CASCADE, blank=True, null=True
+    )
 
     def __str__(self):
-        return self.name
+        items = []
+        parent = self
+        while parent:
+            items.append(parent.name)
+            parent = parent.parent
+        return "/".join(items)
+
+
+class Tag(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey(
+        "profile.User", on_delete=models.CASCADE, blank=True, null=True
+    )
+    name = models.CharField(max_length=100)
+    slug = AutoSlugField(populate_from="name")
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=True, null=True
+    )
+
+    def __str__(self):
+        if self.category:
+            return f"{self.category}/{self.name}"
+        else:
+            return self.name
 
 
 class ActiveAssetManager(models.Manager):
@@ -30,40 +60,15 @@ class AllAssetManager(models.Manager):
         return super().get_queryset()
 
 
-class Asset(models.Model):
-    objects = ActiveAssetManager()
-    inactive_objects = InactiveAssetManager()
-    all_objects = AllAssetManager()
-
-    id = AutoSlugField(
-        primary_key=True, populate_from="symbol", unique=True, manager=all_objects
-    )
-
-    symbol = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
-    categories = models.ManyToManyField(Category)
-    api_id = models.CharField(max_length=100, blank=True, null=True)
-    active = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.name} ({self.symbol})"
-
-
-class InflationChange(models.Model):
-    asset = models.ForeignKey(
-        Asset, related_name="inflation_changes", on_delete=models.CASCADE
-    )
-    change = models.FloatField()
-    timestamp = models.DateField()
-
-    def __str__(self):
-        return f"{self.asset} - {self.change} - {self.timestamp}"
-
-
 class AssetInfo(models.Model):
-    asset = models.ForeignKey(Asset, related_name="info", on_delete=models.CASCADE)
-    base = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
-    value = models.FloatField()
+    base = models.ForeignKey(
+        "oracle.Asset",
+        related_name="+",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    value = models.FloatField(blank=True, null=True)
     high_24h = models.FloatField(blank=True, null=True)
     low_24h = models.FloatField(blank=True, null=True)
     market_cap_rank = models.IntegerField(blank=True, null=True)
@@ -80,8 +85,38 @@ class AssetInfo(models.Model):
     image = models.CharField(max_length=200, blank=True, null=True)
     inflation = models.FloatField(blank=True, null=True)
 
+    class Meta:
+        abstract = True
+
+
+class Asset(AssetInfo):
+    objects = ActiveAssetManager()
+    inactive_objects = InactiveAssetManager()
+    all_objects = AllAssetManager()
+
+    id = AutoSlugField(
+        primary_key=True, populate_from="api_id", unique=True, manager=all_objects
+    )
+
+    symbol = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    tags = models.ManyToManyField(Tag, blank=True)
+    api_id = models.CharField(max_length=100, blank=True, null=True)
+    active = models.BooleanField(default=False)
+
     def __str__(self):
-        return f"{self.asset.symbol}/{self.base.symbol} - {self.value}"
+        return f"{self.name} ({self.symbol})"
+
+
+class InflationChange(models.Model):
+    asset = models.ForeignKey(
+        Asset, related_name="inflation_changes", on_delete=models.CASCADE
+    )
+    change = models.FloatField()
+    timestamp = models.DateField()
+
+    def __str__(self):
+        return f"{self.asset} - {self.change} - {self.timestamp}"
 
 
 class Provider(models.Model):
@@ -129,20 +164,23 @@ class PassiveType(models.TextChoices):
     INTEREST = "INT", "Interest"
 
 
-class Passive(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+class PassiveABC(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
     type = models.CharField(
         max_length=3,
         choices=PassiveType.choices,
+        blank=True,
+        null=True,
     )
-    name = models.CharField(max_length=100, blank=True, null=True)
     min = models.FloatField(blank=True, null=True)
     max = models.FloatField(blank=True, null=True)
-    apy_min = models.FloatField()
+    apy_min = models.FloatField(blank=True, null=True)
     apy_max = models.FloatField(blank=True, null=True)
 
-    def __str__(self):
+    class Meta:
+        abstract = True
+
+    def get_apy_display(self):
         if self.min and self.max:
             rng = f" ({self.min}-{self.max})"
         elif self.min and not self.max:
@@ -160,7 +198,16 @@ class Passive(models.Model):
             apy = f"-{percent(self.apy_max)}"
         else:
             apy = ""
-        return f"{self.service} {self.asset.symbol.upper()} {PassiveType(self.type).label} {rng} - {apy}"
+        return f"{PassiveType(self.type).label} {rng} - {apy}"
+
+
+class Passive(PassiveABC):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+
+    def __str__(self):
+        apy = self.get_apy_display()
+        return f"{self.service} {self.asset.symbol.upper()} {apy}"
 
 
 class PassiveChangeType(models.TextChoices):

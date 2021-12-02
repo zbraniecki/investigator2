@@ -1,5 +1,15 @@
 from django.contrib.auth import get_user_model
-from .models import Portfolio, Holding, Account, Watchlist, WatchlistType
+from .models import (
+    Portfolio,
+    Holding,
+    Account,
+    Watchlist,
+    WatchlistType,
+    PortfolioUI,
+    WatchlistUI,
+    User,
+)
+from investigator.oracle.models import Tag
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
@@ -20,28 +30,56 @@ class HoldingSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
-    holdings = HoldingSerializer(many=True, read_only=True)
+    holdings = serializers.SerializerMethodField("get_holdings")
     portfolios = serializers.SerializerMethodField("get_portfolios")
-    accounts = serializers.SerializerMethodField("get_accounts")
 
     class Meta:
         model = Portfolio
-        fields = ["id", "name", "holdings", "portfolios", "accounts"]
+        fields = ["id", "name", "holdings", "portfolios", "value"]
 
     def get_portfolios(self, obj):
         return [p.id for p in obj.portfolios.all()]
 
-    def get_accounts(self, obj):
-        return [p.id for p in obj.accounts.all()]
+    def get_holdings(self, obj):
+        result = []
+        for holding in obj.holdings.all():
+            result.append(
+                {
+                    "id": holding.asset.id,
+                    "quantity": holding.quantity,
+                    "account": holding.account.service.id,
+                }
+            )
+        for account in obj.accounts.all():
+            for holding in account.holdings:
+                result.append(
+                    {
+                        "id": holding.asset.id,
+                        "quantity": holding.quantity,
+                        "account": holding.account.service.id,
+                    }
+                )
+        for tag in obj.tags.all():
+            holdings = Holding.objects.filter(asset__tags__in=[tag])
+            for holding in holdings:
+                result.append(
+                    {
+                        "id": holding.asset.id,
+                        "quantity": holding.quantity,
+                        "account": holding.account.service.id,
+                    }
+                )
+        return result
 
 
 class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
     portfolio = serializers.SerializerMethodField("get_portfolio")
     assets = serializers.SerializerMethodField("get_assets")
+    type = serializers.SerializerMethodField("get_type")
 
     class Meta:
         model = Watchlist
-        fields = ["id", "name", "assets", "portfolio", "dynamic"]
+        fields = ["id", "name", "type", "assets", "portfolio", "dynamic"]
 
     def get_portfolio(self, obj):
         if obj.type == WatchlistType.PORTFOLIO:
@@ -49,11 +87,14 @@ class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
         else:
             return None
 
+    def get_type(self, obj):
+        return "dynamic"
+
     def get_assets(self, obj):
         if obj.type == WatchlistType.DYNAMIC:
-            return ["eth"]
+            return get_dynamic_assets(obj.dynamic)
         else:
-            return [asset.symbol for asset in obj.assets.all()]
+            return []
 
 
 class AccountSerializer(serializers.HyperlinkedModelSerializer):
@@ -72,9 +113,28 @@ class AccountSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    ui = serializers.SerializerMethodField("get_ui")
+    current = serializers.SerializerMethodField("get_current")
+
     class Meta:
         model = get_user_model()
-        fields = ("id", "username", "email")
+        fields = ("id", "username", "email", "ui", "current")
+
+    def get_ui(self, obj):
+        portfolios = PortfolioUI.objects.filter(
+            user__id=obj.id, visibility=True, order__isnull=False
+        ).order_by("order")
+        watchlists = WatchlistUI.objects.filter(
+            user__id=obj.id, visibility=True, order__isnull=False
+        ).order_by("order")
+        return {
+            "portfolios": [p.portfolio.id for p in portfolios],
+            "watchlists": [w.watchlist.id for w in watchlists],
+        }
+
+    def get_current(self, obj):
+        user = self.context["request"].user
+        return obj.id == user.id
 
 
 class MyCustomTokenSerializer(serializers.ModelSerializer):

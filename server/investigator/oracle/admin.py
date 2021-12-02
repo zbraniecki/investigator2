@@ -2,9 +2,10 @@ from django.contrib import admin
 
 from .models import (
     Category,
+    Tag,
     Asset,
-    InflationChange,
     AssetInfo,
+    InflationChange,
     Provider,
     Service,
     Passive,
@@ -14,16 +15,24 @@ from .models import (
 
 @admin.register(Asset)
 class AssetAdmin(admin.ModelAdmin):
-    list_display = ("rank", "symbol", "name")
-    list_filter = ("categories", "active")
+    list_display = ("name", "symbol", "market_cap_rank")
+    list_filter = ("tags", "active")
     search_fields = ["symbol", "name"]
     ordering = (
-        "info__market_cap_rank",
+        "market_cap_rank",
         "symbol",
     )
 
-    def rank(self, obj):
-        return obj.info.get().market_cap_rank
+    def get_fields(self, request, obj=None, **kwargs):
+        info_fields = AssetInfo._meta.get_fields()
+        fields = super().get_fields(request, obj, **kwargs)
+
+        for field in info_fields:
+            fields.remove(field.name)
+
+        for field in info_fields:
+            fields.append(field.name)
+        return fields
 
 
 class PassiveInline(admin.TabularInline):
@@ -97,10 +106,28 @@ class PassiveAdmin(admin.ModelAdmin):
 
 
 @admin.register(InflationChange)
-class AssetAdmin(admin.ModelAdmin):
+class InflationAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Category)
-admin.site.register(AssetInfo)
+class TagsInline(admin.TabularInline):
+    model = Tag
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    inlines = [TagsInline]
+    list_display = ("name", "owner")
+    list_filter = ("owner",)
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ("name", "category", "owner")
+    list_filter = (
+        "category",
+        "owner",
+    )
+
+
 admin.site.register(Provider)

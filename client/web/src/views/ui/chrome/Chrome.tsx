@@ -26,7 +26,7 @@ import {
   fetchUserInfoThunk,
   getPortfolios,
   getSession,
-  setPortfoliosMeta,
+  AuthenticateState,
 } from "../../../store/account";
 import {
   fetchAssetInfoThunk,
@@ -36,11 +36,10 @@ import {
   getWallets,
 } from "../../../store/oracle";
 import { fetchStrategiesThunk } from "../../../store/strategy";
-import { calculatePortfoliosMeta } from "../../../utils/portfolio";
 import { Watchlists } from "../../pages/Watchlists";
 import { Portfolios } from "../../pages/Portfolios";
-import { Wallets } from "../../pages/Wallets";
-import { Strategy } from "../../pages/Strategy";
+// import { Wallets } from "../../pages/Wallets";
+// import { Strategy } from "../../pages/Strategy";
 
 export interface MenuItem {
   id: string;
@@ -61,19 +60,17 @@ const menuItems: Array<MenuItem> = [
     element: <Portfolios />,
     default: true,
   },
-  {
-    id: "strategies",
-    icon: <PieChartIcon />,
-    element: <Strategy />,
-  },
-  {
-    id: "wallets",
-    icon: <AccountBalanceIcon />,
-    element: <Wallets />,
-  },
+  // {
+  //   id: "strategies",
+  //   icon: <PieChartIcon />,
+  //   element: <Strategy />,
+  // },
+  // {
+  //   id: "wallets",
+  //   icon: <AccountBalanceIcon />,
+  //   element: <Wallets />,
+  // },
 ];
-
-const USER_ID = 1;
 
 export function Chrome() {
   const dispatch = useDispatch();
@@ -118,24 +115,27 @@ export function Chrome() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (session.token) {
-      if (!session.username) {
-        dispatch(fetchUserInfoThunk({ token: session.token }));
-      }
+    if (session.token && session.username === undefined) {
+      dispatch(fetchUserInfoThunk({ token: session.token }));
+    }
+  }, [dispatch, session.token, session.username]);
+
+  useEffect(() => {
+    if (session.authenticateState === AuthenticateState.Session) {
       dispatch(fetchPortfoliosThunk({ token: session.token }));
       dispatch(fetchStrategiesThunk({ token: session.token }));
       dispatch(fetchUserWatchlistsThunk({ token: session.token }));
     }
-  }, [dispatch, session]);
+  }, [dispatch, session.authenticateState]);
 
   const portfolios = useSelector(getPortfolios);
   const assets = useSelector(getAssetInfo);
   const wallets = useSelector(getWallets);
-  const meta = calculatePortfoliosMeta(portfolios, assets, wallets);
+  // const meta = calculatePortfoliosMeta(portfolios, assets, wallets);
 
-  useEffect(() => {
-    dispatch(setPortfoliosMeta(meta));
-  }, [dispatch, meta]);
+  // useEffect(() => {
+  //   dispatch(setPortfoliosMeta(meta));
+  // }, [dispatch, meta]);
 
   return (
     <ThemeProvider theme={theme}>

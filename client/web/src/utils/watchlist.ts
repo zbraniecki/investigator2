@@ -1,98 +1,14 @@
 import { AssetInfo, Watchlist } from "../store/oracle";
-import { PortfolioEntry } from "../store/account";
+import { Portfolio } from "../store/account";
 import { getAsset } from "./asset";
-import { getPortfolio } from "./portfolio";
 import { assert } from "./helpers";
+import { DataRowProps, SymbolNameCell } from "../views/components/Table";
 
-export function getWatchlist(
-  id: string,
-  watchlists: Watchlist[]
-): Watchlist | null {
-  for (const watchlist of watchlists) {
-    if (watchlist.id === id) {
-      return watchlist;
-    }
-  }
-  return null;
-}
-
-export interface WatchlistItem {
-  meta: {
-    type: "asset";
-    market_cap_rank: number;
-    id: string;
-    symbol: string;
-    name: string;
-    price: number;
-    price_change_percentage_1h: number;
-    price_change_percentage_24h: number;
-    price_change_percentage_7d: number;
-    price_change_percentage_30d: number;
-  };
-  children: null;
-}
-
-export function calculateWatchlistItems(
-  wid: string,
-  watchlists: Watchlist[],
-  assetInfo: AssetInfo[],
-  portfolios: PortfolioEntry[]
-): WatchlistItem[] {
-  const items: WatchlistItem[] = [];
-
-  const watchlist = getWatchlist(wid, watchlists);
-  if (watchlist === null || assetInfo.length === 0) {
-    return [];
-  }
-
-  const symbols: Set<string> = new Set(watchlist.assets);
-
-  if (watchlist.portfolio) {
-    const portfolio = getPortfolio(watchlist.portfolio, portfolios);
-    assert(portfolio);
-
-    for (const holding of portfolio.holdings) {
-      symbols.add(holding.symbol);
-    }
-  }
-
-  for (const symbol of symbols) {
-    const asset = getAsset(symbol, assetInfo);
-    assert(asset, `Missing asset: ${symbol}`);
-
-    items.push({
-      meta: {
-        type: "asset",
-        market_cap_rank: asset.market_cap_rank,
-        id: asset.symbol,
-        symbol: asset.symbol,
-        name: asset.name,
-        price: asset.value,
-        price_change_percentage_1h: asset.price_change_percentage_1h,
-        price_change_percentage_24h: asset.price_change_percentage_24h,
-        price_change_percentage_7d: asset.price_change_percentage_7d,
-        price_change_percentage_30d: asset.price_change_percentage_30d,
-      },
-      children: null,
-    });
-  }
-
-  return items;
-}
-
-/**
- * XXX: Should we collapse those two (TableRow and Item)
- * Should we allow for hidden columns?
- * Keep raw data for table sorting etc.
- */
-export interface WatchlistTableRow {
+export interface WatchlistTableRow extends DataRowProps {
   cells: {
     market_cap_rank?: number;
-    symbol: {
-      symbol: string;
-      name: string;
-    };
-    price: number;
+    name?: SymbolNameCell | string;
+    price?: number;
     price_change_percentage_1h: number;
     price_change_percentage_24h: number;
     price_change_percentage_7d: number;
@@ -101,83 +17,83 @@ export interface WatchlistTableRow {
   children?: WatchlistTableRow[];
 }
 
-function prepareWatchlistTableGroup(
-  items: WatchlistItem[]
-): WatchlistTableRow[] {
+export function prepareWatchlistTableData(
+  wid: string,
+  watchlists: Record<string, Watchlist>,
+  assetInfo: Record<string, AssetInfo>,
+  portfolios: Record<string, Portfolio>,
+): {headerRow?: WatchlistTableRow, data: WatchlistTableRow[]} {
   const result: WatchlistTableRow[] = [];
 
-  for (const item of items) {
+  if (Object.keys(assetInfo).length === 0) {
+    return {data: result};
+  }
+
+  let watchlist = watchlists[wid];
+  assert(watchlist);
+
+  let header = {
+    market_cap: 0,
+    price_change_percentage_1h: 0,
+    price_change_percentage_24h: 0,
+    price_change_percentage_7d: 0,
+    price_change_percentage_30d: 0,
+  };
+
+  const symbols: Set<string> = new Set(watchlist.assets);
+
+  if (watchlist.portfolio) {
+    const portfolio = portfolios[watchlist.portfolio];
+    if (portfolio !== undefined) {
+      for (const holding of portfolio.holdings) {
+        symbols.add(holding.id);
+      }
+    }
+  }
+
+  for (const symbol of symbols) {
+    const asset = assetInfo[symbol];
+    assert(asset, `Missing asset: ${symbol}`);
+
+    header.market_cap += asset.info.market_cap;
+
     result.push({
       cells: {
-        market_cap_rank: item.meta.market_cap_rank,
-        symbol: {
-          symbol: item.meta.symbol,
-          name: item.meta.name,
+        market_cap_rank: asset.info.market_cap_rank,
+        name: {
+          symbol: asset.symbol,
+          name: asset.name,
         },
-        price: item.meta.price,
-        price_change_percentage_1h: item.meta.price_change_percentage_1h,
-        price_change_percentage_24h: item.meta.price_change_percentage_24h,
-        price_change_percentage_7d: item.meta.price_change_percentage_7d,
-        price_change_percentage_30d: item.meta.price_change_percentage_30d,
+        price: asset.info.value,
+        price_change_percentage_1h: asset.info.price_change_percentage_1h,
+        price_change_percentage_24h: asset.info.price_change_percentage_24h,
+        price_change_percentage_7d: asset.info.price_change_percentage_7d,
+        price_change_percentage_30d: asset.info.price_change_percentage_30d,
       },
     });
   }
 
-  return result;
-}
+  for (const symbol of symbols) {
+    const asset = assetInfo[symbol];
+    assert(asset, `Missing asset: ${symbol}`);
 
-export interface WatchlistMeta extends Record<string, number> {
-  value_change_1h: number;
-  value_change_24h: number;
-  value_change_7d: number;
-  value_change_30d: number;
-}
+    let perc = asset.info.market_cap / header.market_cap;
 
-export function calculateWatchlistMeta(
-  wid: string,
-  watchlists: Watchlist[],
-  assetInfo: AssetInfo[],
-  portfolios: PortfolioEntry[]
-): WatchlistMeta {
-  const result = {
-    value_change_1h: 0,
-    value_change_24h: 0,
-    value_change_7d: 0,
-    value_change_30d: 0,
+    header.price_change_percentage_1h += asset.info.price_change_percentage_1h * perc;
+    header.price_change_percentage_24h += asset.info.price_change_percentage_24h * perc;
+    header.price_change_percentage_7d += asset.info.price_change_percentage_7d * perc;
+    header.price_change_percentage_30d += asset.info.price_change_percentage_30d * perc;
+  }
+
+  return {
+    headerRow: {
+      cells: {
+        price_change_percentage_1h: header.price_change_percentage_1h,
+        price_change_percentage_24h: header.price_change_percentage_24h,
+        price_change_percentage_7d: header.price_change_percentage_7d,
+        price_change_percentage_30d: header.price_change_percentage_30d,
+      }
+    },
+    data: result,
   };
-
-  const items = calculateWatchlistItems(wid, watchlists, assetInfo, portfolios);
-
-  let totalMcap = 0;
-
-  for (const item of items) {
-    const asset = getAsset(item.meta.symbol, assetInfo);
-    assert(asset, `Missing asset: ${item.meta.symbol}`);
-
-    totalMcap += asset.market_cap;
-  }
-
-  for (const item of items) {
-    const asset = getAsset(item.meta.symbol, assetInfo);
-    assert(asset, `Missing asset: ${item.meta.symbol}`);
-
-    const perc = asset.market_cap / totalMcap;
-    result.value_change_1h += asset.price_change_percentage_1h * perc;
-    result.value_change_24h += asset.price_change_percentage_24h * perc;
-    result.value_change_7d += asset.price_change_percentage_7d * perc;
-    result.value_change_30d += asset.price_change_percentage_30d * perc;
-  }
-
-  return result;
-}
-
-export function prepareWatchlistTableData(
-  wid: string,
-  watchlists: Watchlist[],
-  assetInfo: AssetInfo[],
-  portfolios: PortfolioEntry[]
-): WatchlistTableRow[] {
-  const items = calculateWatchlistItems(wid, watchlists, assetInfo, portfolios);
-
-  return prepareWatchlistTableGroup(items);
 }

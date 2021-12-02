@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from investigator.oracle.models import Asset, Service
+from investigator.oracle.models import Asset, AssetInfo, Service, Tag, PassiveABC
 from autoslug import AutoSlugField
 import uuid
 
@@ -23,12 +23,16 @@ class Account(models.Model):
             return f"{self.owner}'s {self.service}"
 
 
-class Holding(models.Model):
+class Holding(AssetInfo, PassiveABC):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     quantity = models.FloatField()
     account = models.ForeignKey(
-        Account, related_name="holdings", on_delete=models.CASCADE
+        Account,
+        related_name="holdings",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
@@ -74,6 +78,8 @@ class Portfolio(models.Model):
     holdings = models.ManyToManyField(Holding, blank=True)
     portfolios = models.ManyToManyField("Portfolio", blank=True)
     accounts = models.ManyToManyField(Account, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    value = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} ({self.owner})"
@@ -82,6 +88,7 @@ class Portfolio(models.Model):
 class WatchlistType(models.TextChoices):
     ASSETS = "AS", "Assets"
     PORTFOLIO = "PL", "Portfolio"
+    TAG = "TG", "Tag"
     DYNAMIC = "DN", "Dynamic"
 
 
@@ -98,6 +105,21 @@ class Watchlist(models.Model):
         Portfolio, on_delete=models.CASCADE, blank=True, null=True
     )
     dynamic = models.CharField(max_length=100, blank=True, null=True)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} ({self.owner})"
+
+
+class PortfolioUI(models.Model):
+    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visibility = models.BooleanField()
+    order = models.IntegerField()
+
+
+class WatchlistUI(models.Model):
+    watchlist = models.ForeignKey(Watchlist, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visibility = models.BooleanField()
+    order = models.IntegerField()

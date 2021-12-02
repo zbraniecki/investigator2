@@ -50,7 +50,6 @@ export const authenticate = async ({
     return {
       token: resp.key,
       username: resp.user.username,
-      email: resp.user.email,
     };
   }
   return {
@@ -71,7 +70,7 @@ export const logout = async ({ token }: { token: string }) => {
 };
 
 export const fetchUserInfo = async ({ token }: { token: string }) => {
-  const data = await fetch(`${BASE_URL}auth/user/`, {
+  const data = await fetch(`${BASE_URL}profile/users/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

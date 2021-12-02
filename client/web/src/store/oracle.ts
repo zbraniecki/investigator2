@@ -27,28 +27,31 @@ export interface Watchlist {
 }
 
 export interface AssetInfo {
+  id: string;
   symbol: string;
   name: string;
-  pair: [string, string];
-  value: number;
-  high_24h: number;
-  low_24h: number;
-  market_cap_rank: number;
-  market_cap: number;
-  market_cap_change_percentage_24h: number;
-  price_change_percentage_1h: number;
-  price_change_percentage_24h: number;
-  price_change_percentage_7d: number;
-  price_change_percentage_30d: number;
-  circulating_supply: number;
-  total_supply: number;
-  max_supply: number;
-  image: string;
-  last_updated: string;
+  info: {
+    pair: [string, string];
+    value: number;
+    high_24h: number;
+    low_24h: number;
+    market_cap_rank: number;
+    market_cap: number;
+    market_cap_change_percentage_24h: number;
+    price_change_percentage_1h: number;
+    price_change_percentage_24h: number;
+    price_change_percentage_7d: number;
+    price_change_percentage_30d: number;
+    circulating_supply: number;
+    total_supply: number;
+    max_supply: number;
+    image: string;
+    last_updated: string;
+  };
 }
 
 export interface WalletAsset {
-  symbol: string;
+  id: string;
   apy: number;
   yield_type: "ST" | "LP" | "INT";
 }
@@ -56,21 +59,21 @@ export interface WalletAsset {
 export interface Wallet {
   id: string;
   name: string;
-  currency: WalletAsset[];
+  assets: WalletAsset[];
   type: "WALT" | "CHAC" | "SAAC" | "INAC" | "REAC" | "CRAC" | "LOAN";
 }
 
 interface OracleState {
   assetUpdated?: string;
-  assets: AssetInfo[];
-  wallets: Wallet[];
-  watchlists: Watchlist[];
+  assets: Record<string, AssetInfo>;
+  wallets: Record<string, Wallet>;
+  watchlists: Record<string, Watchlist>;
 }
 
 const initialState = {
-  assets: [],
-  wallets: [],
-  watchlists: [],
+  assets: {},
+  wallets: {},
+  watchlists: {},
 } as OracleState;
 
 export const oracleSlice = createSlice({
@@ -79,17 +82,26 @@ export const oracleSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchAssetInfoThunk.fulfilled, (state, action) => {
-      if (action.payload.length > 0) {
-        const item = action.payload[0];
-        state.assetUpdated = item.last_updated;
+      for (let item of action.payload) {
+        if (item.info.last_updated) {
+          state.assetUpdated = item.info.last_updated;
+          break;
+        }
       }
-      state.assets = action.payload;
+      state.assets = {};
+      for (let item of action.payload) {
+        state.assets[item.id] = item;
+      }
     });
     builder.addCase(fetchWalletsThunk.fulfilled, (state, action) => {
-      state.wallets = action.payload;
+      for (let item of action.payload) {
+        state.wallets[item.id] = item;
+      }
     });
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
-      state.watchlists = action.payload;
+      for (let item of action.payload) {
+        state.watchlists[item.id] = item;
+      }
     });
   },
 });

@@ -19,9 +19,14 @@ import { visuallyHidden } from "@mui/utils";
 import { currency, number, percent, symbol } from "../../utils/formatters";
 import { RowsPerPageOption, getRowsPerPageOption, setRowsPerPageOption } from "../../store/ui";
 
-interface DataRowProps {
+export interface SymbolNameCell extends Record<string, string | undefined> {
+  symbol?: string;
+  name?: string;
+}
+
+export interface DataRowProps {
   cells: {
-    [key: string]: string | number | undefined | Record<string, string>;
+    [key: string]: string | number | undefined | SymbolNameCell;
   };
   children?: DataRowProps[];
 }
@@ -135,7 +140,7 @@ function TableComponent({
         <TableHead>
           <TableRow>
             {nested && (
-              <TableCell sx={{ width: tableSettings.columns.collapse.width }} />
+              <TableCell sx={{ borderBottom: 0, width: tableSettings.columns.collapse.width }} />
             )}
             {headers.map(({ id, label, align, width }) => (
               <TableCell
@@ -164,6 +169,7 @@ function TableComponent({
               headers={headers}
               data={subHeaderRow}
               defaultSort={defaultSort}
+              nested={nested}
               hideSensitive={hideSensitive}
             />
           )}
@@ -248,23 +254,27 @@ function Row({
               }
               case "symbol": {
                 // value = symbol(rawValue);
-                const v = rawValue as Record<string, string>;
-                value = (
-                  <>
-                    <Typography sx={{ fontSize: "small" }}>
-                      {v.symbol.toUpperCase()}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        color: "text.disabled",
-                        fontWeight: "light",
-                        fontSize: "small",
-                      }}
-                    >
-                      {v.name}
-                    </Typography>
-                  </>
-                );
+                if (typeof rawValue === "string") {
+                  value = rawValue;
+                } else {
+                  const v = rawValue as Record<string, string>;
+                  value = (
+                    <>
+                      <Typography sx={{ fontSize: "small" }}>
+                        {v.symbol.toUpperCase()}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "text.disabled",
+                          fontWeight: "light",
+                          fontSize: "small",
+                        }}
+                      >
+                        {v.name}
+                      </Typography>
+                    </>
+                  );
+                }
                 break;
               }
               case "percent": {

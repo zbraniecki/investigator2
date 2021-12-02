@@ -3,8 +3,8 @@ from .models import Asset
 
 def get_top30_assets():
     count = 30
-    assets = Asset.objects.all().order_by("-info__market_cap", "symbol")
-    return [asset.symbol for asset in assets][:count]
+    assets = Asset.objects.all().order_by("-market_cap", "symbol")
+    return [asset.id for asset in assets][:count]
 
 
 def get_movers_assets():
@@ -15,7 +15,7 @@ def get_movers_assets():
     )
     asset_len = len(assets)
     selected = assets[:half] + assets[(asset_len - half) :]
-    return [asset.symbol for asset in selected]
+    return [asset.id for asset in selected]
 
 
 def get_dynamic_assets(name):

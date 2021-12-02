@@ -34,39 +34,28 @@ export const fetchUserInfoThunk = createAsyncThunk(
 export const logoutThunk = createAsyncThunk("account/logout", logout);
 
 export interface Holding {
+  id: string;
   symbol: string;
   quantity: number;
   account: string;
 }
 
-export interface PortfolioItem {
-  meta: {
-    type: "asset-group" | "asset" | "portfolio" | "wallet-group";
-    id: string;
-    symbol?: string;
-    name?: string;
-    price?: number;
-    quantity?: number;
-    value: number;
-    wallet?: string;
-    yield?: number;
-    price_change_percentage_24h?: number;
-  };
-  children: PortfolioItem[] | null;
-}
-
-export interface PortfolioEntryMeta {
-  value: number;
-  yield: number;
-  price_change_percentage_24h: number;
-  items: PortfolioItem[];
-}
-
-export interface PortfolioEntry {
+export interface Portfolio {
   id: string;
   name: string;
   holdings: Holding[];
   portfolios: string[];
+  value?: number;
+}
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  ui: {
+    portfolios: string[];
+    watchlists: string[];
+  },
 }
 
 export enum AuthenticateState {
@@ -81,11 +70,10 @@ interface AccountState {
     authenticateState: AuthenticateState;
     token?: string;
     username?: string;
-    email?: string;
   };
-  portfolios: PortfolioEntry[];
-  meta: Record<string, PortfolioEntryMeta>;
-  watchlists: Watchlist[];
+  portfolios: Record<string, Portfolio>;
+  watchlists: Record<string, Watchlist>;
+  users: Record<string, User>;
 }
 
 const initialState = {
@@ -93,21 +81,24 @@ const initialState = {
     authenticateState: AuthenticateState.None,
     token: getFromLocalStorage("token", "string", undefined),
   },
-  portfolios: [],
-  meta: {},
-  watchlists: [],
+  portfolios: {},
+  watchlists: {},
+  users: {},
 } as AccountState;
+
+function cleanSlice(state: any) {
+  state.session.authenticateState = AuthenticateState.None;
+  state.session.username = undefined;
+  state.session.token = undefined;
+  state.portfolios = {};
+  state.watchlists = {};
+  state.users = {};
+}
 
 export const accountSlice = createSlice({
   name: "account",
   initialState,
   reducers: {
-    setPortfoliosMeta: (
-      state,
-      { payload }: { payload: Record<string, PortfolioEntryMeta> }
-    ) => {
-      state.meta = payload;
-    },
     setAuthenticateState: (
       state,
       { payload }: { payload: AuthenticateState }
@@ -117,55 +108,51 @@ export const accountSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPortfoliosThunk.fulfilled, (state, action) => {
-      state.portfolios = action.payload;
+      state.portfolios = {};
+      for (let item of action.payload) {
+        state.portfolios[item.id] = item;
+      }
     });
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
-      state.watchlists = action.payload;
+      state.watchlists = {};
+      for (let item of action.payload) {
+        state.watchlists[item.id] = item;
+      }
     });
     builder.addCase(authenticateThunk.fulfilled, (state, action) => {
       if (action.payload.error) {
         state.session.authenticateState = AuthenticateState.Error;
-        state.session.email = undefined;
-        state.session.username = undefined;
         state.session.token = undefined;
       } else {
         state.session.authenticateState = AuthenticateState.Session;
-        state.session.email = action.payload.email;
-        state.session.username = action.payload.username;
         state.session.token = action.payload.token;
       }
     });
     builder.addCase(logoutThunk.fulfilled, (state, action) => {
-      state.session.authenticateState = AuthenticateState.None;
-      state.session.email = undefined;
-      state.session.username = undefined;
-      state.session.token = undefined;
-      state.portfolios = [];
-      state.meta = {};
-      state.watchlists = [];
+      cleanSlice(state);
     });
     builder.addCase(fetchUserInfoThunk.fulfilled, (state, action) => {
-      if (action.payload.email) {
-        state.session.email = action.payload.email;
-        state.session.username = action.payload.username;
-        state.session.authenticateState = AuthenticateState.Session;
-      } else {
-        state.session.authenticateState = AuthenticateState.None;
-        state.session.email = undefined;
-        state.session.username = undefined;
-        state.session.token = undefined;
-        state.portfolios = [];
-        state.meta = {};
-        state.watchlists = [];
+      if (action.payload.detail) {
+        cleanSlice(state);
+        return;
+      }
+
+      state.users = {};
+      for (let item of action.payload) {
+        state.users[item.username] = item;
+        if (state.session.username === undefined && item.current) {
+          state.session.username = item.username;
+          state.session.authenticateState = AuthenticateState.Session;
+        }
       }
     });
   },
 });
 
 export const getPortfolios = (state: any) => state.account.portfolios;
-export const getPortfolioMeta = (state: any) => state.account.meta;
 export const getWatchlists = (state: any) => state.account.watchlists;
 export const getSession = (state: any) => state.account.session;
-export const { setPortfoliosMeta, setAuthenticateState } = accountSlice.actions;
+export const getUsers = (state: any) => state.account.users;
+export const { setAuthenticateState } = accountSlice.actions;
 
 export default accountSlice.reducer;

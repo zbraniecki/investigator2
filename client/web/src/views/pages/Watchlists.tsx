@@ -8,7 +8,7 @@ import { Component as Table, Props as TableProps } from "../components/Table";
 import {
   WatchlistTableRow,
   prepareWatchlistTableData,
-  calculateWatchlistMeta,
+  // calculateWatchlistMeta,
 } from "../../utils/watchlist";
 import {
   getAssetInfo,
@@ -18,6 +18,8 @@ import {
 import {
   getPortfolios,
   getWatchlists as getUserWatchlists,
+  getUsers,
+  getSession,
 } from "../../store/account";
 import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 import { percent } from "../../utils/formatters";
@@ -37,8 +39,8 @@ const tableMeta: TableProps["meta"] = {
       width: 0.01,
     },
     {
-      label: "Symbol",
-      id: "symbol",
+      label: "Name",
+      id: "name",
       align: "left",
       width: 0.15,
       formatter: "symbol",
@@ -86,10 +88,12 @@ const tableMeta: TableProps["meta"] = {
 };
 
 export function Watchlists() {
+  const publicWatchlists: Record<string, Watchlist> = useSelector(getPublicWatchlists);
+  const userWatchlists: Record<string, Watchlist> = useSelector(getUserWatchlists);
   const assetInfo = useSelector(getAssetInfo);
-  const publicWatchlists = useSelector(getPublicWatchlists);
-  const userWatchlists = useSelector(getUserWatchlists);
   const portfolios = useSelector(getPortfolios);
+  const users = useSelector(getUsers);
+  const session = useSelector(getSession);
   const infoDisplayMode = useSelector(getInfoDisplayMode);
 
   const [wIdx, setwIdx] = React.useState(0);
@@ -97,43 +101,56 @@ export function Watchlists() {
     setwIdx(newValue);
   };
 
+  const watchlists: Record<string, Watchlist> = {};
+  for (let list of Object.values(publicWatchlists)) {
+    watchlists[list.id] = list;
+  }
+  for (let list of Object.values(userWatchlists)) {
+    watchlists[list.id] = list;
+  }
+
   let tableData: Array<WatchlistTableRow> = [];
-
-  const watchlists: Watchlist[] = Array.from(publicWatchlists);
-  watchlists.push(...userWatchlists);
-
   let subHeaderRow;
 
-  if (watchlists.length >= wIdx + 1) {
-    const wid = watchlists[wIdx].id;
-    tableData = prepareWatchlistTableData(
+  let tabs: {id: string, name: string}[] = [];
+  if (session.username) {
+    let currentUser = users[session.username];
+    tabs = currentUser.ui.watchlists
+    .filter((wid: string) => {
+      return watchlists[wid] !== undefined;
+    })
+    .map((wid: string) => {
+      let watchlist = watchlists[wid];
+      return {
+        id: watchlist.id,
+        name: watchlist.name,
+      };
+    });
+  } else {
+    tabs = Object.values(watchlists)
+      .map(wlist => {
+        return {
+          id: wlist.id,
+          name: wlist.name,
+        };
+      });
+  }
+
+
+  if (tabs.length >= wIdx + 1) {
+    const wid = tabs[wIdx].id;
+    let {
+      headerRow,
+      data
+    } = prepareWatchlistTableData(
       wid,
       watchlists,
       assetInfo,
       portfolios
     );
-
-    const meta = calculateWatchlistMeta(wid, watchlists, assetInfo, portfolios);
-
-    const augumented = [
-      ["price_change_percentage_1h", "value_change_1h"],
-      ["price_change_percentage_24h", "value_change_24h"],
-      ["price_change_percentage_7d", "value_change_7d"],
-      ["price_change_percentage_30d", "value_change_30d"],
-    ];
-
-    const cells: Record<string, number> = {};
-    for (const key of augumented) {
-      const mkey: string = key[1];
-      cells[key[0]] = meta[mkey];
-    }
-
-    subHeaderRow = {
-      cells,
-    };
+    subHeaderRow = headerRow;
+    tableData = data;
   }
-
-  const tabs: Array<string> = watchlists.map((wlist: Watchlist) => wlist.name);
 
   return (
     <>
@@ -142,7 +159,7 @@ export function Watchlists() {
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs value={wIdx} onChange={handleChange}>
               {tabs.map((tab) => (
-                <Tab key={`tab-${tab}`} label={tab} />
+                <Tab key={`tab-${tab.id}`} label={tab.name} />
               ))}
             </Tabs>
           </Box>

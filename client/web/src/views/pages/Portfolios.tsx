@@ -1,8 +1,12 @@
+import React from "react";
+import Box from "@mui/material/Box";
 import { useSelector } from "react-redux";
 import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 import { Component as Table, Props as TableProps } from "../components/Table";
-import { preparePortfolioTableData } from "../../utils/portfolio";
-import { getPortfolios, getPortfolioMeta } from "../../store/account";
+import { PortfolioTableRow, preparePortfolioTableData } from "../../utils/portfolio";
+import { Portfolio, getPortfolios, getUsers, getSession } from "../../store/account";
 import { getAssetInfo, getWallets } from "../../store/oracle";
 import { currency, percent } from "../../utils/formatters";
 import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
@@ -16,8 +20,8 @@ const tableMeta: TableProps["meta"] = {
   nested: true,
   headers: [
     {
-      label: "Symbol",
-      id: "symbol",
+      label: "Name",
+      id: "name",
       align: "left",
       width: 0.15,
       formatter: "symbol",
@@ -63,42 +67,68 @@ const tableMeta: TableProps["meta"] = {
 };
 
 export function Portfolios() {
-  const portfolios = useSelector(getPortfolios);
+  const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
   const assetInfo = useSelector(getAssetInfo);
-  const portfolioMeta = useSelector(getPortfolioMeta);
   const wallets = useSelector(getWallets);
+  const users = useSelector(getUsers);
+  const session = useSelector(getSession);
   const infoDisplayMode = useSelector(getInfoDisplayMode);
 
-  let pid = "uuid";
-  if (portfolios.length > 0) {
-    pid = portfolios[0].id;
-  }
-  const tableData = preparePortfolioTableData(
-    pid,
-    portfolios,
-    portfolioMeta,
-    assetInfo,
-    wallets
-  );
+  const [pIdx, setpIdx] = React.useState(0);
+  const handleChange = (event: any, newValue: any) => {
+    setpIdx(newValue);
+  };
 
-  let value = "$--.-- | 24h: -.-% | yield: -.-%";
-  const pMeta = portfolioMeta[pid];
-  if (pMeta !== undefined) {
-    const v =
-      infoDisplayMode === InfoDisplayMode.ShowAll
-        ? currency(pMeta.value)
-        : "$**-**";
-    value = `${v} | 24h: ${percent(
-      pMeta.price_change_percentage_24h
-    )} | yield: ${percent(pMeta.yield)}`;
+  let tableData: Array<PortfolioTableRow> = [];
+  let subHeaderRow;
+
+  let currentUser = session.username ? users[session.username] : undefined;
+  let plists = currentUser?.ui.portfolios || [];
+
+  let tabs: {id: string, name: string}[] = plists
+    .filter((pid: string) => {
+      return portfolios[pid] !== undefined;
+    })
+    .map((pid: string) => {
+      let portfolio = portfolios[pid];
+      return {
+        id: portfolio.id,
+        name: portfolio.name,
+      };
+    });
+
+  if (tabs.length >= pIdx + 1) {
+    const pid = tabs[pIdx].id;
+    let {
+      headerRow,
+      data,
+    } = preparePortfolioTableData(
+      pid,
+      portfolios,
+      assetInfo,
+      wallets
+    );
+    subHeaderRow = headerRow;
+    tableData = data;
   }
 
   return (
     <>
-      <Typography align="right">Value: {value}</Typography>
+      <Box sx={{ display: "flex", flexDirection: "row" }}>
+        <Box sx={{ flexGrow: 1 }}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs value={pIdx} onChange={handleChange}>
+              {tabs.map((tab) => (
+                <Tab key={`tab-${tab.id}`} label={tab.name} />
+              ))}
+            </Tabs>
+          </Box>
+        </Box>
+      </Box>
       <Table
         meta={tableMeta}
         data={tableData}
+        subHeaderRow={subHeaderRow}
         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
       />
     </>

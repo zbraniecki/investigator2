@@ -1,35 +1,19 @@
 from .models import Category, Asset, AssetInfo, Service, Passive
-from investigator.profile.models import Watchlist, WatchlistType
+from investigator.profile.models import Watchlist, WatchlistType, WatchlistUI
 from rest_framework import serializers
 from django.db.models import Q
 from datetime import datetime
 from .dynamic_lists import get_dynamic_assets
 
 
-class CategorySerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["name"]
-
-
-class AssetSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Asset
-        fields = ["symbol", "name"]
-
-
-class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
-    pair = serializers.SerializerMethodField("get_pair")
-    name = serializers.SerializerMethodField("get_name")
-    symbol = serializers.SerializerMethodField("get_symbol")
+class AssetInfoSerializer(serializers.ModelSerializer):
+    base = serializers.SerializerMethodField("get_base")
     last_updated = serializers.SerializerMethodField("get_last_updated")
 
     class Meta:
-        model = AssetInfo
+        model = Asset
         fields = [
-            "symbol",
-            "name",
-            "pair",
+            "base",
             "value",
             "high_24h",
             "low_24h",
@@ -47,34 +31,37 @@ class AssetInfoSerializer(serializers.HyperlinkedModelSerializer):
             "last_updated",
         ]
 
-    def get_pair(self, obj):
-        return [
-            obj.asset.symbol,
-            obj.base.symbol.upper(),
-        ]
-
-    def get_name(self, obj):
-        return obj.asset.name
-
-    def get_symbol(self, obj):
-        return obj.asset.symbol
+    def get_base(self, obj):
+        return obj.base.symbol if obj.base else None
 
     def get_last_updated(self, obj):
-        return obj.last_updated.isoformat()
+        return obj.last_updated.isoformat() if obj.last_updated else None
+
+
+class AssetSerializer(serializers.ModelSerializer):
+    tags = serializers.SerializerMethodField("get_tags")
+    info = AssetInfoSerializer(source='*')
+
+    class Meta:
+        model = Asset
+        fields = ["id", "symbol", "name", "tags", "info"]
+
+    def get_tags(self, obj):
+        return [tag.__str__() for tag in obj.tags.all()]
 
 
 class ServiceSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.SerializerMethodField("get_name")
-    currency = serializers.SerializerMethodField("get_currency")
+    assets = serializers.SerializerMethodField("get_assets")
 
     class Meta:
         model = Service
-        fields = ["id", "name", "currency", "type"]
+        fields = ["id", "name", "assets", "type"]
 
     def get_name(self, obj):
         return obj.provider.__str__()
 
-    def get_currency(self, obj):
+    def get_assets(self, obj):
         today = datetime.today()
         passives = Passive.objects.filter(service=obj)
 
@@ -83,7 +70,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
         for passive in passives:
             result.append(
                 {
-                    "symbol": passive.asset.symbol,
+                    "id": passive.asset.id,
                     "apy": passive.apy_min,
                     "yield_type": passive.type,
                 }
@@ -105,6 +92,7 @@ class PublicWatchlistSerializer(serializers.HyperlinkedModelSerializer):
             "type",
             "assets",
             "portfolio",
+            "dynamic",
         ]
 
     def get_portfolio(self, obj):
