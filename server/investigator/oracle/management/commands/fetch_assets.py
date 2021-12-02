@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.utils.dateparse import parse_datetime
 import requests
 import json
+import yfinance as yf
 
 PAGES = 8
 MAX_BATCH = 250
@@ -111,6 +112,11 @@ ASSET_KEYS = {
     ],
 }
 
+STOCK_ASSETS = [
+    "AMZN",
+    "TSLA",
+    "ETN",
+]
 
 def fetch_batch(source, batch_idx, crypto, usd, enable, only_update):
     # with open(f"coins_{pidx}.json", "w") as f:
@@ -221,6 +227,99 @@ def fetch_crypto_assets(active=False, dry=False):
             if len(ids) == 0:
                 break
 
+def fetch_stock_assets(active, dry):
+    asset_class = Category.objects.get(name="asset_class")
+    stock = Tag.objects.get(name="stock", category__in=[asset_class])
+    fiat = Tag.objects.get(name="fiat", category__in=[asset_class])
+    usd, created = Asset.all_objects.update_or_create(
+        symbol="usd",
+        tags__in=[fiat],
+        defaults={
+            "id": "usd",
+            "symbol": "usd",
+            "name": "US Dollar",
+            "value": 1,
+            "active": True,
+        },
+    )
+    if created:
+        usd.tags.add(fiat)
+
+    # data = yf.download(tickers='AMZN', period='1d', interval='1d')
+    # amzn = yf.Ticker("AMZN")
+    # print(amzn.info)
+    tickers = yf.Tickers(STOCK_ASSETS)
+
+    data = yf.download(  # or pdr.get_data_yahoo(...
+            # tickers list or string as well
+            tickers = STOCK_ASSETS,
+
+            # use "period" instead of start/end
+            # valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
+            # (optional, default is '1mo')
+            period = "1d",
+
+            # fetch data by interval (including intraday if period < 60 days)
+            # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+            # (optional, default is '1d')
+            interval = "1d",
+
+            # group by ticker (to access via data['SPY'])
+            # (optional, default is 'column')
+            group_by = 'ticker',
+
+            # adjust all OHLC automatically
+            # (optional, default is False)
+            auto_adjust = False,
+
+            # download pre/post regular market hours data
+            # (optional, default is False)
+            prepost = False,
+
+            # use threads for mass downloading? (True/False/Integer)
+            # (optional, default is True)
+            threads = True,
+
+            # proxy URL scheme use use when downloading?
+            # (optional, default is None)
+            proxy = None
+        )
+    for label, content in data.items():
+        symbol = label[0].lower()
+        ticker = tickers.tickers[symbol.upper()].info
+        price_change_percentage_24h = None
+        col = label[1]
+
+        if col != "Close":
+            continue
+        # print(f"=== { ticker } ===")
+        for item in content.items():
+            date = item[0]
+            value = item[1]
+            # price_change_percentage_24h = value
+            # print(f"{date} - {value}")
+
+        asset, created = Asset.all_objects.update_or_create(
+            api_id=symbol,
+            tags__in=[stock],
+            defaults={
+                "base": usd,
+                "symbol": symbol,
+                "name": ticker["shortName"],
+                "value": value,
+                "active": True,
+                "url": ticker["website"],
+                "image": ticker["logo_url"],
+                "last_updated": date,
+                "market_cap": ticker["marketCap"],
+            },
+        )
+
+        if created:
+            print(f"{symbol} (added)")
+            asset.tags.add(stock)
+        else:
+            print(f"{symbol} (updated)")
 
 class Command(BaseCommand):
     help = "Fetch assets by asset class"
@@ -243,5 +342,7 @@ class Command(BaseCommand):
 
         if asset_class == "crypto":
             fetch_crypto_assets(active, dry)
+        elif asset_class == "fiat":
+            fetch_stock_assets(active, dry)
         else:
             raise Exception("Unknown asset class")
