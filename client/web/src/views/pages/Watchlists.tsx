@@ -85,6 +85,7 @@ const tableMeta: TableProps["meta"] = {
       colorDiff: true,
     },
   ],
+  pager: true,
 };
 
 export function Watchlists() {

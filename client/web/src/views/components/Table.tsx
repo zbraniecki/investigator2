@@ -48,6 +48,7 @@ export interface Props {
       colorDiff?: boolean;
       sensitive?: boolean;
     }[];
+    pager?: boolean;
   };
   subHeaderRow?: DataRowProps;
   data: DataRowProps[];
@@ -351,7 +352,7 @@ function Row({
 }
 
 export function Component({
-  meta: { id, sort, nested, headers },
+  meta: { id, sort, nested, headers, pager },
   data,
   subHeaderRow,
   hideSensitive,
@@ -423,6 +424,7 @@ export function Component({
           slice={[page * rowsPerPage, page * rowsPerPage + rowsPerPage]}
         />
       </TableContainer>
+      { pager &&
       <TablePagination
         rowsPerPageOptions={[5, 10, 30, 50, { label: "All", value: -1 }]}
         component="div"
@@ -432,6 +434,7 @@ export function Component({
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      }
     </>
   );
 }

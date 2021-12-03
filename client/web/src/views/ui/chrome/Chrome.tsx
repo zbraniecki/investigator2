@@ -7,6 +7,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PieChartIcon from "@mui/icons-material/PieChart";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import cyan from "@mui/material/colors/cyan";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useSelector, useDispatch } from "react-redux";
@@ -36,6 +37,7 @@ import {
   getWallets,
 } from "../../../store/oracle";
 import { fetchStrategiesThunk } from "../../../store/strategy";
+import { Dashboard } from "../../pages/Dashboard";
 import { Watchlists } from "../../pages/Watchlists";
 import { Portfolios } from "../../pages/Portfolios";
 // import { Wallets } from "../../pages/Wallets";
@@ -49,6 +51,11 @@ export interface MenuItem {
 }
 
 const menuItems: Array<MenuItem> = [
+  {
+    id: "dashboard",
+    icon: <DashboardIcon />,
+    element: <Dashboard />,
+  },
   {
     id: "watchlists",
     icon: <TrendingUpIcon />,
