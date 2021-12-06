@@ -8,9 +8,8 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { CardActionArea } from '@mui/material';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Chip from '@mui/material/Chip';
 import Avatar from '@mui/material/Avatar';
@@ -88,6 +87,7 @@ const tableMeta: TableProps["meta"] = {
       colorDiff: true,
     },
   ],
+  header: true,
 };
 
 const tableMeta2: TableProps["meta"] = {
@@ -198,30 +198,31 @@ export function Dashboard() {
           </CardActionArea>
         </Card>
       </Grid>
-      <Grid item xs={5}>
-        <Card>
+      <Grid item xs={5} sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Card sx={{ height: "100%", width: "100%" }}>
           <CardActionArea>
             <CardContent>
               <Typography sx={{textAlign: "center"}} gutterBottom variant="h5" component="div">
                 Total: $50,000
               </Typography>
+              <Divider variant="middle" sx={{ margin: "20px" }} />
               <Stack direction="row" sx={{ justifyContent: "center" }}>
-                <Item >
+                <Item elevation={0} sx={{ bgcolor: "inherit" }}>
                   <Chip avatar={
                   <Typography sx={{ display: "flex", textAlign: "center", alignItems: "center", justifyContent: "center" }} align="center">1h</Typography>
                   } label="0.45%" variant="outlined" />
                 </Item>
-                <Item >
+                <Item elevation={0} sx={{ bgcolor: "inherit" }}>
                   <Chip avatar={
                   <Typography sx={{ display: "flex", textAlign: "center", alignItems: "center", justifyContent: "center" }} align="center">24h</Typography>
                   } label="2.30%" color="success" variant="outlined" />
                 </Item>
-                <Item >
+                <Item elevation={0} sx={{ bgcolor: "inherit" }}>
                   <Chip avatar={
                   <Typography sx={{ display: "flex", textAlign: "center", alignItems: "center", justifyContent: "center" }} align="center">7d</Typography>
                   } label="-1.22%" variant="outlined" />
                 </Item>
-                <Item >
+                <Item elevation={0} sx={{ bgcolor: "inherit" }}>
                   <Chip avatar={
                   <Typography sx={{ display: "flex", textAlign: "center", alignItems: "center", justifyContent: "center" }} align="center">30d</Typography>
                   } label={

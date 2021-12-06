@@ -65,6 +65,8 @@ const tableMeta: TableProps["meta"] = {
     },
   ],
   pager: true,
+  header: true,
+  outline: true,
 };
 
 export function Portfolios() {

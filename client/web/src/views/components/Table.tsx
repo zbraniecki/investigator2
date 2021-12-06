@@ -15,6 +15,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { Component as Card } from "../components/Card";
 import { visuallyHidden } from "@mui/utils";
 import { currency, number, percent, symbol } from "../../utils/formatters";
 import { RowsPerPageOption, getRowsPerPageOption, setRowsPerPageOption } from "../../store/ui";
@@ -49,6 +50,8 @@ export interface Props {
       sensitive?: boolean;
     }[];
     pager?: boolean;
+    header?: boolean;
+    outline?: boolean;
   };
   subHeaderRow?: DataRowProps;
   data: DataRowProps[];
@@ -65,6 +68,7 @@ export interface RowProps {
   };
   nested?: boolean;
   hideSensitive: boolean;
+  setOpenModal: any;
 }
 
 export interface TableProps {
@@ -81,6 +85,7 @@ export interface TableProps {
   hideSensitive: boolean;
   subHeaderRow?: DataRowProps;
   slice?: [number, number];
+  setOpenModal: any;
 }
 
 const tableSettings = {
@@ -102,6 +107,7 @@ function TableComponent({
   nested,
   subHeaderRow,
   slice,
+  setOpenModal,
 }: TableProps) {
   const [orderBy, setOrderBy] = React.useState(defaultSort.column);
   const [sortDirection, setSortDirection] = React.useState(
@@ -150,7 +156,7 @@ function TableComponent({
                 sortDirection={
                   orderBy === id ? (sortDirection as SortDirection) : false
                 }
-                sx={{ borderBottom: 0, width }}
+                sx={{ borderBottom: 0, width, paddingBottom: 0 }}
               >
                 <TableSortLabel
                   direction={
@@ -172,6 +178,7 @@ function TableComponent({
               defaultSort={defaultSort}
               nested={nested}
               hideSensitive={hideSensitive}
+              setOpenModal={setOpenModal}
             />
           )}
         </TableHead>
@@ -188,6 +195,7 @@ function TableComponent({
               headers={headers}
               nested={nested}
               hideSensitive={hideSensitive}
+              setOpenModal={setOpenModal}
             />
           );
         })}
@@ -203,6 +211,7 @@ function Row({
   defaultSort,
   nested,
   hideSensitive,
+  setOpenModal,
 }: RowProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -261,10 +270,13 @@ function Row({
                   const v = rawValue as Record<string, string>;
                   value = (
                     <>
-                      <Typography sx={{ fontSize: "small" }}>
+                      <Typography sx={{ fontSize: "small" }}
+                        onClick={() => {setOpenModal(true)}}
+                      >
                         {v.symbol.toUpperCase()}
                       </Typography>
                       <Typography
+                        onClick={() => {setOpenModal(true)}}
                         sx={{
                           color: "text.disabled",
                           fontWeight: "light",
@@ -313,8 +325,10 @@ function Row({
             value = <Typography sx={{ color, fontWeight, fontSize }}>{value}</Typography>;
             if (!subHeaderRow) {
               paddingTop = undefined;
+              paddingBottom = 1;
+            } else {
+              paddingBottom = 1;
             }
-            paddingBottom = undefined;
           }
 
 
@@ -342,6 +356,7 @@ function Row({
                 defaultSort={defaultSort}
                 nested={nested}
                 hideSensitive={hideSensitive}
+                setOpenModal={setOpenModal}
               />
             </Collapse>
           </TableCell>
@@ -352,11 +367,12 @@ function Row({
 }
 
 export function Component({
-  meta: { id, sort, nested, headers, pager },
+  meta: { id, sort, nested, headers, pager, header, outline },
   data,
   subHeaderRow,
   hideSensitive,
 }: Props) {
+  const [openModal, setOpenModal] = React.useState(false);
   const dispatch = useDispatch();
   let rpp = useSelector(getRowsPerPageOption);
 
@@ -408,20 +424,24 @@ export function Component({
     setPage(0);
   };
 
+  let elevation = outline ? 1 : 0; 
+  let sx = outline ? {} : {bgcolor: "inherit"};
+
   return (
     <>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={elevation} sx={sx} >
         <TableComponent
           tableId={id}
           data={data}
           headers={headers}
-          displayHeaders
+          displayHeaders={header || false}
           sortable
           defaultSort={sort}
           hideSensitive={hideSensitive}
           subHeaderRow={subHeaderRow}
           nested={nested}
           slice={[page * rowsPerPage, page * rowsPerPage + rowsPerPage]}
+          setOpenModal={setOpenModal}
         />
       </TableContainer>
       { pager &&
@@ -435,6 +455,7 @@ export function Component({
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
       }
+      <Card meta={{id: "foo", openModal, setOpenModal}} data={{name: {name: "Foo"}}} />
     </>
   );
 }

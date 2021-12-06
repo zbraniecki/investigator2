@@ -4,6 +4,7 @@ import {
   Portfolio,
 } from "../store/account";
 import { AssetInfo, Wallet } from "../store/oracle";
+import { Holding } from "../store/account";
 import { getAsset } from "./asset";
 import { getWalletAsset } from "./wallet";
 import { assert } from "./helpers";
@@ -41,15 +42,44 @@ export function preparePortfolioTableData(
   let value = 0;
   let apy = 0;
 
+  let holdings: Record<string, Holding[]> = {};
+
   for (const holding of portfolio.holdings) {
-    let asset = assetInfo[holding.id];
+    if (!holdings[holding.id]) {
+      holdings[holding.id] = [];
+    }
+    holdings[holding.id].push(holding);
+  }
+
+  for (const holdingList of Object.values(holdings)) {
+    let firstHolding = holdingList[0];
+    assert(firstHolding);
+    let asset = assetInfo[firstHolding.id];
     assert(asset);
 
-    let wallet = wallets[holding.account];
+    let wallet = wallets[firstHolding.account];
     assert(wallet);
     let walletAsset = getWalletAsset(wallet.id, asset.id, wallets);
 
-    value += holding.quantity * asset.info.value;
+    let children: PortfolioTableRow[] | undefined = [];
+    let quantity = 0;
+    let value = 0;
+
+    for (let holding of holdingList) {
+      quantity += holding.quantity;
+      value += holding.quantity * asset.info.value;
+      children.push({
+        cells: {
+          quantity: holding.quantity,
+          value: holding.quantity * asset.info.value,
+        },
+      });
+    }
+    
+    if (children.length === 1) {
+      children = undefined;
+    }
+
     result.push({
       cells: {
         name: {
@@ -57,11 +87,12 @@ export function preparePortfolioTableData(
           name: asset.name,
         },
         price: asset.info.value,
-        quantity: holding.quantity,
+        quantity,
         wallet: wallet.name,
         yield: walletAsset?.apy,
-        value: holding.quantity * asset.info.value,
+        value,
       },
+      children,
     });
   }
 
