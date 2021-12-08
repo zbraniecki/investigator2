@@ -22,12 +22,13 @@ import {
 } from "../../store/account";
 import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 import { percent } from "../../utils/formatters";
+import { SearchInput } from "../components/Search";
 
 const tableMeta: TableProps["meta"] = {
   id: "watchlist",
   sort: {
     column: "market_cap_rank",
-    direction: "desc",
+    direction: "asc",
   },
   nested: false,
   headers: [
@@ -99,6 +100,7 @@ export function Watchlists() {
   const infoDisplayMode = useSelector(getInfoDisplayMode);
 
   const [wIdx, setwIdx] = React.useState(0);
+  const [searchQuery, setSearchQuery] = React.useState("");
   const handleChange = (event: any, newValue: any) => {
     setwIdx(newValue);
   };
@@ -159,11 +161,16 @@ export function Watchlists() {
     }
   }
 
+  const handleSearch = (event: any) => {
+  console.log(event);
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <>
-      <Box sx={{ display: "flex", flexDirection: "row" }}>
-        <Box sx={{ flexGrow: 1 }}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{ flex: 1 }}>
+          <Box>
             <Tabs value={wIdx} onChange={handleChange}>
               {tabs.map((tab) => (
                 <Tab key={`tab-${tab.id}`} label={tab.name} />
@@ -171,12 +178,14 @@ export function Watchlists() {
             </Tabs>
           </Box>
         </Box>
+        <SearchInput handleChange={handleSearch} />
       </Box>
       <Table
         meta={tableMeta}
         data={tableData}
         subHeaderRow={subHeaderRow}
         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
+        searchQuery={searchQuery}
       />
     </>
   );

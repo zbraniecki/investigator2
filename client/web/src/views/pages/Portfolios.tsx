@@ -15,7 +15,7 @@ const tableMeta: TableProps["meta"] = {
   id: "portfolio",
   sort: {
     column: "value",
-    direction: "asc",
+    direction: "desc",
   },
   nested: true,
   headers: [

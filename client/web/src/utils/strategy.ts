@@ -108,7 +108,6 @@ export function createStrategyTableData(
       type: "catch-all",
     });
   }
-  console.log(unlistedAssetIds);
 
   return {
     cells: {

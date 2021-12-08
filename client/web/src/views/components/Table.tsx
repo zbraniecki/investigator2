@@ -19,6 +19,7 @@ import { Component as Card } from "../components/Card";
 import { visuallyHidden } from "@mui/utils";
 import { currency, number, percent, symbol } from "../../utils/formatters";
 import { RowsPerPageOption, getRowsPerPageOption, setRowsPerPageOption } from "../../store/ui";
+import { assert } from "../../utils/helpers";
 
 export interface SymbolNameCell extends Record<string, string | undefined> {
   symbol?: string;
@@ -57,6 +58,7 @@ export interface Props {
   subHeaderRow?: DataRowProps;
   data: DataRowProps[];
   hideSensitive: boolean;
+  searchQuery?: string;
 }
 
 export interface RowProps {
@@ -97,23 +99,25 @@ const tableSettings = {
   },
 };
 
-function sortFunc(orderBy: any, sortDirection: any, a: any, b: any): number {
-  let aval = a.cells[orderBy];
+function sortFunc(orderBy: string[], sortDirection: any, a: any, b: any): number {
+  let orderKey = orderBy[0];
+  assert(orderKey);
+  let aval = a.cells[orderKey];
   if (aval === undefined || aval === null || a.type === "catch-all") {
-    aval = Infinity;
+    aval = -Infinity;
   }
-  let bval = b.cells[orderBy];
+  let bval = b.cells[orderKey];
   if (bval === undefined || bval === null || b.type === "catch-all") {
-    bval = Infinity;
+    bval = -Infinity;
   }
-  if (aval === bval) {
-    return sortFunc("current", "asc", a, b);
+  if (aval === bval && orderBy.length > 1) {
+    return sortFunc(orderBy.slice(1), sortDirection, a, b);
   }
 
   if (sortDirection === "asc") {
-    return bval > aval ? 1 : -1;
+    return aval - bval;
   }
-  return bval > aval ? -1 : 1;
+  return bval - aval;
 }
 
 function TableComponent({
@@ -134,7 +138,7 @@ function TableComponent({
     defaultSort.direction
   );
 
-  data.sort(sortFunc.bind(undefined, orderBy, sortDirection));
+  data.sort(sortFunc.bind(undefined, [orderBy, "current"], sortDirection));
 
   if (slice && slice[1] !== -1) {
     data = data.slice(slice[0], slice[1]);
@@ -379,6 +383,7 @@ export function Component({
   data,
   subHeaderRow,
   hideSensitive,
+  searchQuery,
 }: Props) {
   const [openModal, setOpenModal] = React.useState(false);
   const dispatch = useDispatch();
@@ -434,6 +439,15 @@ export function Component({
 
   let elevation = outline ? 1 : 0; 
   let sx = outline ? {} : {bgcolor: "inherit"};
+
+  if (searchQuery) {
+    data = data.filter((row) => {
+      if (typeof row.cells.name === "object") {
+        return row.cells.name.symbol?.toLowerCase().includes(searchQuery);
+      }
+      return true;
+    });
+  }
 
   return (
     <>
