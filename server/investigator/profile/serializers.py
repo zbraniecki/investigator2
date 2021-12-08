@@ -10,6 +10,7 @@ from .models import (
     User,
 )
 from investigator.oracle.models import Tag
+from investigator.strategy.models import StrategyUI
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
@@ -127,9 +128,13 @@ class UserSerializer(serializers.ModelSerializer):
         watchlists = WatchlistUI.objects.filter(
             user__id=obj.id, visibility=True, order__isnull=False
         ).order_by("order")
+        strategies = StrategyUI.objects.filter(
+            user__id=obj.id, visibility=True, order__isnull=False
+        ).order_by("order")
         return {
             "portfolios": [p.portfolio.id for p in portfolios],
             "watchlists": [w.watchlist.id for w in watchlists],
+            "strategies": [s.strategy.id for s in strategies],
         }
 
     def get_current(self, obj):

@@ -54,6 +54,46 @@ function computeHeaderData(
   return cells;
 }
 
+export function buildPortfolioTableData(
+  portfolio: Portfolio,
+  portfolios: Record<string, Portfolio>,
+  assetInfo: Record<string, AssetInfo>,
+): PortfolioTableRow[] {
+  let rows: PortfolioTableRow[] = portfolio.holdings.map(({id, quantity, account}) => {
+    let asset = assetInfo[id];
+    assert(asset);
+
+    return {
+      cells: {
+        id,
+        name: {
+          name: asset.name,
+          symbol: asset.symbol,
+        },
+        price: asset.info.value,
+        quantity,
+        value: asset.info.value * quantity,
+      },
+      type: "asset",
+    };
+  });
+  let res2: PortfolioTableRow[] = portfolio.portfolios.map(pid => {
+    let portfolio = portfolios[pid];
+    assert(portfolio);
+    return {
+      cells: {
+        id: portfolio.id,
+        name: portfolio.name,
+      },
+      children: buildPortfolioTableData(portfolio, portfolios, assetInfo),
+      type: "portfolio",
+    };
+  });
+  rows.push(...res2);
+  return rows;
+}
+
+
 export function createPortfolioTableData(
   portfolio: Portfolio,
   portfolios: Record<string, Portfolio>,

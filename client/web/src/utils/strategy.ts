@@ -1,163 +1,158 @@
-// import { Wallet, AssetInfo } from "../store/oracle";
-// import {
-//   PortfolioEntry,
-//   PortfolioItem,
-//   PortfolioEntryMeta,
-// } from "../store/account";
-// import { Strategy } from "../store/strategy";
-// import { assert } from "./helpers";
-// // import { groupItemsByAsset } from "./portfolio";
-// // import { getAsset } from "./asset";
+/* eslint camelcase: "off" */
 
-// // export function getStrategy(
-// //   id: string,
-// //   strategies: Strategy[]
-// // ): Strategy | null {
-// //   for (const strategy of strategies) {
-// //     if (strategy.id === id) {
-// //       return strategy;
-// //     }
-// //   }
-// //   return null;
-// // }
+import {
+  Portfolio,
+} from "../store/account";
+import { AssetInfo, Wallet } from "../store/oracle";
+import { Strategy } from "../store/strategy";
+import { getAsset } from "./asset";
+import { PortfolioTableRow } from "./portfolio";
+import { buildPortfolioTableData, createPortfolioTableData } from "./portfolio";
+import {
+  assert,
+  groupTableDataByColumn,
+  groupTableDataByColumn2,
+  computeGroupedTableData,
+  GroupingStrategy
+} from "./helpers";
+import { DataRowProps, SymbolNameCell } from "../views/components/Table";
 
-// // export interface StrategyItem {
-// //   symbol: string;
-// //   name: string;
-// //   target: number;
-// //   current: number;
-// //   deviation: number;
-// //   delta: number;
-// //   deltaUsd: number;
-// // }
+export interface StrategyTableRow {
+  cells: {
+    name?: SymbolNameCell | string;
+    target?: number;
+    current?: number;
+    deviation?: number;
+    delta?: number;
+    deltaUsd?: number;
+  };
+  children?: StrategyTableRow[];
+  type: "portfolio" | "asset" | "catch-all";
+}
 
-// export interface StrategyTableRow {
-//   cells: {
-//     symbol: {
-//       symbol?: string;
-//       name?: string;
-//     };
-//     target: number;
-//     current: number;
-//     deviation: number;
-//     delta: number;
-//     deltaUsd: number;
-//   };
-//   children?: StrategyTableRow[];
-// }
+export function createStrategyTableData(
+  strategy: Strategy,
+  portfolios: Record<string, Portfolio>,
+  assetInfo: Record<string, AssetInfo>,
+  computedTableData: Record<string, Record<string, any>>,
+  topLevel: boolean,
+): StrategyTableRow {
+  let totalPortfolioValue = Object.values(computedTableData).reduce((total, asset) => {
+    return total + asset.value;
+  }, 0);
 
-// // function getAssetFromItems(
-// //   symbol: string,
-// //   items: PortfolioItem[]
-// // ): PortfolioItem | null {
-// //   for (const item of items) {
-// //     if (item.meta.id === symbol) {
-// //       return item;
-// //     }
-// //   }
-// //   return null;
-// // }
+  let rows: StrategyTableRow[] = strategy.targets.map((target) => {
+    let asset = assetInfo[target.asset];
+    assert(asset);
 
-// // function calculateStrategyItems(
-// //   sid: string,
-// //   portfolios: PortfolioEntry[],
-// //   portfolioMeta: Record<string, PortfolioEntryMeta>,
-// //   assetInfo: AssetInfo[],
-// //   wallets: Wallet[],
-// //   strategies: Strategy[]
-// // ): StrategyItem[] {
-// //   const result: StrategyItem[] = [];
+    let computedData = computedTableData[asset.id];
+    assert(computedData);
 
-// //   const strategy = getStrategy(sid, strategies);
-// //   assert(strategy);
+    let targetValue = totalPortfolioValue * target.percent;
+    let currentPercent = computedData.value / totalPortfolioValue;
+    let deviation = Math.abs(target.percent - currentPercent);
+    let delta = targetValue / computedData.value - 1;
+    let deltaUsd = targetValue - computedData.value;
+    return {
+      cells: {
+        name: {
+          name: asset.name,
+          symbol: asset.symbol,
+        },
+        target: target.percent,
+        current: currentPercent,
+        deviation,
+        delta,
+        deltaUsd,
+      },
+      type: "asset",
+    };
+  });
 
-// //   const pmeta = Object.values(portfolioMeta)[0];
-// //   const items = groupItemsByAsset(pmeta.items);
+  let targettedAssetIds = strategy.targets.map(target => target.asset);
+  let unlistedAssetIds: Set<string> = new Set();
+  for (let asset of Object.keys(computedTableData)) {
+    if (!targettedAssetIds.includes(asset)) {
+      unlistedAssetIds.add(asset);
+    }
+  }
+  if (unlistedAssetIds.size > 0) {
+    let children: StrategyTableRow[] = [];
+    for (let assetId of unlistedAssetIds) {
+      let asset = assetInfo[assetId];
+      assert(asset);
 
-// //   for (const target of strategy.targets) {
-// //     const item = getAssetFromItems(target.symbol, items);
-// //     let currentValue = 0;
-// //     if (item) {
-// //       currentValue += item.meta.value;
-// //     }
-// //     for (const symbol of target.contains) {
-// //       const citem = getAssetFromItems(symbol, items);
-// //       if (citem) {
-// //         currentValue += citem.meta.value;
-// //       }
-// //     }
+      let computedData = computedTableData[asset.id];
+      assert(computedData);
 
-// //     const asset = getAsset(target.symbol, assetInfo);
-// //     assert(asset);
+      let current = computedData.value / totalPortfolioValue;
 
-// //     const currentPercent = currentValue / pmeta.value;
-// //     const targetValue = pmeta.value * target.percent;
-// //     const deviation = Math.abs(target.percent - currentPercent);
-// //     const delta = targetValue / currentValue - 1;
-// //     const deltaUsd = targetValue - currentValue;
+      children.push({
+        cells: {
+          name: {
+            name: asset.name,
+            symbol: asset.symbol,
+          },
+          current,
+        },
+        type: "asset",
+      });
+    }
 
-// //     result.push({
-// //       symbol: asset.symbol,
-// //       name: asset.name,
-// //       target: target.percent,
-// //       current: currentPercent,
-// //       deviation,
-// //       delta,
-// //       deltaUsd,
-// //     });
-// //   }
+    rows.push({
+      cells: {
+        name: "?",
+        current: children.reduce((total, row) => total + (row.cells.current || 0), 0),
+      },
+      children,
+      type: "catch-all",
+    });
+  }
+  console.log(unlistedAssetIds);
 
-// //   return result;
-// // }
+  return {
+    cells: {
+    },
+    children: rows.length > 0 ? rows : undefined,
+    type: "asset",
+  };
+}
 
-// // function prepareStrategyTableGroup(items: StrategyItem[]): StrategyTableRow[] {
-// //   const result: StrategyTableRow[] = [];
-// //   for (const item of items) {
-// //     result.push({
-// //       cells: {
-// //         symbol: {
-// //           symbol: item.symbol,
-// //           name: item.name,
-// //         },
-// //         target: item.target,
-// //         current: item.current,
-// //         deviation: item.deviation,
-// //         delta: item.delta,
-// //         deltaUsd: item.deltaUsd,
-// //       },
-// //     });
-// //   }
+export function prepareStrategyTableData(
+  sid: string,
+  strategies: Record<string, Strategy>,
+  portfolios: Record<string, Portfolio>,
+  assetInfo: Record<string, AssetInfo>,
+): StrategyTableRow | undefined {
+  let strategy = strategies[sid];
+  assert(strategy);
+  if (Object.keys(assetInfo).length === 0 || Object.keys(portfolios).length === 0) {
+    return undefined;
+  }
 
-// //   return result;
-// // }
+  let portfolio = portfolios[strategy.portfolio];
+  assert(portfolio);
 
-// export function prepareStrategyTableData(
-//   sid: string,
-//   portfolios: PortfolioEntry[],
-//   portfolioMeta: Record<string, PortfolioEntryMeta>,
-//   assetInfo: AssetInfo[],
-//   wallets: Wallet[],
-//   strategies: Strategy[]
-// ): StrategyTableRow[] {
-//   // if (strategies.length === 0 || Object.keys(portfolioMeta).length === 0) {
-//   //   return [];
-//   // }
 
-//   // const items: StrategyItem[] = calculateStrategyItems(
-//   //   sid,
-//   //   portfolios,
-//   //   portfolioMeta,
-//   //   assetInfo,
-//   //   wallets,
-//   //   strategies
-//   // );
-//   // items.sort((a, b) => {
-//   //   if (b.target === a.target) {
-//   //     return b.current - a.current;
-//   //   }
-//   //   return b.target - a.target;
-//   // });
+  let portfolioData = buildPortfolioTableData(
+    portfolio,
+    portfolios,
+    assetInfo,
+  );
+  let groupedPortfolioData = groupTableDataByColumn2(
+    portfolioData,
+    "id",
+    true,
+  );
+  let computedTableData = computeGroupedTableData(groupedPortfolioData, ["value"]);
 
-//   // return prepareStrategyTableGroup(items);
-//   return [];
-// }
+  let data = createStrategyTableData(
+    strategy,
+    portfolios,
+    assetInfo,
+    computedTableData,
+    true,
+  );
+
+  return data;
+}

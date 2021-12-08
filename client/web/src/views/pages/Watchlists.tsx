@@ -8,7 +8,6 @@ import { Component as Table, Props as TableProps } from "../components/Table";
 import {
   WatchlistTableRow,
   prepareWatchlistTableData,
-  // calculateWatchlistMeta,
 } from "../../utils/watchlist";
 import {
   getAssetInfo,

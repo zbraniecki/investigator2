@@ -30,7 +30,7 @@ export interface DataRowProps {
     [key: string]: string | number | undefined | SymbolNameCell;
   };
   children?: DataRowProps[];
-  type: "portfolio" | "asset";
+  type: "portfolio" | "asset" | "catch-all";
 }
 
 export interface Props {
@@ -97,6 +97,25 @@ const tableSettings = {
   },
 };
 
+function sortFunc(orderBy: any, sortDirection: any, a: any, b: any): number {
+  let aval = a.cells[orderBy];
+  if (aval === undefined || aval === null || a.type === "catch-all") {
+    aval = Infinity;
+  }
+  let bval = b.cells[orderBy];
+  if (bval === undefined || bval === null || b.type === "catch-all") {
+    bval = Infinity;
+  }
+  if (aval === bval) {
+    return sortFunc("current", "asc", a, b);
+  }
+
+  if (sortDirection === "asc") {
+    return bval > aval ? 1 : -1;
+  }
+  return bval > aval ? -1 : 1;
+}
+
 function TableComponent({
   tableId,
   data,
@@ -115,20 +134,8 @@ function TableComponent({
     defaultSort.direction
   );
 
-  data.sort((a, b) => {
-    let aval = a.cells[orderBy];
-    if (aval === undefined || aval === null) {
-      aval = Infinity;
-    }
-    let bval = b.cells[orderBy];
-    if (bval === undefined || bval === null) {
-      bval = Infinity;
-    }
-    if (sortDirection === "asc") {
-      return bval > aval ? 1 : -1;
-    }
-    return bval > aval ? -1 : 1;
-  });
+  data.sort(sortFunc.bind(undefined, orderBy, sortDirection));
+
   if (slice && slice[1] !== -1) {
     data = data.slice(slice[0], slice[1]);
   }

@@ -55,6 +55,7 @@ export interface User {
   ui: {
     portfolios: string[];
     watchlists: string[];
+    strategies: string[];
   },
 }
 

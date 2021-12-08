@@ -41,7 +41,9 @@ function groupRows(
       }
       grouped[CATCH_ALL_KEY].push(row);
     } else {
-      assert(typeof key === "string");
+      if (typeof key === "object") {
+        key = `${key.name}/${key.symbol}`;
+      }
       if (!grouped.hasOwnProperty(key)) {
         grouped[key] = [];
       }
@@ -50,15 +52,42 @@ function groupRows(
   }
 }
 
+export function groupTableDataByColumn2(
+  data: DataRowProps[],
+  keyColumn: string,
+  flattenPortfolios: boolean,
+): Record<string, DataRowProps[]> {
+  let grouped: Record<string, DataRowProps[]> = {};
+
+  data.forEach((row) => groupRows(row, keyColumn, grouped, flattenPortfolios));
+
+  return grouped;
+}
+
+export function computeGroupedTableData(
+  data: Record<string, DataRowProps[]>,
+  columns: string[],
+): Record<string, any> {
+  let result: Record<string, Record<string, any>> = {};
+  for (let [key, entries] of Object.entries(data)) {
+    result[key] = {};
+    for (let column of columns) {
+      result[key][column] = entries.reduce((total, row) => {
+        assert(typeof row.cells.value === "number");
+        return total + row.cells.value;
+      }, 0);
+    }
+  }
+  return result;
+}
+
 export function groupTableDataByColumn(
   data: DataRowProps[],
   keyColumn: string,
   groupColumns: {key: string, strategy: GroupingStrategy}[],
   flattenPortfolios: boolean,
 ): DataRowProps[] {
-  let grouped: Record<string, DataRowProps[]> = {};
-
-  data.forEach((row) => groupRows(row, keyColumn, grouped, flattenPortfolios));
+  let grouped = groupTableDataByColumn2(data, keyColumn, flattenPortfolios);
 
   let result: DataRowProps[] = Object.values(grouped).map((children) => {
     assert(children.length > 0);

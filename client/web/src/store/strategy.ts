@@ -11,21 +11,22 @@ export const fetchStrategiesThunk = createAsyncThunk(
 
 export interface Strategy {
   id: string;
+  portfolio: string;
   targets: Target[];
 }
 
 export interface Target {
-  symbol: string;
+  asset: string;
   contains: string[];
   percent: number;
 }
 
 interface StrategyState {
-  strategies: Strategy[];
+  strategies: Record<string, Strategy>;
 }
 
 const initialState = {
-  strategies: [],
+  strategies: {},
 } as StrategyState;
 
 export const strategySlice = createSlice({
@@ -34,10 +35,13 @@ export const strategySlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchStrategiesThunk.fulfilled, (state, action) => {
-      state.strategies = action.payload;
+      state.strategies = {};
+      for (let item of action.payload) {
+        state.strategies[item.id] = item;
+      }
     });
     builder.addCase(logoutThunk.fulfilled, (state, action) => {
-      state.strategies = [];
+      state.strategies = {};
     });
   },
 });

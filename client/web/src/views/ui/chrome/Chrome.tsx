@@ -41,7 +41,7 @@ import { Dashboard } from "../../pages/Dashboard";
 import { Watchlists } from "../../pages/Watchlists";
 import { Portfolios } from "../../pages/Portfolios";
 import { Wallets } from "../../pages/Wallets";
-// import { Strategy } from "../../pages/Strategy";
+import { Strategy } from "../../pages/Strategy";
 
 export interface MenuItem {
   id: string;
@@ -67,11 +67,11 @@ const menuItems: Array<MenuItem> = [
     element: <Portfolios />,
     default: true,
   },
-  // {
-  //   id: "strategies",
-  //   icon: <PieChartIcon />,
-  //   element: <Strategy />,
-  // },
+  {
+    id: "strategies",
+    icon: <PieChartIcon />,
+    element: <Strategy />,
+  },
   {
     id: "wallets",
     icon: <AccountBalanceIcon />,

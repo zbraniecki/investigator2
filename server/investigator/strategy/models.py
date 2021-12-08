@@ -43,3 +43,9 @@ class StrategyChange(models.Model):
 
     def __str__(self):
         return f"{self.target.asset} - {self.change} - {self.timestamp}"
+
+class StrategyUI(models.Model):
+    strategy = models.ForeignKey(Strategy, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    visibility = models.BooleanField()
+    order = models.IntegerField()

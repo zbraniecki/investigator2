@@ -11,6 +11,7 @@ from .models import (
     PortfolioUI,
     WatchlistUI,
 )
+from investigator.strategy.models import StrategyUI
 from investigator.oracle.models import AssetInfo
 
 
@@ -84,15 +85,19 @@ class PortfolioUIInline(admin.TabularInline):
 class WatchlistUIInline(admin.TabularInline):
     model = WatchlistUI
 
+class StrategyUIInline(admin.TabularInline):
+    model = StrategyUI
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     inlines = [
         PortfolioUIInline,
         WatchlistUIInline,
+        StrategyUIInline,
     ]
 
 
 admin.site.register(Watchlist)
 admin.site.register(PortfolioUI)
 admin.site.register(WatchlistUI)
+admin.site.register(StrategyUI)
