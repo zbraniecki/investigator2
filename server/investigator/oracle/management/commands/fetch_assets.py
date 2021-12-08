@@ -257,7 +257,7 @@ def fetch_stock_assets(active, dry):
             # use "period" instead of start/end
             # valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
             # (optional, default is '1mo')
-            period = "1d",
+            period = "5d",
 
             # fetch data by interval (including intraday if period < 60 days)
             # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
@@ -292,12 +292,14 @@ def fetch_stock_assets(active, dry):
 
         if col != "Close":
             continue
-        # print(f"=== { ticker } ===")
-        for item in content.items():
-            date = item[0]
-            value = item[1]
-            # price_change_percentage_24h = value
-            # print(f"{date} - {value}")
+        print(f"=== { symbol } ===")
+        items = list(content.items())
+        last = items[-1]
+        prev = items[-2]
+
+        date = last[0]
+        value = last[1]
+        price_change_percentage_24h = (prev[1] - last[1]) / value
 
         asset, created = Asset.all_objects.update_or_create(
             api_id=symbol,
@@ -308,18 +310,19 @@ def fetch_stock_assets(active, dry):
                 "name": ticker["shortName"],
                 "value": value,
                 "active": True,
-                "url": ticker["website"],
+                # "url": ticker["website"],
                 "image": ticker["logo_url"],
                 "last_updated": date,
                 "market_cap": ticker["marketCap"],
+                "price_change_percentage_24h": price_change_percentage_24h,
             },
         )
 
-        if created:
-            print(f"{symbol} (added)")
-            asset.tags.add(stock)
-        else:
-            print(f"{symbol} (updated)")
+        # if created:
+        #     print(f"{symbol} (added)")
+        #     asset.tags.add(stock)
+        # else:
+        #     print(f"{symbol} (updated)")
 
 class Command(BaseCommand):
     help = "Fetch assets by asset class"
@@ -342,7 +345,7 @@ class Command(BaseCommand):
 
         if asset_class == "crypto":
             fetch_crypto_assets(active, dry)
-        elif asset_class == "fiat":
+        elif asset_class == "stock":
             fetch_stock_assets(active, dry)
         else:
             raise Exception("Unknown asset class")

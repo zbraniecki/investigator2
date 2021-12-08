@@ -111,7 +111,7 @@ export function prepareWatchlistTableData(
 ): WatchlistTableRow | undefined {
   let watchlist = watchlists[wid];
   assert(watchlist);
-  if (Object.keys(assetInfo).length === 0) {
+  if (Object.keys(assetInfo).length === 0 || Object.keys(portfolios).length === 0) {
     return undefined;
   }
 
