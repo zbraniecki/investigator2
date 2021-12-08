@@ -7,11 +7,12 @@ import { AssetInfo, Wallet } from "../store/oracle";
 import { Holding } from "../store/account";
 import { getAsset } from "./asset";
 import { getWalletAsset } from "./wallet";
-import { assert } from "./helpers";
+import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
 import { DataRowProps, SymbolNameCell } from "../views/components/Table";
 
 export interface PortfolioTableRow extends DataRowProps {
   cells: {
+    id: string,
     name?: SymbolNameCell | string;
     price?: number;
     quantity?: number;
@@ -20,126 +21,119 @@ export interface PortfolioTableRow extends DataRowProps {
     yield?: number;
   };
   children?: PortfolioTableRow[];
+  type: "portfolio" | "asset";
 }
 
+function computeHeaderData(
+  portfolio: Portfolio,
+  data: PortfolioTableRow[],
+  topLevel: boolean,
+): PortfolioTableRow["cells"] {
+  let cells: PortfolioTableRow["cells"] = {
+    id: `header-${portfolio.id}`,
+    value: portfolio.value !== undefined ? portfolio.value : data.reduce((total, curr) => total + (curr.cells.value || 0), 0),
+  };
+
+  if (!topLevel) {
+    cells.name = portfolio.name;
+  }
+
+  let totalYield = data.reduce((total, row) => {
+    if (row.cells.yield && row.cells.value && cells.value) {
+      let perc = row.cells.value / cells.value;
+      return total + (row.cells.yield * perc);
+    } else {
+      return total;
+    }
+  }, 0);
+
+  if (totalYield > 0) {
+    cells.yield = totalYield;
+  }
+
+  return cells;
+}
+
+export function createPortfolioTableData(
+  portfolio: Portfolio,
+  portfolios: Record<string, Portfolio>,
+  assetInfo: Record<string, AssetInfo>,
+  wallets: Record<string, Wallet>,
+  topLevel: boolean,
+): PortfolioTableRow {
+  let rows: PortfolioTableRow[] = portfolio.holdings.map(({id, quantity, account}) => {
+    let asset = assetInfo[id];
+    assert(asset);
+    let wallet = wallets[account];
+    assert(wallet);
+    let walletAsset = getWalletAsset(wallet.id, asset.id, wallets);
+
+    return {
+      cells: {
+        id,
+        name: {
+          name: asset.name,
+          symbol: asset.symbol,
+        },
+        price: asset.info.value,
+        quantity,
+        value: asset.info.value * quantity,
+        wallet: wallet.name,
+        yield: walletAsset?.apy,
+      },
+      type: "asset",
+    };
+  });
+  let res2 = portfolio.portfolios.map(pid => {
+    let portfolio = portfolios[pid];
+    assert(portfolio);
+    return createPortfolioTableData(portfolio, portfolios, assetInfo, wallets, false);
+  });
+  rows.push(...res2);
+
+  rows.sort((a, b) => (b.cells.value || 0) - (a.cells.value || 0));
+
+  let cells = computeHeaderData(portfolio, rows, topLevel);
+
+  return {
+    cells,
+    children: rows.length > 0 ? rows : undefined,
+    type: "portfolio",
+  };
+}
 
 export function preparePortfolioTableData(
   pid: string,
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>,
   wallets: Record<string, Wallet>,
-): {headerRow?: PortfolioTableRow, data: PortfolioTableRow[]} {
-  const result: PortfolioTableRow[] = [];
-
-  if (Object.keys(assetInfo).length === 0 ||
-     Object.keys(wallets).length === 0) {
-    return {data: result};
-  }
-
+): PortfolioTableRow | undefined {
   let portfolio = portfolios[pid];
   assert(portfolio);
-
-  let value = 0;
-  let apy = 0;
-
-  let holdings: Record<string, Holding[]> = {};
-
-  for (const holding of portfolio.holdings) {
-    if (!holdings[holding.id]) {
-      holdings[holding.id] = [];
-    }
-    holdings[holding.id].push(holding);
+  if (Object.keys(assetInfo).length === 0) {
+    return undefined;
   }
 
-  for (const holdingList of Object.values(holdings)) {
-    let firstHolding = holdingList[0];
-    assert(firstHolding);
-    let asset = assetInfo[firstHolding.id];
-    assert(asset);
-
-    let wallet = wallets[firstHolding.account];
-    assert(wallet);
-    let walletAsset = getWalletAsset(wallet.id, asset.id, wallets);
-
-    let children: PortfolioTableRow[] | undefined = [];
-    let quantity = 0;
-    let value = 0;
-
-    for (let holding of holdingList) {
-      quantity += holding.quantity;
-      value += holding.quantity * asset.info.value;
-      children.push({
-        cells: {
-          quantity: holding.quantity,
-          value: holding.quantity * asset.info.value,
-        },
-      });
-    }
-    
-    if (children.length === 1) {
-      children = undefined;
-    }
-
-    result.push({
-      cells: {
-        name: {
-          symbol: asset.symbol,
-          name: asset.name,
-        },
-        price: asset.info.value,
-        quantity,
-        wallet: wallet.name,
-        yield: walletAsset?.apy,
-        value,
-      },
-      children,
-    });
+  let data = createPortfolioTableData(
+    portfolio,
+    portfolios,
+    assetInfo,
+    wallets,
+    true,
+  );
+  if (data.children !== undefined) {
+    data.children = groupTableDataByColumn(
+      data.children,
+      "id",
+      [
+        {key: "name", strategy: GroupingStrategy.IfSame},
+        {key: "price", strategy: GroupingStrategy.IfSame},
+        {key: "wallet", strategy: GroupingStrategy.IfSame},
+        {key: "yield", strategy: GroupingStrategy.IfSame},
+      ],
+      false,
+    ) as PortfolioTableRow[];
   }
 
-  for (const pid of portfolio.portfolios) {
-    let portfolio = portfolios[pid];
-    assert(portfolio);
-
-    let sub = preparePortfolioTableData(pid, portfolios, assetInfo, wallets);
-    result.push({
-      cells: {
-        name: portfolio.name,
-        value: portfolio.value || sub.headerRow?.cells.value,
-      },
-      children: sub.data.length > 0 ? sub.data : undefined,
-    });
-    value += portfolio.value || sub.headerRow?.cells.value || 0;
-  }
-
-  for (const holding of portfolio.holdings) {
-    let asset = assetInfo[holding.id];
-    assert(asset);
-    let walletAsset = getWalletAsset(holding.account, holding.id, wallets);
-    
-    let subValue = holding.quantity * asset.info.value;
-    let perc = subValue / value;
-
-    apy = (walletAsset?.apy || 0) * perc;
-  }
-
-  for (const pid of portfolio.portfolios) {
-    let portfolio = portfolios[pid];
-    assert(portfolio);
-
-    let sub = preparePortfolioTableData(pid, portfolios, assetInfo, wallets);
-    if (sub.headerRow) {
-      let perc = (sub.headerRow.cells.value || 0) / value;
-      apy += (sub.headerRow.cells.yield || 0) * perc;
-    }
-  }
-
-  return {
-    headerRow: {
-      cells: {
-        value,
-        yield: apy,
-      }
-    },
-    data: result,
-  };
+  return data;
 }

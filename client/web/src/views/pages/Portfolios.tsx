@@ -8,8 +8,8 @@ import { Component as Table, Props as TableProps } from "../components/Table";
 import { PortfolioTableRow, preparePortfolioTableData } from "../../utils/portfolio";
 import { Portfolio, getPortfolios, getUsers, getSession } from "../../store/account";
 import { getAssetInfo, getWallets } from "../../store/oracle";
-import { currency, percent } from "../../utils/formatters";
 import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
+import { currency, percent } from "../../utils/formatters";
 
 const tableMeta: TableProps["meta"] = {
   id: "portfolio",
@@ -83,7 +83,7 @@ export function Portfolios() {
   };
 
   let tableData: Array<PortfolioTableRow> = [];
-  let subHeaderRow;
+  let subHeaderRow: PortfolioTableRow | undefined;
 
   let currentUser = session.username ? users[session.username] : undefined;
   let plists = currentUser?.ui.portfolios || [];
@@ -102,17 +102,22 @@ export function Portfolios() {
 
   if (tabs.length >= pIdx + 1) {
     const pid = tabs[pIdx].id;
-    let {
-      headerRow,
-      data,
-    } = preparePortfolioTableData(
+    let data = preparePortfolioTableData(
       pid,
       portfolios,
       assetInfo,
       wallets
     );
-    subHeaderRow = headerRow;
-    tableData = data;
+    if (data !== undefined) {
+      let { cells, children } = data;
+      if (children !== undefined) {
+        subHeaderRow = {
+          cells,
+          type: "asset",
+        };
+        tableData = children;
+      }
+    }
   }
 
   return (

@@ -110,6 +110,10 @@ export const accountSlice = createSlice({
     builder.addCase(fetchPortfoliosThunk.fulfilled, (state, action) => {
       state.portfolios = {};
       for (let item of action.payload) {
+        //XXX: Switch to undefined in Serializer
+        if (item.value === null) {
+          item.value = undefined;
+        }
         state.portfolios[item.id] = item;
       }
     });

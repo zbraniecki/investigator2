@@ -19,6 +19,12 @@ import {
   WatchlistTableRow,
   prepareWatchlistTableData,
 } from "../../utils/watchlist";
+import {
+  PortfolioTableRow,
+} from "../../utils/portfolio";
+import {
+  assert,
+} from "../../utils/helpers";
 import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 import {
   getAssetInfo,
@@ -144,42 +150,50 @@ export function Dashboard() {
   let watchlist = publicWatchlists[wid];
 
   let tableData: Array<WatchlistTableRow> = [];
-  let subHeaderRow;
-  let {
-    headerRow,
-    data
-  } = prepareWatchlistTableData(
+  let data = prepareWatchlistTableData(
     wid,
     publicWatchlists,
     assetInfo,
     portfolios
   );
-  tableData = data.slice(0, 3);
+  assert(data);
+  assert(data.children);
+  let subHeaderRow: WatchlistTableRow = {
+    cells: data.cells,
+    type: "asset",
+  };
+  tableData = data.children.slice(0, 3);
 
-  let tableData2 = [
+  let tableData2: PortfolioTableRow[] = [
     {
       "cells": {
+        "id": "stock",
         "name": "Stock",
         "value": 34000,
-        "price_change_percentage_1h": 0.03,
-        "price_change_percentage_24h": -0.0219,
+        // "price_change_percentage_1h": 0.03,
+        // "price_change_percentage_24h": -0.0219,
       },
+      type: "asset",
     },
     {
       "cells": {
+        "id": "crypto",
         "name": "Crypto",
         "value": 11921,
-        "price_change_percentage_1h": 0.0401,
-        "price_change_percentage_24h": 0.0919,
+        // "price_change_percentage_1h": 0.0401,
+        // "price_change_percentage_24h": 0.0919,
       },
+      type: "asset",
     },
     {
       "cells": {
+        "id": "cash",
         "name": "Cash",
         "value": 1833,
-        "price_change_percentage_1h": 0.0,
-        "price_change_percentage_24h": 0.0,
+        // "price_change_percentage_1h": 0.0,
+        // "price_change_percentage_24h": 0.0,
       },
+      type: "asset",
     },
   ];
 

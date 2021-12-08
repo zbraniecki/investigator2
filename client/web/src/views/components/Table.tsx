@@ -30,6 +30,7 @@ export interface DataRowProps {
     [key: string]: string | number | undefined | SymbolNameCell;
   };
   children?: DataRowProps[];
+  type: "portfolio" | "asset";
 }
 
 export interface Props {

@@ -113,7 +113,7 @@ export function Watchlists() {
   }
 
   let tableData: Array<WatchlistTableRow> = [];
-  let subHeaderRow;
+  let subHeaderRow: WatchlistTableRow | undefined;
 
   let tabs: {id: string, name: string}[] = [];
   if (session.username) {
@@ -142,17 +142,22 @@ export function Watchlists() {
 
   if (tabs.length >= wIdx + 1) {
     const wid = tabs[wIdx].id;
-    let {
-      headerRow,
-      data
-    } = prepareWatchlistTableData(
+    let data = prepareWatchlistTableData(
       wid,
       watchlists,
       assetInfo,
       portfolios
     );
-    subHeaderRow = headerRow;
-    tableData = data;
+    if (data !== undefined) {
+      let { cells, children } = data;
+      if (children !== undefined) {
+        subHeaderRow = {
+          cells,
+          type: "asset",
+        };
+        tableData = children;
+      }
+    }
   }
 
   return (

@@ -40,7 +40,7 @@ import { fetchStrategiesThunk } from "../../../store/strategy";
 import { Dashboard } from "../../pages/Dashboard";
 import { Watchlists } from "../../pages/Watchlists";
 import { Portfolios } from "../../pages/Portfolios";
-// import { Wallets } from "../../pages/Wallets";
+import { Wallets } from "../../pages/Wallets";
 // import { Strategy } from "../../pages/Strategy";
 
 export interface MenuItem {
@@ -72,11 +72,11 @@ const menuItems: Array<MenuItem> = [
   //   icon: <PieChartIcon />,
   //   element: <Strategy />,
   // },
-  // {
-  //   id: "wallets",
-  //   icon: <AccountBalanceIcon />,
-  //   element: <Wallets />,
-  // },
+  {
+    id: "wallets",
+    icon: <AccountBalanceIcon />,
+    element: <Wallets />,
+  },
 ];
 
 export function Chrome() {

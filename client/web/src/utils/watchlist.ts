@@ -7,59 +7,79 @@ import { DataRowProps, SymbolNameCell } from "../views/components/Table";
 export interface WatchlistTableRow extends DataRowProps {
   cells: {
     market_cap_rank?: number;
+    market_cap?: number;
     name?: SymbolNameCell | string;
     price?: number;
-    price_change_percentage_1h: number;
-    price_change_percentage_24h: number;
-    price_change_percentage_7d: number;
-    price_change_percentage_30d: number;
+    price_change_percentage_1h?: number;
+    price_change_percentage_24h?: number;
+    price_change_percentage_7d?: number;
+    price_change_percentage_30d?: number;
   };
   children?: WatchlistTableRow[];
+  type: "portfolio" | "asset";
 }
 
-export function prepareWatchlistTableData(
-  wid: string,
-  watchlists: Record<string, Watchlist>,
-  assetInfo: Record<string, AssetInfo>,
-  portfolios: Record<string, Portfolio>,
-): {headerRow?: WatchlistTableRow, data: WatchlistTableRow[]} {
-  const result: WatchlistTableRow[] = [];
-
-  if (Object.keys(assetInfo).length === 0) {
-    return {data: result};
-  }
-
-  let watchlist = watchlists[wid];
-  assert(watchlist);
-
-  let header = {
-    market_cap: 0,
+function computeHeaderData(
+  watchlist: Watchlist,
+  data: WatchlistTableRow[],
+  topLevel: boolean,
+): WatchlistTableRow["cells"] {
+  let cells = {
     price_change_percentage_1h: 0,
     price_change_percentage_24h: 0,
     price_change_percentage_7d: 0,
     price_change_percentage_30d: 0,
   };
 
+  let totalMcap = data.reduce((total, curr) => total + (curr.cells.market_cap || 0), 0);
+
+  data.forEach(row => {
+    if (row.cells.market_cap === undefined) {
+      return;
+    }
+    let perc = row.cells.market_cap / totalMcap;
+    if (row.cells.price_change_percentage_1h) {
+      cells.price_change_percentage_1h += row.cells.price_change_percentage_1h * perc;
+    }
+    if (row.cells.price_change_percentage_24h) {
+      cells.price_change_percentage_24h += row.cells.price_change_percentage_24h * perc;
+    }
+    if (row.cells.price_change_percentage_7d) {
+      cells.price_change_percentage_7d += row.cells.price_change_percentage_7d * perc;
+    }
+    if (row.cells.price_change_percentage_30d) {
+      cells.price_change_percentage_30d += row.cells.price_change_percentage_30d * perc;
+    }
+  });
+
+  return cells;
+}
+
+export function createWatchlistTableData(
+  watchlist: Watchlist,
+  watchlists: Record<string, Watchlist>,
+  assetInfo: Record<string, AssetInfo>,
+  portfolios: Record<string, Portfolio>,
+  topLevel: boolean,
+): WatchlistTableRow {
   const symbols: Set<string> = new Set(watchlist.assets);
 
   if (watchlist.portfolio) {
     const portfolio = portfolios[watchlist.portfolio];
-    if (portfolio !== undefined) {
-      for (const holding of portfolio.holdings) {
-        symbols.add(holding.id);
-      }
+    assert(portfolio);
+    for (const holding of portfolio.holdings) {
+      symbols.add(holding.id);
     }
   }
 
-  for (const symbol of symbols) {
+  let rows: WatchlistTableRow[] = Array.from(symbols).map(symbol => {
     const asset = assetInfo[symbol];
     assert(asset, `Missing asset: ${symbol}`);
 
-    header.market_cap += asset.info.market_cap;
-
-    result.push({
+    return {
       cells: {
         market_cap_rank: asset.info.market_cap_rank,
+        market_cap: asset.info.market_cap,
         name: {
           symbol: asset.symbol,
           name: asset.name,
@@ -70,30 +90,37 @@ export function prepareWatchlistTableData(
         price_change_percentage_7d: asset.info.price_change_percentage_7d,
         price_change_percentage_30d: asset.info.price_change_percentage_30d,
       },
-    });
-  }
+      type: "asset",
+    };
+  });
 
-  for (const symbol of symbols) {
-    const asset = assetInfo[symbol];
-    assert(asset, `Missing asset: ${symbol}`);
-
-    let perc = asset.info.market_cap / header.market_cap;
-
-    header.price_change_percentage_1h += asset.info.price_change_percentage_1h * perc;
-    header.price_change_percentage_24h += asset.info.price_change_percentage_24h * perc;
-    header.price_change_percentage_7d += asset.info.price_change_percentage_7d * perc;
-    header.price_change_percentage_30d += asset.info.price_change_percentage_30d * perc;
-  }
+  let cells = computeHeaderData(watchlist, rows, topLevel);
 
   return {
-    headerRow: {
-      cells: {
-        price_change_percentage_1h: header.price_change_percentage_1h,
-        price_change_percentage_24h: header.price_change_percentage_24h,
-        price_change_percentage_7d: header.price_change_percentage_7d,
-        price_change_percentage_30d: header.price_change_percentage_30d,
-      }
-    },
-    data: result,
+    cells,
+    children: rows.length > 0 ? rows : undefined,
+    type: "asset",
   };
+}
+
+export function prepareWatchlistTableData(
+  wid: string,
+  watchlists: Record<string, Watchlist>,
+  assetInfo: Record<string, AssetInfo>,
+  portfolios: Record<string, Portfolio>,
+): WatchlistTableRow | undefined {
+  let watchlist = watchlists[wid];
+  assert(watchlist);
+  if (Object.keys(assetInfo).length === 0) {
+    return undefined;
+  }
+
+  let data = createWatchlistTableData(
+    watchlist,
+    watchlists,
+    assetInfo,
+    portfolios,
+    true,
+  );
+  return data;
 }
