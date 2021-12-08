@@ -102,13 +102,16 @@ const tableSettings = {
 function sortFunc(orderBy: string[], sortDirection: any, a: any, b: any): number {
   let orderKey = orderBy[0];
   assert(orderKey);
+
+  let bottom = sortDirection === "asc" ? Infinity : -Infinity;
+
   let aval = a.cells[orderKey];
   if (aval === undefined || aval === null || a.type === "catch-all") {
-    aval = -Infinity;
+    aval = bottom;
   }
   let bval = b.cells[orderKey];
   if (bval === undefined || bval === null || b.type === "catch-all") {
-    bval = -Infinity;
+    bval = bottom;
   }
   if (aval === bval && orderBy.length > 1) {
     return sortFunc(orderBy.slice(1), sortDirection, a, b);
