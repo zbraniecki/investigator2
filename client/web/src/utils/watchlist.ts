@@ -114,18 +114,17 @@ export function prepareWatchlistTableData(
   }
 
   let watchlist = watchlists[wid];
-  assert(watchlist);
+  if (watchlist === undefined) {
+    return undefined;
+  }
+  if (watchlist.portfolio && portfolios[watchlist.portfolio] === undefined) {
+    return undefined;
+  }
+
   if (Object.keys(assetInfo).length === 0) {
     return undefined;
   }
 
-  if (Object.keys(portfolios).length === 0) {
-    for (let [id, w] of Object.entries(watchlists)) {
-      if (w.portfolio !== undefined) {
-        delete watchlists[id];
-      }
-    }
-  }
 
   let data = createWatchlistTableData(
     watchlist,

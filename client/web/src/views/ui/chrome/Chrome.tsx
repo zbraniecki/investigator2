@@ -50,33 +50,6 @@ export interface MenuItem {
   default?: boolean;
 }
 
-const menuItems: Array<MenuItem> = [
-  {
-    id: "dashboard",
-    icon: <DashboardIcon />,
-    element: <Dashboard />,
-  },
-  {
-    id: "watchlists",
-    icon: <TrendingUpIcon />,
-    element: <Watchlists />,
-  },
-  {
-    id: "portfolios",
-    icon: <MonetizationOnIcon />,
-    element: <Portfolios />,
-  },
-  {
-    id: "strategies",
-    icon: <PieChartIcon />,
-    element: <Strategy />,
-  },
-  {
-    id: "wallets",
-    icon: <AccountBalanceIcon />,
-    element: <Wallets />,
-  },
-];
 
 export function Chrome() {
   const dispatch = useDispatch();
@@ -89,10 +62,38 @@ export function Chrome() {
     noSsr: true,
   });
 
-  let activeMenuItems = Array.from(menuItems);
+  let menuItems: Array<MenuItem> = [
+    {
+      id: "dashboard",
+      icon: <DashboardIcon />,
+      element: <Dashboard />,
+    },
+    {
+      id: "watchlists",
+      icon: <TrendingUpIcon />,
+      element: <Watchlists />,
+    },
+    {
+      id: "portfolios",
+      icon: <MonetizationOnIcon />,
+      element: <Portfolios />,
+    },
+    {
+      id: "strategies",
+      icon: <PieChartIcon />,
+      element: <Strategy />,
+    },
+    {
+      id: "wallets",
+      icon: <AccountBalanceIcon />,
+      element: <Wallets />,
+    },
+  ];
+
   if (!session.username) {
-    activeMenuItems = activeMenuItems.filter(item => ["wallets"].includes(item.id));
+    menuItems = menuItems.filter(item => !["strategies", "portfolios", "wallets"].includes(item.id));
   }
+  console.log(session);
 
   let defaultId = session.username ? "portfolios" : "watchlists";
   menuItems.forEach(item => {
