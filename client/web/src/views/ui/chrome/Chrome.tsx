@@ -93,7 +93,6 @@ export function Chrome() {
   if (!session.username) {
     menuItems = menuItems.filter(item => !["strategies", "portfolios", "wallets"].includes(item.id));
   }
-  console.log(session);
 
   let defaultId = session.username ? "portfolios" : "watchlists";
   menuItems.forEach(item => {

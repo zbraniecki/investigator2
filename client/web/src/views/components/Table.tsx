@@ -10,15 +10,28 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import Collapse from "@mui/material/Collapse";
+import Checkbox from '@mui/material/Checkbox';
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import MenuIcon from '@mui/icons-material/Menu';
+import Menu from '@mui/material/Menu';
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import Divider from '@mui/material/Divider';
+import AbcIcon from '@mui/icons-material/Abc';
+import SubjectIcon from '@mui/icons-material/Subject';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import { Component as Card } from "../components/Card";
 import { visuallyHidden } from "@mui/utils";
 import { currency, number, percent, symbol } from "../../utils/formatters";
 import { RowsPerPageOption, getRowsPerPageOption, setRowsPerPageOption } from "../../store/ui";
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { assert } from "../../utils/helpers";
 
 export interface SymbolNameCell extends Record<string, string | undefined> {
@@ -89,6 +102,7 @@ export interface TableProps {
   subHeaderRow?: DataRowProps;
   slice?: [number, number];
   setOpenModal: any;
+  sx?: any;
 }
 
 const tableSettings = {
@@ -135,6 +149,7 @@ function TableComponent({
   subHeaderRow,
   slice,
   setOpenModal,
+  sx,
 }: TableProps) {
   const [orderBy, setOrderBy] = React.useState(defaultSort.column);
   const [sortDirection, setSortDirection] = React.useState(
@@ -389,8 +404,18 @@ export function Component({
   searchQuery,
 }: Props) {
   const [openModal, setOpenModal] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const dispatch = useDispatch();
   let rpp = useSelector(getRowsPerPageOption);
+
+  const open = Boolean(anchorEl);
+
+  const handleMenuOpen = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   let rowsPerPage;
   switch (rpp) {
@@ -441,7 +466,7 @@ export function Component({
   };
 
   let elevation = outline ? 1 : 0; 
-  let sx = outline ? {} : {bgcolor: "inherit"};
+  let sx = outline ? { paddingRight: "30px" } : {bgcolor: "inherit"};
 
   if (searchQuery) {
     data = data.filter((row) => {
@@ -455,6 +480,72 @@ export function Component({
   return (
     <>
       <TableContainer component={Paper} elevation={elevation} sx={sx} >
+        <Box sx={{width: "100%", height: 0, display: "flex", flexDirection: "row-reverse"}}>
+          <IconButton sx={{ height: "36px", marginRight: "-30px" }} onClick={handleMenuOpen}>
+            <MenuIcon sx={{}} />
+          </IconButton>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+            MenuListProps={{dense: true}}>
+            <MenuItem sx={{
+              display: "flex",
+            }}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>Name</ListItemText>
+              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px" }}>
+                <ToggleButtonGroup
+                  size="small"
+                  value={["symbol", "name"]}
+                >
+                  <ToggleButton value="icon">
+                    <MonetizationOnIcon />
+                  </ToggleButton>
+                  <ToggleButton value="symbol">
+                    <AbcIcon />
+                  </ToggleButton>
+                  <ToggleButton value="name">
+                    <SubjectIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </ListItemIcon>
+            </MenuItem>
+            <Divider />
+            <MenuItem sx={{
+              display: "flex",
+            }}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>Market Cap Rank</ListItemText>
+              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+                <Checkbox />
+              </ListItemIcon>
+            </MenuItem>
+            <MenuItem sx={{display: "flex",}}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>1h</ListItemText>
+              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+                <Checkbox />
+              </ListItemIcon>
+            </MenuItem>
+            <MenuItem sx={{display: "flex",}}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>24h</ListItemText>
+              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+                <Checkbox />
+              </ListItemIcon>
+            </MenuItem>
+            <MenuItem sx={{display: "flex",}}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>7d</ListItemText>
+              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+                <Checkbox />
+              </ListItemIcon>
+            </MenuItem>
+            <MenuItem sx={{display: "flex",}}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>30d</ListItemText>
+              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+                <Checkbox />
+              </ListItemIcon>
+            </MenuItem>
+          </Menu>
+        </Box>
         <TableComponent
           tableId={id}
           data={data}
@@ -467,6 +558,7 @@ export function Component({
           nested={nested}
           slice={[page * rowsPerPage, page * rowsPerPage + rowsPerPage]}
           setOpenModal={setOpenModal}
+          sx={{ marginRight: "30px" }}
         />
       </TableContainer>
       { pager &&
