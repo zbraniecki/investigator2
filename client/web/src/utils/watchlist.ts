@@ -109,10 +109,22 @@ export function prepareWatchlistTableData(
   assetInfo: Record<string, AssetInfo>,
   portfolios: Record<string, Portfolio>,
 ): WatchlistTableRow | undefined {
+  if (Object.keys(watchlists).length === 0) {
+    return undefined;
+  }
+
   let watchlist = watchlists[wid];
   assert(watchlist);
-  if (Object.keys(assetInfo).length === 0 || Object.keys(portfolios).length === 0) {
+  if (Object.keys(assetInfo).length === 0) {
     return undefined;
+  }
+
+  if (Object.keys(portfolios).length === 0) {
+    for (let [id, w] of Object.entries(watchlists)) {
+      if (w.portfolio !== undefined) {
+        delete watchlists[id];
+      }
+    }
   }
 
   let data = createWatchlistTableData(

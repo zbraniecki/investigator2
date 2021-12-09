@@ -150,19 +150,21 @@ export function Dashboard() {
   let watchlist = publicWatchlists[wid];
 
   let tableData: Array<WatchlistTableRow> = [];
+  let subHeaderRow: WatchlistTableRow | undefined;
   let data = prepareWatchlistTableData(
     wid,
     publicWatchlists,
     assetInfo,
     portfolios
   );
-  assert(data);
-  assert(data.children);
-  let subHeaderRow: WatchlistTableRow = {
-    cells: data.cells,
-    type: "asset",
-  };
-  tableData = data.children.slice(0, 3);
+  if (data) {
+    assert(data.children);
+    subHeaderRow = {
+      cells: data.cells,
+      type: "asset",
+    };
+    tableData = data.children.slice(0, 3);
+  }
 
   let tableData2: PortfolioTableRow[] = [
     {

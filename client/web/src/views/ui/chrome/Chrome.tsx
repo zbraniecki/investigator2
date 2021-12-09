@@ -65,7 +65,6 @@ const menuItems: Array<MenuItem> = [
     id: "portfolios",
     icon: <MonetizationOnIcon />,
     element: <Portfolios />,
-    default: true,
   },
   {
     id: "strategies",
@@ -88,6 +87,16 @@ export function Chrome() {
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)", {
     noSsr: true,
+  });
+
+  let activeMenuItems = Array.from(menuItems);
+  if (!session.username) {
+    activeMenuItems = activeMenuItems.filter(item => ["wallets"].includes(item.id));
+  }
+
+  let defaultId = session.username ? "portfolios" : "watchlists";
+  menuItems.forEach(item => {
+    item.default = item.id === defaultId;
   });
 
   let lightModeName: PaletteMode;
@@ -138,11 +147,6 @@ export function Chrome() {
   const portfolios = useSelector(getPortfolios);
   const assets = useSelector(getAssetInfo);
   const wallets = useSelector(getWallets);
-  // const meta = calculatePortfoliosMeta(portfolios, assets, wallets);
-
-  // useEffect(() => {
-  //   dispatch(setPortfoliosMeta(meta));
-  // }, [dispatch, meta]);
 
   return (
     <ThemeProvider theme={theme}>

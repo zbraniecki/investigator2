@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -5,6 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Toolbar from "@mui/material/Toolbar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { MenuItem } from "./chrome/Chrome";
+import { getSession } from "../../store/account";
 
 const drawerWidth = 55;
 
@@ -13,6 +15,8 @@ interface Props {
 }
 
 export default function InvestigatorDrawer({ menuItems }: Props) {
+  const session = useSelector(getSession);
+
   const navigate = useNavigate();
 
   const handlePageSelect: React.MouseEventHandler<HTMLDivElement> = (e) => {
@@ -24,7 +28,11 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
   let pageState = pathname.substr(1);
 
   if (!pageState) {
-    pageState = "portfolios";
+    if (session.username) {
+      pageState = "portfolios";
+    } else {
+      pageState = "watchlists";
+    }
   }
 
   return (
