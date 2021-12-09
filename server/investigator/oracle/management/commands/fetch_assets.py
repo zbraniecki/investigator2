@@ -301,21 +301,23 @@ def fetch_stock_assets(input_data, active, dry):
 
             d = data[symbol]
             ticker = tickers.tickers[symbol.upper()].info
+            defaults={
+                "base": usd,
+                "symbol": symbol,
+                "name": ticker["shortName"],
+                "active": True,
+                # "url": ticker["website"],
+                "image": ticker["logo_url"],
+                "last_updated": d["last_updated"],
+                "market_cap": ticker["marketCap"],
+                "price_change_percentage_24h": d["price_change_percentage_24h"],
+            }
+            if d["value"] > 0:
+                defaults["value"] = d["value"]
             asset, created = Asset.all_objects.update_or_create(
                 api_id=symbol,
                 tags__in=[stock],
-                defaults={
-                    "base": usd,
-                    "symbol": symbol,
-                    "name": ticker["shortName"],
-                    "value": d["value"],
-                    "active": True,
-                    # "url": ticker["website"],
-                    "image": ticker["logo_url"],
-                    "last_updated": d["last_updated"],
-                    "market_cap": ticker["marketCap"],
-                    "price_change_percentage_24h": d["price_change_percentage_24h"],
-                },
+                defaults=defaults,
             )
 
             if created:

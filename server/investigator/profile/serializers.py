@@ -67,7 +67,7 @@ class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
                     {
                         "id": holding.asset.id,
                         "quantity": holding.quantity,
-                        "account": holding.account.service.id,
+                        "account": holding.account.service.id if holding.account else None,
                     }
                 )
         return result

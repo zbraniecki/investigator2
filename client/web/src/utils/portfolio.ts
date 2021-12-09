@@ -105,8 +105,10 @@ export function createPortfolioTableData(
     let asset = assetInfo[id];
     assert(asset);
     let wallet = wallets[account];
-    assert(wallet);
-    let walletAsset = getWalletAsset(wallet.id, asset.id, wallets);
+    let walletAsset;
+    if (wallet) {
+      walletAsset = getWalletAsset(wallet.id, asset.id, wallets);
+    }
 
     return {
       cells: {
@@ -118,7 +120,7 @@ export function createPortfolioTableData(
         price: asset.info.value,
         quantity,
         value: asset.info.value * quantity,
-        wallet: wallet.name,
+        wallet: wallet?.name,
         yield: walletAsset?.apy,
       },
       type: "asset",
