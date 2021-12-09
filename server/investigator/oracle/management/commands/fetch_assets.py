@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.utils.dateparse import parse_datetime
 import requests
 import json
+import os
 import yfinance as yf
 
 PAGES = 8
@@ -111,61 +112,6 @@ ASSET_KEYS = {
         "market_cap_change_percentage_24h",
     ],
 }
-
-STOCK_ACCOUNTS = [
-    {
-        "name": "Single-1",
-        "provider": "Edward Jones",
-        "holdings": [
-            {"id": "usd", "quantity": 1440.58},
-            {"id": "amzn", "quantity": 5},
-            {"id": "bam", "quantity": 156},
-            {"id": "bamr", "quantity": 1},
-            {"id": "etn", "quantity": 126},
-            {"id": "nflx", "quantity": 20},
-            {"id": "pg", "quantity": 36},
-            {"id": "tsla", "quantity": 65},
-            {"id": "vz", "quantity": 107},
-            {"id": "tan", "quantity": 104},
-        ],
-    },
-    {
-        "name": "Single-2",
-        "provider": "Edward Jones",
-        "holdings": [
-            {"id": "usd", "quantity": 133.91},
-            {"id": "ddd", "quantity": 268},
-            {"id": "atvi", "quantity": 87},
-            {"id": "all", "quantity": 65},
-            {"id": "all", "quantity": 65},
-            {"id": "beam", "quantity": 10},
-            {"id": "chpt", "quantity": 82},
-            {"id": "c", "quantity": 88},
-            {"id": "dlr", "quantity": 54},
-            {"id": "edit", "quantity": 149},
-            {"id": "emr", "quantity": 85},
-            {"id": "evgo", "quantity": 502},
-            {"id": "fmc", "quantity": 38},
-            {"id": "gd", "quantity": 35},
-            {"id": "ibm", "quantity": 59},
-            {"id": "kd", "quantity": 11},
-            {"id": "lev", "quantity": 291},
-            {"id": "lmt", "quantity": 28},
-            {"id": "nee", "quantity": 64},
-            {"id": "pg", "quantity": 59},
-            {"id": "regn", "quantity": 16},
-            {"id": "spwr", "quantity": 115},
-            {"id": "tm", "quantity": 62},
-            {"id": "vrtx", "quantity": 34},
-            {"id": "zts", "quantity": 47},
-            {"id": "fxi", "quantity": 149},
-            {"id": "vss", "quantity": 100},
-            {"id": "vwo", "quantity": 314},
-            {"id": "voo", "quantity": 20},
-            {"id": "gibix", "quantity": 1283.333},
-        ],
-    },
-]
 
 def fetch_batch(source, batch_idx, crypto, usd, enable, only_update):
     # with open(f"coins_{pidx}.json", "w") as f:
@@ -276,7 +222,7 @@ def fetch_crypto_assets(active=False, dry=False):
             if len(ids) == 0:
                 break
 
-def fetch_stock_assets(active, dry):
+def fetch_stock_assets(input_data, active, dry):
     owner = User.objects.get(username="zbraniecki")
     asset_class = Category.objects.get(name="asset_class")
     stock = Tag.objects.get(name="stock", category__in=[asset_class])
@@ -295,7 +241,7 @@ def fetch_stock_assets(active, dry):
     if created:
         usd.tags.add(fiat)
 
-    for input in STOCK_ACCOUNTS:
+    for input in input_data:
         provider = Provider.objects.get(name__iexact=input["provider"])
         service = Service.objects.get(provider=provider)
 
@@ -409,6 +355,12 @@ class Command(BaseCommand):
         if asset_class == "crypto":
             fetch_crypto_assets(active, dry)
         elif asset_class == "stock":
-            fetch_stock_assets(active, dry)
+            file_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "../../../../../res/stock.json",
+            )
+            with open(file_path, "r") as fp:
+                data = json.load(fp)
+            fetch_stock_assets(data, active, dry)
         else:
             raise Exception("Unknown asset class")
