@@ -1,0 +1,23 @@
+* Visualize "total worth" like https://www.visualcapitalist.com/chart-assets-make-wealth/
+* Add asset "cards" with history of transactions, charts, and info
+* Complete dashboard for logged out / logged in
+* Add ability to edit data, add transactions, changes to passive etc.
+* Add wealth change over time chart
+* Add ability to edit/build strategies
+* Add ability to add/edit/remove portfolios, watchlists, wallets (providers, services, accounts)
+* Add chart to track strategy divergence over time
+* Add ability to add expected investment money and simulate using it to reduce divergence
+* Suggest different divergence reduction options based on the amount of money and approaches:
+ * Limit transactions
+ * Cover biggest divergences
+ * Cover largest divergent accounts
+* Mobile UX
+* Light/Dark mode
+* Table column and data settings
+* Adjust which data is shown depending on how long since you last looked (1h, 24h, 7d, 30d)
+* Ability to share some views via unique URL (show values, hide values)
+* Ability to share some views with another account
+* "Share strategy" / "Copy strategy"
+* Improve "assets to monitor"
+* Alert when asset you monitor reaches X
+* Reason about dry-powder, how much, where to hold (include APY)
