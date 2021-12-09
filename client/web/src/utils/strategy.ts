@@ -46,13 +46,13 @@ export function createStrategyTableData(
     assert(asset);
 
     let computedData = computedTableData[asset.id];
-    assert(computedData);
 
+    let currentValue = computedData?.value || 0;
     let targetValue = totalPortfolioValue * target.percent;
-    let currentPercent = computedData.value / totalPortfolioValue;
+    let currentPercent = currentValue / totalPortfolioValue;
     let deviation = Math.abs(target.percent - currentPercent);
-    let delta = targetValue / computedData.value - 1;
-    let deltaUsd = targetValue - computedData.value;
+    let delta = targetValue / currentValue - 1;
+    let deltaUsd = targetValue - currentValue;
     return {
       cells: {
         name: {

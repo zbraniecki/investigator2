@@ -1,5 +1,5 @@
-from django.contrib.auth.models import User
-from investigator.oracle.models import Asset, Category, Tag
+from investigator.profile.models import User, Account, Holding
+from investigator.oracle.models import Asset, Category, Tag, Provider, Service
 from django.core.management.base import BaseCommand
 from django.utils.dateparse import parse_datetime
 import requests
@@ -112,10 +112,59 @@ ASSET_KEYS = {
     ],
 }
 
-STOCK_ASSETS = [
-    "AMZN",
-    "TSLA",
-    "ETN",
+STOCK_ACCOUNTS = [
+    {
+        "name": "Single-1",
+        "provider": "Edward Jones",
+        "holdings": [
+            {"id": "usd", "quantity": 1440.58},
+            {"id": "amzn", "quantity": 5},
+            {"id": "bam", "quantity": 156},
+            {"id": "bamr", "quantity": 1},
+            {"id": "etn", "quantity": 126},
+            {"id": "nflx", "quantity": 20},
+            {"id": "pg", "quantity": 36},
+            {"id": "tsla", "quantity": 65},
+            {"id": "vz", "quantity": 107},
+            {"id": "tan", "quantity": 104},
+        ],
+    },
+    {
+        "name": "Single-2",
+        "provider": "Edward Jones",
+        "holdings": [
+            {"id": "usd", "quantity": 133.91},
+            {"id": "ddd", "quantity": 268},
+            {"id": "atvi", "quantity": 87},
+            {"id": "all", "quantity": 65},
+            {"id": "all", "quantity": 65},
+            {"id": "beam", "quantity": 10},
+            {"id": "chpt", "quantity": 82},
+            {"id": "c", "quantity": 88},
+            {"id": "dlr", "quantity": 54},
+            {"id": "edit", "quantity": 149},
+            {"id": "emr", "quantity": 85},
+            {"id": "evgo", "quantity": 502},
+            {"id": "fmc", "quantity": 38},
+            {"id": "gd", "quantity": 35},
+            {"id": "ibm", "quantity": 59},
+            {"id": "kd", "quantity": 11},
+            {"id": "lev", "quantity": 291},
+            {"id": "lmt", "quantity": 28},
+            {"id": "nee", "quantity": 64},
+            {"id": "pg", "quantity": 59},
+            {"id": "regn", "quantity": 16},
+            {"id": "spwr", "quantity": 115},
+            {"id": "tm", "quantity": 62},
+            {"id": "vrtx", "quantity": 34},
+            {"id": "zts", "quantity": 47},
+            {"id": "fxi", "quantity": 149},
+            {"id": "vss", "quantity": 100},
+            {"id": "vwo", "quantity": 314},
+            {"id": "voo", "quantity": 20},
+            {"id": "gibix", "quantity": 1283.333},
+        ],
+    },
 ]
 
 def fetch_batch(source, batch_idx, crypto, usd, enable, only_update):
@@ -228,6 +277,7 @@ def fetch_crypto_assets(active=False, dry=False):
                 break
 
 def fetch_stock_assets(active, dry):
+    owner = User.objects.get(username="zbraniecki")
     asset_class = Category.objects.get(name="asset_class")
     stock = Tag.objects.get(name="stock", category__in=[asset_class])
     fiat = Tag.objects.get(name="fiat", category__in=[asset_class])
@@ -245,84 +295,97 @@ def fetch_stock_assets(active, dry):
     if created:
         usd.tags.add(fiat)
 
-    # data = yf.download(tickers='AMZN', period='1d', interval='1d')
-    # amzn = yf.Ticker("AMZN")
-    # print(amzn.info)
-    tickers = yf.Tickers(STOCK_ASSETS)
+    for input in STOCK_ACCOUNTS:
+        provider = Provider.objects.get(name__iexact=input["provider"])
+        service = Service.objects.get(provider=provider)
 
-    data = yf.download(  # or pdr.get_data_yahoo(...
-            # tickers list or string as well
-            tickers = STOCK_ASSETS,
-
-            # use "period" instead of start/end
-            # valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
-            # (optional, default is '1mo')
-            period = "5d",
-
-            # fetch data by interval (including intraday if period < 60 days)
-            # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
-            # (optional, default is '1d')
-            interval = "1d",
-
-            # group by ticker (to access via data['SPY'])
-            # (optional, default is 'column')
-            group_by = 'ticker',
-
-            # adjust all OHLC automatically
-            # (optional, default is False)
-            auto_adjust = False,
-
-            # download pre/post regular market hours data
-            # (optional, default is False)
-            prepost = False,
-
-            # use threads for mass downloading? (True/False/Integer)
-            # (optional, default is True)
-            threads = True,
-
-            # proxy URL scheme use use when downloading?
-            # (optional, default is None)
-            proxy = None
+        account, created = Account.objects.get_or_create(
+            service=service,
+            name=input["name"],
+            owner=owner,
         )
-    for label, content in data.items():
-        symbol = label[0].lower()
-        ticker = tickers.tickers[symbol.upper()].info
-        price_change_percentage_24h = None
-        col = label[1]
 
-        if col != "Close":
-            continue
-        print(f"=== { symbol } ===")
-        items = list(content.items())
-        last = items[-1]
-        prev = items[-2]
+        symbols = [h["id"] for h in input["holdings"]]
+        tickers = yf.Tickers(symbols)
 
-        date = last[0]
-        value = last[1]
-        price_change_percentage_24h = (prev[1] - last[1]) / value
+        input_data = yf.download(
+                tickers = symbols,
+                period = "5d",
+                interval = "1d",
+                group_by = 'ticker',
+                auto_adjust = False,
+                prepost = False,
+                threads = True,
+                proxy = None
+            )
 
-        asset, created = Asset.all_objects.update_or_create(
-            api_id=symbol,
-            tags__in=[stock],
-            defaults={
-                "base": usd,
-                "symbol": symbol,
-                "name": ticker["shortName"],
-                "value": value,
-                "active": True,
-                # "url": ticker["website"],
-                "image": ticker["logo_url"],
-                "last_updated": date,
-                "market_cap": ticker["marketCap"],
+        data = {}
+
+        for label, content in input_data.items():
+            symbol = label[0].lower()
+            price_change_percentage_24h = None
+            col = label[1]
+
+            if col != "Close":
+                continue
+            items = list(content.items())
+            last = items[-1]
+            prev = items[-2]
+
+            date = last[0]
+            value = last[1]
+            price_change_percentage_24h = (last[1] - prev[1]) / value
+            data[symbol] = {
                 "price_change_percentage_24h": price_change_percentage_24h,
-            },
-        )
+                "value": value,
+                "last_updated": date,
+            }
 
-        # if created:
-        #     print(f"{symbol} (added)")
-        #     asset.tags.add(stock)
-        # else:
-        #     print(f"{symbol} (updated)")
+        for hdata in input["holdings"]:
+            symbol = hdata["id"]
+            if symbol == "usd":
+                holding = Holding.objects.update_or_create(
+                    asset=usd,
+                    account=account,
+                    defaults = {
+                        "quantity": hdata["quantity"],
+                    },
+                )
+                continue
+
+            d = data[symbol]
+            ticker = tickers.tickers[symbol.upper()].info
+            asset, created = Asset.all_objects.update_or_create(
+                api_id=symbol,
+                tags__in=[stock],
+                defaults={
+                    "base": usd,
+                    "symbol": symbol,
+                    "name": ticker["shortName"],
+                    "value": d["value"],
+                    "active": True,
+                    # "url": ticker["website"],
+                    "image": ticker["logo_url"],
+                    "last_updated": d["last_updated"],
+                    "market_cap": ticker["marketCap"],
+                    "price_change_percentage_24h": d["price_change_percentage_24h"],
+                },
+            )
+
+            if created:
+                asset.tags.add(stock)
+
+            holding = Holding.objects.update_or_create(
+                asset=asset,
+                account=account,
+                defaults = {
+                    "quantity": hdata["quantity"],
+                },
+            )
+
+    return None
+
+
 
 class Command(BaseCommand):
     help = "Fetch assets by asset class"

@@ -27,8 +27,8 @@ import { SearchInput } from "../components/Search";
 const tableMeta: TableProps["meta"] = {
   id: "watchlist",
   sort: {
-    column: "market_cap_rank",
-    direction: "asc",
+    column: "market_cap",
+    direction: "desc",
   },
   nested: false,
   headers: [

@@ -26,6 +26,7 @@ import SubjectIcon from '@mui/icons-material/Subject';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import InputBase from '@mui/material/InputBase';
 import { Component as Card } from "../components/Card";
 import { visuallyHidden } from "@mui/utils";
 import { currency, number, percent, symbol } from "../../utils/formatters";
@@ -244,6 +245,7 @@ function Row({
   setOpenModal,
 }: RowProps) {
   const [open, setOpen] = React.useState(false);
+  const [editId, setEditId] = React.useState(null);
 
   const subHeaderRow = id.includes("sub-header-row");
 
@@ -362,6 +364,11 @@ function Row({
           }
 
 
+              // <InputBase
+              //   sx={{ ml: 1, flex: 1 }}
+              //   placeholder="25.00%"
+              //   inputProps={{ 'aria-label': 'search google maps' }}
+              // />
           return (
             <TableCell
               key={`${id}-${header.label}`}
@@ -540,6 +547,13 @@ export function Component({
             </MenuItem>
             <MenuItem sx={{display: "flex",}}>
               <ListItemText sx={{ minWidth: "100px", flex: 1 }}>30d</ListItemText>
+              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+                <Checkbox />
+              </ListItemIcon>
+            </MenuItem>
+            <Divider />
+            <MenuItem sx={{display: "flex",}}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>Default layout</ListItemText>
               <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
                 <Checkbox />
               </ListItemIcon>

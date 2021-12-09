@@ -52,7 +52,7 @@ class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
                 }
             )
         for account in obj.accounts.all():
-            for holding in account.holdings:
+            for holding in account.holdings.all():
                 result.append(
                     {
                         "id": holding.asset.id,

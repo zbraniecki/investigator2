@@ -12,7 +12,7 @@ from .models import (
     WatchlistUI,
 )
 from investigator.strategy.models import StrategyUI
-from investigator.oracle.models import AssetInfo
+from investigator.oracle.models import AssetInfo, PassiveABC
 
 
 class HoldingInline(admin.TabularInline):
@@ -52,12 +52,17 @@ class HoldingAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None, **kwargs):
         info_fields = AssetInfo._meta.get_fields()
+        passive_fields = PassiveABC._meta.get_fields()
         fields = super().get_fields(request, obj, **kwargs)
 
         for field in info_fields:
             fields.remove(field.name)
+        for field in passive_fields:
+            fields.remove(field.name)
 
         for field in info_fields:
+            fields.append(field.name)
+        for field in passive_fields:
             fields.append(field.name)
         return fields
 

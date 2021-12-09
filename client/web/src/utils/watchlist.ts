@@ -55,6 +55,23 @@ function computeHeaderData(
   return cells;
 }
 
+function getAssetsFromPortfolio(
+  portfolio: Portfolio,
+  portfolios: Record<string, Portfolio>
+): Set<string> {
+  let symbols: Set<string> = new Set();
+  for (const holding of portfolio.holdings) {
+    symbols.add(holding.id);
+  }
+  for (const pid of portfolio.portfolios) {
+    let p = portfolios[pid];
+    assert(p);
+    let subset = getAssetsFromPortfolio(p, portfolios);
+    subset.forEach(symbols.add, symbols);
+  }
+  return symbols;
+}
+
 export function createWatchlistTableData(
   watchlist: Watchlist,
   watchlists: Record<string, Watchlist>,
@@ -65,11 +82,10 @@ export function createWatchlistTableData(
   const symbols: Set<string> = new Set(watchlist.assets);
 
   if (watchlist.portfolio) {
-    const portfolio = portfolios[watchlist.portfolio];
+    let portfolio = portfolios[watchlist.portfolio];
     assert(portfolio);
-    for (const holding of portfolio.holdings) {
-      symbols.add(holding.id);
-    }
+    let subset = getAssetsFromPortfolio(portfolio, portfolios);
+    subset.forEach(symbols.add, symbols);
   }
 
   let rows: WatchlistTableRow[] = Array.from(symbols).map(symbol => {
