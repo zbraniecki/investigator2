@@ -42,6 +42,8 @@ class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
         return [p.id for p in obj.portfolios.all()]
 
     def get_holdings(self, obj):
+        user = self.context["request"].user
+
         result = []
         for holding in obj.holdings.all():
             result.append(
@@ -61,7 +63,10 @@ class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
                     }
                 )
         for tag in obj.tags.all():
-            holdings = Holding.objects.filter(asset__tags__in=[tag])
+            holdings = Holding.objects.filter(
+                asset__tags__in=[tag],
+                account__owner_id=user.id,
+            )
             for holding in holdings:
                 result.append(
                     {

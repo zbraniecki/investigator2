@@ -172,6 +172,7 @@ export function preparePortfolioTableData(
         {key: "price", strategy: GroupingStrategy.IfSame},
         {key: "wallet", strategy: GroupingStrategy.IfSame},
         {key: "yield", strategy: GroupingStrategy.IfSame},
+        {key: "quantity", strategy: GroupingStrategy.Sum},
       ],
       false,
     ) as PortfolioTableRow[];

@@ -11,6 +11,7 @@ export function assert(condition: any, msg?: string): asserts condition {
 export enum GroupingStrategy {
   Always,
   IfSame,
+  Sum,
 };
 
 function isSame(a: SymbolNameCell | string | number | undefined, b: SymbolNameCell | string | number | undefined): boolean {
@@ -140,6 +141,19 @@ export function groupTableDataByColumn(
           break;
         }
         case GroupingStrategy.Always: {
+          break;
+        }
+        case GroupingStrategy.Sum: {
+          let value = children.reduce((total, child) => {
+            let v = child.cells[groupColumn.key];
+            if (v) {
+              assert(typeof v === "number");
+              return total + v;
+            } else {
+              return total;
+            }
+          }, 0);
+          cells[groupColumn.key] = value;
           break;
         }
       }
