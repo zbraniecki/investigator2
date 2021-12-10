@@ -29,9 +29,9 @@ const style: any = {
   p: 4,
 };
 
-const ExpandMore = styled(({ expand }: { expand: boolean }) => <IconButton />)(
+const ExpandMore = styled(() => <IconButton />)(
   ({ theme }) => ({
-    transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
+    transform: true ? "rotate(0deg)" : "rotate(180deg)",
     marginLeft: "auto",
     transition: theme.transitions.create("transform", {
       duration: theme.transitions.duration.shortest,
@@ -53,9 +53,6 @@ export interface Props {
 export function Component({ meta: { openModal, setOpenModal } }: Props) {
   const [expanded, setExpanded] = React.useState(false);
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
   const handleClose = () => setOpenModal(false);
 
   return (
@@ -105,12 +102,7 @@ export function Component({ meta: { openModal, setOpenModal } }: Props) {
           <IconButton aria-label="share">
             <ShareIcon />
           </IconButton>
-          <ExpandMore
-            expand={expanded}
-            onClick={handleExpandClick}
-            aria-expanded={expanded}
-            aria-label="show more"
-          >
+          <ExpandMore>
             <ExpandMoreIcon />
           </ExpandMore>
         </CardActions>

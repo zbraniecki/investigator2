@@ -150,7 +150,6 @@ export function prepareStrategyTableData(
     portfolios,
     assetInfo,
     computedTableData,
-    true
   );
 
   return data;

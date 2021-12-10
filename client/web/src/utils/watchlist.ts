@@ -82,7 +82,6 @@ export function createWatchlistTableData(
   watchlists: Record<string, Watchlist>,
   assetInfo: Record<string, AssetInfo>,
   portfolios: Record<string, Portfolio>,
-  topLevel: boolean
 ): WatchlistTableRow {
   const symbols: Set<string> = new Set(watchlist.assets);
 
@@ -115,7 +114,7 @@ export function createWatchlistTableData(
     };
   });
 
-  const cells = computeHeaderData(watchlist, rows, topLevel);
+  const cells = computeHeaderData(watchlist, rows);
 
   return {
     cells,
@@ -151,7 +150,6 @@ export function prepareWatchlistTableData(
     watchlists,
     assetInfo,
     portfolios,
-    true
   );
   return data;
 }

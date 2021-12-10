@@ -4,19 +4,19 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import cyan from "@mui/material/colors/cyan";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useSelector, useDispatch } from "react-redux";
-// import {
-//   LightMode,
-//   InfoDisplayMode,
-//   getLightModeName,
-// } from "../../components/settings";
-// import InvestigatorAppBar from "../AppBar";
+import {
+  LightMode,
+  InfoDisplayMode,
+  getLightModeName,
+} from "../../components/settings";
+import InvestigatorAppBar from "./AppBar";
 // import InvestigatorDrawer from "../Drawer";
 // import Content from "../Content";
-// import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
-import { getLightMode, getLightModeName } from "../../store/ui";
+import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
 
 export function Chrome() {
-  const storedLightMode = useSelector(getLightMode);
+  const storedLightMode: LightMode = useSelector(getLightMode);
+  const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
 
   const lightModeName = getLightModeName(storedLightMode);
 
@@ -30,17 +30,17 @@ export function Chrome() {
       }),
     [lightModeName]
   );
-  // <InvestigatorAppBar
-  //   setLightMode={setLightMode}
-  //   lightModeName={lightModeName}
-  //   infoDisplayMode={infoDisplayMode}
-  // />
   // <InvestigatorDrawer menuItems={menuItems} />
   // <Content menuItems={menuItems} />
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: "flex" }} />
+      <InvestigatorAppBar
+        setLightMode={setLightMode}
+        lightModeName={lightModeName}
+        infoDisplayMode={infoDisplayMode}
+      />
+      <Box sx={{ flex: 1 }} />
     </ThemeProvider>
   );
 }
