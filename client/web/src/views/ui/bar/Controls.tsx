@@ -6,12 +6,12 @@ import IconButton from "@mui/material/IconButton";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { AccountMenu } from "./Menu";
-import { LoginModal } from "../Login";
-import { Switch } from "../../components/Switch";
 import Person from "@mui/icons-material/Person";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CircularProgress from "@mui/material/CircularProgress";
+import { AccountMenu } from "./Menu";
+import { LoginModal } from "../Login";
+import { Switch } from "../../components/Switch";
 import { setInfoDisplayMode } from "../../../store/ui";
 import { LightMode, InfoDisplayMode } from "../../../components/settings";
 import {
@@ -27,7 +27,11 @@ interface Props {
   setLightMode: any;
 }
 
-export function Controls({ infoDisplayMode, lightModeName, setLightMode }: Props) {
+export function Controls({
+  infoDisplayMode,
+  lightModeName,
+  setLightMode,
+}: Props) {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loginModalOpen, setLoginModalOpen] = React.useState(false);
@@ -100,10 +104,12 @@ export function Controls({ infoDisplayMode, lightModeName, setLightMode }: Props
     <>
       <Toolbar>
         <Tooltip title="Show values">
-          <Switch
-            checked={infoDisplayMode === InfoDisplayMode.ShowAll}
-            onChange={handleInfoDisplayModeChange}
-          />
+          <div>
+            <Switch
+              checked={infoDisplayMode === InfoDisplayMode.ShowAll}
+              onChange={handleInfoDisplayModeChange}
+            />
+          </div>
         </Tooltip>
         <Tooltip title={`Last updated: ${lastUpdate}\n`}>
           <div>
@@ -123,13 +129,13 @@ export function Controls({ infoDisplayMode, lightModeName, setLightMode }: Props
         <Tooltip title="Account settings">
           <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
             <Avatar sx={{ width: 32, height: 32, bgcolor: "divider" }}>
-              {session.authenticateState === AuthenticateState.Session ?
+              {session.authenticateState === AuthenticateState.Session ? (
                 session.username ? (
                   <Typography color="white">{session.username}</Typography>
                 ) : (
                   <Person sx={{ color: "primary.50" }} fontSize="small" />
                 )
-              : (
+              ) : (
                 <Person sx={{ color: "action.disabled" }} fontSize="small" />
               )}
             </Avatar>

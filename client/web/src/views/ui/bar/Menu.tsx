@@ -8,9 +8,7 @@ import Divider from "@mui/material/Divider";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import Person from "@mui/icons-material/Person";
 import Logout from "@mui/icons-material/Logout";
-import {
-  AuthenticateState,
-} from "../../../store/account";
+import { AuthenticateState } from "../../../store/account";
 
 interface Props {
   anchorEl: any;
@@ -38,8 +36,7 @@ export function AccountMenu({
   setLightMode,
 }: Props) {
   return (
-    <>
-      <Menu
+    <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
@@ -106,6 +103,5 @@ export function AccountMenu({
           </MenuItem>
         )}
       </Menu>
-    </>
   );
 }

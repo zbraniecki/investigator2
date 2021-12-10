@@ -1,8 +1,8 @@
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
+import { PaletteMode } from "@mui/material";
 import { Logo } from "./bar/Logo";
 import { Controls } from "./bar/Controls";
-import { PaletteMode } from "@mui/material";
 import { InfoDisplayMode } from "../../components/settings";
 
 interface Props {

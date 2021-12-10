@@ -11,14 +11,14 @@ export function Logo({ lightModeName }: Props) {
     bg: "background.paper",
     lines: "divider",
     text: "black",
-  }
+  };
 
   if (lightModeName === "light") {
     logoColors = {
       bg: "primary.50",
       lines: "primary.600",
       text: "primary.50",
-    }
+    };
   }
 
   return (
@@ -31,9 +31,12 @@ export function Logo({ lightModeName }: Props) {
         }}
         variant="rounded"
       >
-        <SsidChartIcon fontSize="large" sx={{
-          color: logoColors.lines,
-        }} />
+        <SsidChartIcon
+          fontSize="large"
+          sx={{
+            color: logoColors.lines,
+          }}
+        />
       </Avatar>
       <Typography
         variant="h5"

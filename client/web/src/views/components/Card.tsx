@@ -29,15 +29,13 @@ const style: any = {
   p: 4,
 };
 
-const ExpandMore = styled(() => <IconButton />)(
-  ({ theme }) => ({
-    transform: true ? "rotate(0deg)" : "rotate(180deg)",
-    marginLeft: "auto",
-    transition: theme.transitions.create("transform", {
-      duration: theme.transitions.duration.shortest,
-    }),
-  })
-);
+const ExpandMore = styled(() => <IconButton />)(({ theme }) => ({
+  transform: true ? "rotate(0deg)" : "rotate(180deg)",
+  marginLeft: "auto",
+  transition: theme.transitions.create("transform", {
+    duration: theme.transitions.duration.shortest,
+  }),
+}));
 
 export interface Props {
   meta: {

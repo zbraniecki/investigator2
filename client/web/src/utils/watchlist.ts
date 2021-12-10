@@ -81,7 +81,7 @@ export function createWatchlistTableData(
   watchlist: Watchlist,
   watchlists: Record<string, Watchlist>,
   assetInfo: Record<string, AssetInfo>,
-  portfolios: Record<string, Portfolio>,
+  portfolios: Record<string, Portfolio>
 ): WatchlistTableRow {
   const symbols: Set<string> = new Set(watchlist.assets);
 
@@ -149,7 +149,7 @@ export function prepareWatchlistTableData(
     watchlist,
     watchlists,
     assetInfo,
-    portfolios,
+    portfolios
   );
   return data;
 }
