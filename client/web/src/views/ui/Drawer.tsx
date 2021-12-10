@@ -5,7 +5,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Toolbar from "@mui/material/Toolbar";
 import { useNavigate, useLocation } from "react-router-dom";
-import { MenuItem } from "./chrome/Chrome";
+import { MenuItem } from "./Menu";
 import { getSession } from "../../store/account";
 
 const drawerWidth = 55;

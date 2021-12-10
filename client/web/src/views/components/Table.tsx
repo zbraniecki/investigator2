@@ -10,29 +10,27 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import Collapse from "@mui/material/Collapse";
-import Checkbox from '@mui/material/Checkbox';
+import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import MenuIcon from '@mui/icons-material/Menu';
-import Menu from '@mui/material/Menu';
-import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
-import Divider from '@mui/material/Divider';
-import AbcIcon from '@mui/icons-material/Abc';
-import SubjectIcon from '@mui/icons-material/Subject';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import InputBase from '@mui/material/InputBase';
-import { Component as Card } from "../components/Card";
-import { visuallyHidden } from "@mui/utils";
+import MenuIcon from "@mui/icons-material/Menu";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
+import AbcIcon from "@mui/icons-material/Abc";
+import SubjectIcon from "@mui/icons-material/Subject";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import { Component as Card } from "./Card";
 import { currency, number, percent, symbol } from "../../utils/formatters";
-import { RowsPerPageOption, getRowsPerPageOption, setRowsPerPageOption } from "../../store/ui";
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { getRowsPerPageOption, setRowsPerPageOption } from "../../store/ui";
+import { RowsPerPageOption } from "../../components/settings";
 import { assert } from "../../utils/helpers";
 
 export interface SymbolNameCell extends Record<string, string | undefined> {
@@ -61,7 +59,12 @@ export interface Props {
       id: string;
       align: "inherit" | "left" | "right" | "center" | "justify" | undefined;
       width: number | "auto";
-      formatter?: "percent" | "currency" | "number" | "symbol" | "currency-delta";
+      formatter?:
+        | "percent"
+        | "currency"
+        | "number"
+        | "symbol"
+        | "currency-delta";
       colorDiff?: boolean;
       sensitive?: boolean;
     }[];
@@ -114,11 +117,16 @@ const tableSettings = {
   },
 };
 
-function sortFunc(orderBy: string[], sortDirection: any, a: any, b: any): number {
-  let orderKey = orderBy[0];
+function sortFunc(
+  orderBy: string[],
+  sortDirection: any,
+  a: any,
+  b: any
+): number {
+  const orderKey = orderBy[0];
   assert(orderKey);
 
-  let bottom = sortDirection === "asc" ? Infinity : -Infinity;
+  const bottom = sortDirection === "asc" ? Infinity : -Infinity;
 
   let aval = a.cells[orderKey];
   if (aval === undefined || aval === null || a.type === "catch-all") {
@@ -143,14 +151,12 @@ function TableComponent({
   data,
   headers,
   displayHeaders,
-  sortable,
   defaultSort,
   hideSensitive,
   nested,
   subHeaderRow,
   slice,
   setOpenModal,
-  sx,
 }: TableProps) {
   const [orderBy, setOrderBy] = React.useState(defaultSort.column);
   const [sortDirection, setSortDirection] = React.useState(
@@ -178,7 +184,12 @@ function TableComponent({
         <TableHead>
           <TableRow>
             {nested && (
-              <TableCell sx={{ borderBottom: 0, width: tableSettings.columns.collapse.width }} />
+              <TableCell
+                sx={{
+                  borderBottom: 0,
+                  width: tableSettings.columns.collapse.width,
+                }}
+              />
             )}
             {headers.map(({ id, label, align, width }) => (
               <TableCell
@@ -245,7 +256,6 @@ function Row({
   setOpenModal,
 }: RowProps) {
   const [open, setOpen] = React.useState(false);
-  const [editId, setEditId] = React.useState(null);
 
   const subHeaderRow = id.includes("sub-header-row");
 
@@ -270,7 +280,7 @@ function Row({
           let value;
           let color = "inherit";
           let fontWeight = "regular";
-          let fontSize = undefined;
+          let fontSize;
 
           if (rawValue === undefined) {
             value = "";
@@ -302,13 +312,18 @@ function Row({
                   const v = rawValue as Record<string, string>;
                   value = (
                     <>
-                      <Typography sx={{ fontSize: "small" }}
-                        onClick={() => {setOpenModal(true)}}
+                      <Typography
+                        sx={{ fontSize: "small" }}
+                        onClick={() => {
+                          setOpenModal(true);
+                        }}
                       >
                         {v.symbol.toUpperCase()}
                       </Typography>
                       <Typography
-                        onClick={() => {setOpenModal(true)}}
+                        onClick={() => {
+                          setOpenModal(true);
+                        }}
                         sx={{
                           color: "text.disabled",
                           fontWeight: "light",
@@ -354,7 +369,11 @@ function Row({
           }
 
           if (typeof value === "string") {
-            value = <Typography sx={{ color, fontWeight, fontSize }}>{value}</Typography>;
+            value = (
+              <Typography sx={{ color, fontWeight, fontSize }}>
+                {value}
+              </Typography>
+            );
             if (!subHeaderRow) {
               paddingTop = undefined;
               paddingBottom = 1;
@@ -363,12 +382,11 @@ function Row({
             }
           }
 
-
-              // <InputBase
-              //   sx={{ ml: 1, flex: 1 }}
-              //   placeholder="25.00%"
-              //   inputProps={{ 'aria-label': 'search google maps' }}
-              // />
+          // <InputBase
+          //   sx={{ ml: 1, flex: 1 }}
+          //   placeholder="25.00%"
+          //   inputProps={{ 'aria-label': 'search google maps' }}
+          // />
           return (
             <TableCell
               key={`${id}-${header.label}`}
@@ -413,7 +431,7 @@ export function Component({
   const [openModal, setOpenModal] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const dispatch = useDispatch();
-  let rpp = useSelector(getRowsPerPageOption);
+  const rpp = useSelector(getRowsPerPageOption);
 
   const open = Boolean(anchorEl);
 
@@ -451,7 +469,7 @@ export function Component({
   };
 
   const handleChangeRowsPerPage = (event: any) => {
-    let v = parseInt(event.target.value, 10);
+    const v = parseInt(event.target.value, 10);
     switch (v) {
       case 5:
         dispatch(setRowsPerPageOption(RowsPerPageOption.Count5));
@@ -468,12 +486,14 @@ export function Component({
       case -1:
         dispatch(setRowsPerPageOption(RowsPerPageOption.All));
         break;
+      default:
+        break;
     }
     setPage(0);
   };
 
-  let elevation = outline ? 1 : 0; 
-  let sx = outline ? { paddingRight: "30px" } : {bgcolor: "inherit"};
+  const elevation = outline ? 1 : 0;
+  const sx = outline ? { paddingRight: "30px" } : { bgcolor: "inherit" };
 
   if (searchQuery) {
     data = data.filter((row) => {
@@ -486,9 +506,19 @@ export function Component({
 
   return (
     <>
-      <TableContainer component={Paper} elevation={elevation} sx={sx} >
-        <Box sx={{width: "100%", height: 0, display: "flex", flexDirection: "row-reverse"}}>
-          <IconButton sx={{ height: "36px", marginRight: "-30px" }} onClick={handleMenuOpen}>
+      <TableContainer component={Paper} elevation={elevation} sx={sx}>
+        <Box
+          sx={{
+            width: "100%",
+            height: 0,
+            display: "flex",
+            flexDirection: "row-reverse",
+          }}
+        >
+          <IconButton
+            sx={{ height: "36px", marginRight: "-30px" }}
+            onClick={handleMenuOpen}
+          >
             <MenuIcon sx={{}} />
           </IconButton>
           <Menu
@@ -496,16 +526,24 @@ export function Component({
             anchorEl={anchorEl}
             open={open}
             onClose={handleMenuClose}
-            MenuListProps={{dense: true}}>
-            <MenuItem sx={{
-              display: "flex",
-            }}>
-              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>Name</ListItemText>
-              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px" }}>
-                <ToggleButtonGroup
-                  size="small"
-                  value={["symbol", "name"]}
-                >
+            MenuListProps={{ dense: true }}
+          >
+            <MenuItem
+              sx={{
+                display: "flex",
+              }}
+            >
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
+                Name
+              </ListItemText>
+              <ListItemIcon
+                sx={{
+                  marginRight: "-10px",
+                  marginLeft: "20px",
+                  width: "100px",
+                }}
+              >
+                <ToggleButtonGroup size="small" value={["symbol", "name"]}>
                   <ToggleButton value="icon">
                     <MonetizationOnIcon />
                   </ToggleButton>
@@ -519,42 +557,104 @@ export function Component({
               </ListItemIcon>
             </MenuItem>
             <Divider />
-            <MenuItem sx={{
-              display: "flex",
-            }}>
-              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>Market Cap Rank</ListItemText>
-              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+            <MenuItem
+              sx={{
+                display: "flex",
+              }}
+            >
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
+                Market Cap Rank
+              </ListItemText>
+              <ListItemIcon
+                sx={{
+                  marginRight: "-10px",
+                  marginLeft: "20px",
+                  width: "100px",
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                }}
+              >
                 <Checkbox />
               </ListItemIcon>
             </MenuItem>
-            <MenuItem sx={{display: "flex",}}>
-              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>1h</ListItemText>
-              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+            <MenuItem sx={{ display: "flex" }}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
+                1h
+              </ListItemText>
+              <ListItemIcon
+                sx={{
+                  marginRight: "-10px",
+                  marginLeft: "20px",
+                  width: "100px",
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                }}
+              >
                 <Checkbox />
               </ListItemIcon>
             </MenuItem>
-            <MenuItem sx={{display: "flex",}}>
-              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>24h</ListItemText>
-              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+            <MenuItem sx={{ display: "flex" }}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
+                24h
+              </ListItemText>
+              <ListItemIcon
+                sx={{
+                  marginRight: "-10px",
+                  marginLeft: "20px",
+                  width: "100px",
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                }}
+              >
                 <Checkbox />
               </ListItemIcon>
             </MenuItem>
-            <MenuItem sx={{display: "flex",}}>
-              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>7d</ListItemText>
-              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+            <MenuItem sx={{ display: "flex" }}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
+                7d
+              </ListItemText>
+              <ListItemIcon
+                sx={{
+                  marginRight: "-10px",
+                  marginLeft: "20px",
+                  width: "100px",
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                }}
+              >
                 <Checkbox />
               </ListItemIcon>
             </MenuItem>
-            <MenuItem sx={{display: "flex",}}>
-              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>30d</ListItemText>
-              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+            <MenuItem sx={{ display: "flex" }}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
+                30d
+              </ListItemText>
+              <ListItemIcon
+                sx={{
+                  marginRight: "-10px",
+                  marginLeft: "20px",
+                  width: "100px",
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                }}
+              >
                 <Checkbox />
               </ListItemIcon>
             </MenuItem>
             <Divider />
-            <MenuItem sx={{display: "flex",}}>
-              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>Default layout</ListItemText>
-              <ListItemIcon sx={{ marginRight: "-10px", marginLeft: "20px", width: "100px", display: "flex", flexDirection: "row-reverse" }}>
+            <MenuItem sx={{ display: "flex" }}>
+              <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
+                Default layout
+              </ListItemText>
+              <ListItemIcon
+                sx={{
+                  marginRight: "-10px",
+                  marginLeft: "20px",
+                  width: "100px",
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                }}
+              >
                 <Checkbox />
               </ListItemIcon>
             </MenuItem>
@@ -575,18 +675,21 @@ export function Component({
           sx={{ marginRight: "30px" }}
         />
       </TableContainer>
-      { pager &&
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 30, 50, { label: "All", value: -1 }]}
-        component="div"
-        count={data.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+      {pager && (
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 30, 50, { label: "All", value: -1 }]}
+          component="div"
+          count={data.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      )}
+      <Card
+        meta={{ id: "foo", openModal, setOpenModal }}
+        data={{ name: { name: "Foo" } }}
       />
-      }
-      <Card meta={{id: "foo", openModal, setOpenModal}} data={{name: {name: "Foo"}}} />
     </>
   );
 }

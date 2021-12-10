@@ -56,7 +56,7 @@ export interface User {
     portfolios: string[];
     watchlists: string[];
     strategies: string[];
-  },
+  };
 }
 
 export enum AuthenticateState {
@@ -110,8 +110,8 @@ export const accountSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchPortfoliosThunk.fulfilled, (state, action) => {
       state.portfolios = {};
-      for (let item of action.payload) {
-        //XXX: Switch to undefined in Serializer
+      for (const item of action.payload) {
+        // XXX: Switch to undefined in Serializer
         if (item.value === null) {
           item.value = undefined;
         }
@@ -120,7 +120,7 @@ export const accountSlice = createSlice({
     });
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
       state.watchlists = {};
-      for (let item of action.payload) {
+      for (const item of action.payload) {
         state.watchlists[item.id] = item;
       }
     });
@@ -133,7 +133,7 @@ export const accountSlice = createSlice({
         state.session.token = action.payload.token;
       }
     });
-    builder.addCase(logoutThunk.fulfilled, (state, action) => {
+    builder.addCase(logoutThunk.fulfilled, (state) => {
       cleanSlice(state);
     });
     builder.addCase(fetchUserInfoThunk.fulfilled, (state, action) => {
@@ -143,7 +143,7 @@ export const accountSlice = createSlice({
       }
 
       state.users = {};
-      for (let item of action.payload) {
+      for (const item of action.payload) {
         state.users[item.username] = item;
         if (state.session.username === undefined && item.current) {
           state.session.username = item.username;

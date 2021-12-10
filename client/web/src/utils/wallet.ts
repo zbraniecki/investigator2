@@ -1,19 +1,15 @@
-import {
-  Portfolio,
-} from "../store/account";
+import { Portfolio } from "../store/account";
 import { AssetInfo, Wallet, WalletAsset } from "../store/oracle";
-import { PortfolioTableRow, createPortfolioTableData } from "./portfolio";
-import { Holding } from "../store/account";
-import { getAsset } from "./asset";
+import { createPortfolioTableData } from "./portfolio";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
-import { DataRowProps, SymbolNameCell } from "../views/components/Table";
+import { SymbolNameCell } from "../views/components/Table";
 
 export function getWalletAsset(
   walletId: string,
   assetId: string,
-  wallets: Record<string, Wallet>,
+  wallets: Record<string, Wallet>
 ): WalletAsset | null {
-  let wallet = wallets[walletId];
+  const wallet = wallets[walletId];
   if (!wallet) {
     return null;
   }
@@ -27,7 +23,7 @@ export function getWalletAsset(
 
 export interface WalletTableRow {
   cells: {
-    id: string,
+    id: string;
     wallet?: string;
     name?: SymbolNameCell | string;
     quantity?: number;
@@ -42,31 +38,31 @@ export function prepareWalletTableData(
   pid: string,
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>,
-  wallets: Record<string, Wallet>,
+  wallets: Record<string, Wallet>
 ): WalletTableRow | undefined {
-  let portfolio = portfolios[pid];
+  const portfolio = portfolios[pid];
   assert(portfolio);
   if (Object.keys(assetInfo).length === 0) {
     return undefined;
   }
 
-  let data = createPortfolioTableData(
+  const data = createPortfolioTableData(
     portfolio,
     portfolios,
     assetInfo,
     wallets,
-    true,
+    true
   ) as WalletTableRow;
-  
+
   if (data.children !== undefined) {
     data.children = groupTableDataByColumn(
       data.children,
       "wallet",
       [
-        {key: "name", strategy: GroupingStrategy.IfSame},
-        {key: "wallet", strategy: GroupingStrategy.IfSame},
+        { key: "name", strategy: GroupingStrategy.IfSame },
+        { key: "wallet", strategy: GroupingStrategy.IfSame },
       ],
-      true,
+      true
     ) as WalletTableRow[];
   }
 

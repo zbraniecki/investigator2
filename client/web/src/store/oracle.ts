@@ -82,24 +82,24 @@ export const oracleSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchAssetInfoThunk.fulfilled, (state, action) => {
-      for (let item of action.payload) {
+      for (const item of action.payload) {
         if (item.info.last_updated) {
           state.assetUpdated = item.info.last_updated;
           break;
         }
       }
       state.assets = {};
-      for (let item of action.payload) {
+      for (const item of action.payload) {
         state.assets[item.id] = item;
       }
     });
     builder.addCase(fetchWalletsThunk.fulfilled, (state, action) => {
-      for (let item of action.payload) {
+      for (const item of action.payload) {
         state.wallets[item.id] = item;
       }
     });
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
-      for (let item of action.payload) {
+      for (const item of action.payload) {
         state.watchlists[item.id] = item;
       }
     });

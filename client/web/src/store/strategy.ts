@@ -36,11 +36,11 @@ export const strategySlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchStrategiesThunk.fulfilled, (state, action) => {
       state.strategies = {};
-      for (let item of action.payload) {
+      for (const item of action.payload) {
         state.strategies[item.id] = item;
       }
     });
-    builder.addCase(logoutThunk.fulfilled, (state, action) => {
+    builder.addCase(logoutThunk.fulfilled, (state) => {
       state.strategies = {};
     });
   },

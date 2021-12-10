@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import { Routes, Route } from "react-router-dom";
-import { MenuItem } from "./chrome/Chrome";
+import { MenuItem } from "./Menu";
 
 interface Props {
   menuItems: Array<MenuItem>;

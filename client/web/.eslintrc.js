@@ -38,7 +38,7 @@ module.exports = {
       "react/react-in-jsx-scope": 0,
       "@typescript-eslint/no-use-before-define": ["error", { "functions": false }],
       "@typescript-eslint/no-shadow": ["error"],
-      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-unused-vars": "warn",
       "react/function-component-definition": [1, {
         "namedComponents": "function-declaration",
         "unnamedComponents": "arrow-function"

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Box from '@mui/material/Box';
+import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -21,13 +21,13 @@ import Person from "@mui/icons-material/Person";
 import Logout from "@mui/icons-material/Logout";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CircularProgress from "@mui/material/CircularProgress";
-import SsidChartIcon from '@mui/icons-material/SsidChart';
-import { LoginModal } from "./chrome/Login";
-import { LightMode, InfoDisplayMode, setInfoDisplayMode } from "../../store/ui";
+import SsidChartIcon from "@mui/icons-material/SsidChart";
+import { LoginModal } from "./Login";
+import { setInfoDisplayMode } from "../../store/ui";
+import { LightMode, InfoDisplayMode } from "../../components/settings";
 import {
   AuthenticateState,
   getSession,
-  setAuthenticateState,
   logoutThunk,
 } from "../../store/account";
 import { fetchAssetInfoThunk, getAssetUpdated } from "../../store/oracle";
@@ -69,7 +69,7 @@ const SwitchThumb = styled("span")(
     content: "";
     width: 100%;
     height: 100%;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="1 0 23 23"><path fill="${encodeURIComponent(
       "#fff"
     )}" d="M12 6c3.79 0 7.17 2.13 8.82 5.5-.59 1.22-1.42 2.27-2.41 3.12l1.41 1.41c1.39-1.23 2.49-2.77 3.18-4.53C21.27 7.11 17 4 12 4c-1.27 0-2.49.2-3.64.57l1.65 1.65C10.66 6.09 11.32 6 12 6zm-1.07 1.14L13 9.21c.57.25 1.03.71 1.28 1.28l2.07 2.07c.08-.34.14-.7.14-1.07C16.5 9.01 14.48 7 12 7c-.37 0-.72.05-1.07.14zM2.01 3.87l2.68 2.68C3.06 7.83 1.77 9.53 1 11.5 2.73 15.89 7 19 12 19c1.52 0 2.98-.29 4.32-.82l3.42 3.42 1.41-1.41L3.42 2.45 2.01 3.87zm7.5 7.5l2.61 2.61c-.04.01-.08.02-.12.02-1.38 0-2.5-1.12-2.5-2.5 0-.05.01-.08.01-.13zm-3.4-3.4l1.75 1.75c-.23.55-.36 1.15-.36 1.78 0 2.48 2.02 4.5 4.5 4.5.63 0 1.23-.13 1.77-.36l.98.98c-.88.24-1.8.38-2.75.38-3.79 0-7.17-2.13-8.82-5.5.7-1.43 1.72-2.61 2.93-3.53z"/></svg>') center center no-repeat;
   }
@@ -82,7 +82,7 @@ const SwitchThumb = styled("span")(
     transform: translateX(18px);
     
     &:before {
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="1 0 24 23"><path fill="${encodeURIComponent(
         "#fff"
       )}" d="M12 6c3.79 0 7.17 2.13 8.82 5.5-.59 1.22-1.42 2.27-2.41 3.12l1.41 1.41c1.39-1.23 2.49-2.77 3.18-4.53C21.27 7.11 17 4 12 4c-1.27 0-2.49.2-3.64.57l1.65 1.65C10.66 6.09 11.32 6 12 6zm-1.07 1.14L13 9.21c.57.25 1.03.71 1.28 1.28l2.07 2.07c.08-.34.14-.7.14-1.07C16.5 9.01 14.48 7 12 7c-.37 0-.72.05-1.07.14zM2.01 3.87l2.68 2.68C3.06 7.83 1.77 9.53 1 11.5 2.73 15.89 7 19 12 19c1.52 0 2.98-.29 4.32-.82l3.42 3.42 1.41-1.41L3.42 2.45 2.01 3.87zm7.5 7.5l2.61 2.61c-.04.01-.08.02-.12.02-1.38 0-2.5-1.12-2.5-2.5 0-.05.01-.08.01-.13zm-3.4-3.4l1.75 1.75c-.23.55-.36 1.15-.36 1.78 0 2.48 2.02 4.5 4.5 4.5.63 0 1.23-.13 1.77-.36l.98.98c-.88.24-1.8.38-2.75.38-3.79 0-7.17-2.13-8.82-5.5.7-1.43 1.72-2.61 2.93-3.53z"/></svg>') center center no-repeat;
     }
@@ -101,7 +101,7 @@ const SwitchTrack = styled("span")(
 );
 
 function MUISwitch(props: any) {
-  const { getInputProps, checked, disabled, focusVisible } = useSwitch(props);
+  const { checked, disabled, focusVisible } = useSwitch(props);
 
   const stateClasses = {
     checked,
@@ -115,7 +115,7 @@ function MUISwitch(props: any) {
         <SwitchTrack>
           <SwitchThumb className={clsx(stateClasses)} />
         </SwitchTrack>
-        <SwitchInput {...getInputProps()} />
+        <SwitchInput />
       </SwitchRoot>
     </Tooltip>
   );
@@ -193,15 +193,15 @@ export default function InvestigatorAppBar({
     return false;
   };
 
-  function handleInfoDisplayModeChange() {
+  const handleInfoDisplayModeChange = () => {
     const newState =
       infoDisplayMode === InfoDisplayMode.ShowAll
         ? InfoDisplayMode.HideValues
         : InfoDisplayMode.ShowAll;
     dispatch(setInfoDisplayMode(newState));
-  }
+  };
 
-  let logoColor = lightModeName == "dark" ? "primary.main" : "white":
+  const logoColor = lightModeName === "dark" ? "primary.main" : "white";
 
   return (
     <AppBar
@@ -213,13 +213,16 @@ export default function InvestigatorAppBar({
         alignItems: "center",
       }}
     >
-      <Avatar sx={{
-        marginLeft: "10px",
-        marginRight: "10px",
-        bgcolor: "transparent",
-        border: "1px solid",
-        borderColor: logoColor,
-      }} variant="rounded">
+      <Avatar
+        sx={{
+          marginLeft: "10px",
+          marginRight: "10px",
+          bgcolor: "transparent",
+          border: "1px solid",
+          borderColor: logoColor,
+        }}
+        variant="rounded"
+      >
         <SsidChartIcon fontSize="large" sx={{ color: logoColor }} />
       </Avatar>
       <Typography

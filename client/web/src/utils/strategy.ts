@@ -1,21 +1,15 @@
 /* eslint camelcase: "off" */
 
-import {
-  Portfolio,
-} from "../store/account";
-import { AssetInfo, Wallet } from "../store/oracle";
+import { Portfolio } from "../store/account";
+import { AssetInfo } from "../store/oracle";
 import { Strategy } from "../store/strategy";
-import { getAsset } from "./asset";
-import { PortfolioTableRow } from "./portfolio";
-import { buildPortfolioTableData, createPortfolioTableData } from "./portfolio";
+import { buildPortfolioTableData } from "./portfolio";
 import {
   assert,
-  groupTableDataByColumn,
   groupTableDataByColumn2,
   computeGroupedTableData,
-  GroupingStrategy
 } from "./helpers";
-import { DataRowProps, SymbolNameCell } from "../views/components/Table";
+import { SymbolNameCell } from "../views/components/Table";
 
 export interface StrategyTableRow {
   cells: {
@@ -34,25 +28,25 @@ export function createStrategyTableData(
   strategy: Strategy,
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>,
-  computedTableData: Record<string, Record<string, any>>,
-  topLevel: boolean,
+  computedTableData: Record<string, Record<string, any>>
 ): StrategyTableRow {
-  let totalPortfolioValue = Object.values(computedTableData).reduce((total, asset) => {
-    return total + asset.value;
-  }, 0);
+  const totalPortfolioValue = Object.values(computedTableData).reduce(
+    (total, asset) => total + asset.value,
+    0
+  );
 
-  let rows: StrategyTableRow[] = strategy.targets.map((target) => {
-    let asset = assetInfo[target.asset];
+  const rows: StrategyTableRow[] = strategy.targets.map((target) => {
+    const asset = assetInfo[target.asset];
     assert(asset);
 
-    let computedData = computedTableData[asset.id];
+    const computedData = computedTableData[asset.id];
 
-    let currentValue = computedData?.value || 0;
-    let targetValue = totalPortfolioValue * target.percent;
-    let currentPercent = currentValue / totalPortfolioValue;
-    let deviation = Math.abs(target.percent - currentPercent);
-    let delta = targetValue / currentValue - 1;
-    let deltaUsd = targetValue - currentValue;
+    const currentValue = computedData?.value || 0;
+    const targetValue = totalPortfolioValue * target.percent;
+    const currentPercent = currentValue / totalPortfolioValue;
+    const deviation = Math.abs(target.percent - currentPercent);
+    const delta = targetValue / currentValue - 1;
+    const deltaUsd = targetValue - currentValue;
     return {
       cells: {
         name: {
@@ -69,23 +63,23 @@ export function createStrategyTableData(
     };
   });
 
-  let targettedAssetIds = strategy.targets.map(target => target.asset);
-  let unlistedAssetIds: Set<string> = new Set();
-  for (let asset of Object.keys(computedTableData)) {
+  const targettedAssetIds = strategy.targets.map((target) => target.asset);
+  const unlistedAssetIds: Set<string> = new Set();
+  for (const asset of Object.keys(computedTableData)) {
     if (!targettedAssetIds.includes(asset)) {
       unlistedAssetIds.add(asset);
     }
   }
   if (unlistedAssetIds.size > 0) {
-    let children: StrategyTableRow[] = [];
-    for (let assetId of unlistedAssetIds) {
-      let asset = assetInfo[assetId];
+    const children: StrategyTableRow[] = [];
+    for (const assetId of unlistedAssetIds) {
+      const asset = assetInfo[assetId];
       assert(asset);
 
-      let computedData = computedTableData[asset.id];
+      const computedData = computedTableData[asset.id];
       assert(computedData);
 
-      let current = computedData.value / totalPortfolioValue;
+      const current = computedData.value / totalPortfolioValue;
 
       children.push({
         cells: {
@@ -102,7 +96,10 @@ export function createStrategyTableData(
     rows.push({
       cells: {
         name: "?",
-        current: children.reduce((total, row) => total + (row.cells.current || 0), 0),
+        current: children.reduce(
+          (total, row) => total + (row.cells.current || 0),
+          0
+        ),
       },
       children,
       type: "catch-all",
@@ -110,8 +107,7 @@ export function createStrategyTableData(
   }
 
   return {
-    cells: {
-    },
+    cells: {},
     children: rows.length > 0 ? rows : undefined,
     type: "asset",
   };
@@ -121,36 +117,40 @@ export function prepareStrategyTableData(
   sid: string,
   strategies: Record<string, Strategy>,
   portfolios: Record<string, Portfolio>,
-  assetInfo: Record<string, AssetInfo>,
+  assetInfo: Record<string, AssetInfo>
 ): StrategyTableRow | undefined {
-  let strategy = strategies[sid];
+  const strategy = strategies[sid];
   assert(strategy);
-  if (Object.keys(assetInfo).length === 0 || Object.keys(portfolios).length === 0) {
+  if (
+    Object.keys(assetInfo).length === 0 ||
+    Object.keys(portfolios).length === 0
+  ) {
     return undefined;
   }
 
-  let portfolio = portfolios[strategy.portfolio];
+  const portfolio = portfolios[strategy.portfolio];
   assert(portfolio);
 
-
-  let portfolioData = buildPortfolioTableData(
+  const portfolioData = buildPortfolioTableData(
     portfolio,
     portfolios,
-    assetInfo,
+    assetInfo
   );
-  let groupedPortfolioData = groupTableDataByColumn2(
+  const groupedPortfolioData = groupTableDataByColumn2(
     portfolioData,
     "id",
-    true,
+    true
   );
-  let computedTableData = computeGroupedTableData(groupedPortfolioData, ["value"]);
+  const computedTableData = computeGroupedTableData(groupedPortfolioData, [
+    "value",
+  ]);
 
-  let data = createStrategyTableData(
+  const data = createStrategyTableData(
     strategy,
     portfolios,
     assetInfo,
     computedTableData,
-    true,
+    true
   );
 
   return data;

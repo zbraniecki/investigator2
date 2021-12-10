@@ -15,8 +15,8 @@ import {
   AuthenticateState,
   setAuthenticateState,
   authenticateThunk,
-} from "../../../store/account";
-import { assert } from "../../../utils/helpers";
+} from "../../store/account";
+import { assert } from "../../utils/helpers";
 
 interface Props {
   open: any;
@@ -32,7 +32,7 @@ export function LoginModal({ open, handleClose, authenticateState }: Props) {
     setShowPassword(!showPassword);
   };
 
-  function handleOk() {
+  const handleOk = () => {
     if (authenticateState === AuthenticateState.None) {
       const emailField = document.getElementById("email");
       assert(emailField instanceof HTMLInputElement);
@@ -46,19 +46,19 @@ export function LoginModal({ open, handleClose, authenticateState }: Props) {
         })
       );
     }
-  }
+  };
 
-  function onFieldFocus() {
+  const onFieldFocus = () => {
     if (authenticateState === AuthenticateState.Error) {
       dispatch(setAuthenticateState(AuthenticateState.None));
     }
-  }
+  };
 
-  function onKeyUp(event: any) {
+  const onKeyUp = (event: any) => {
     if (event.keyCode === 13) {
       handleOk();
     }
-  }
+  };
 
   return (
     <Dialog open={open} onClose={handleClose}>
