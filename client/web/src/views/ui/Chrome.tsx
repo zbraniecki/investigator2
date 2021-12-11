@@ -9,7 +9,7 @@ import {
   InfoDisplayMode,
   getLightModeName,
 } from "../../components/settings";
-import InvestigatorAppBar from "./AppBar";
+import { InvestigatorAppBar } from "./AppBar";
 // import InvestigatorDrawer from "../Drawer";
 // import Content from "../Content";
 import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";

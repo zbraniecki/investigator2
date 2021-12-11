@@ -11,11 +11,37 @@ interface Props {
   infoDisplayMode: InfoDisplayMode;
 }
 
-export default function InvestigatorAppBar({
+export interface AppBarColors {
+  primary: string;
+  background: string;
+  dent: string;
+  button: string;
+  accent: string;
+}
+
+export function InvestigatorAppBar({
   setLightMode,
   lightModeName,
   infoDisplayMode,
 }: Props) {
+  let colors: AppBarColors = {
+    primary: "primary.50",
+    background: "transparent",
+    dent: "divider",
+    button: "primary.50",
+    accent: "primary.900",
+  };
+
+  if (lightModeName === "light") {
+    colors = {
+      primary: "primary.50",
+      background: "transparent",
+      dent: "divider",
+      button: "primary.50",
+      accent: "primary.500",
+    };
+  }
+
   return (
     <AppBar
       position="static"
@@ -26,12 +52,13 @@ export default function InvestigatorAppBar({
         padding: "0.5rem 0",
       }}
     >
-      <Logo lightModeName={lightModeName} />
+      <Logo lightModeName={lightModeName} colors={colors} />
       <Box sx={{ flex: 1 }} />
       <Controls
         infoDisplayMode={infoDisplayMode}
         lightModeName={lightModeName}
         setLightMode={setLightMode}
+        colors={colors}
       />
     </AppBar>
   );

@@ -1,3 +1,5 @@
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Switch from "@mui/material/Switch";
 import { PaletteMode } from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -8,35 +10,89 @@ import Divider from "@mui/material/Divider";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import Person from "@mui/icons-material/Person";
 import Logout from "@mui/icons-material/Logout";
-import { AuthenticateState } from "../../../store/account";
+import Tooltip from "@mui/material/Tooltip";
+import IconButton from "@mui/material/IconButton";
+import Avatar from "@mui/material/Avatar";
+import Typography from "@mui/material/Typography";
+import { LightMode } from "../../../components/settings";
+import { AppBarColors } from "../AppBar";
+import { LoginModal } from "../Login";
+import { AuthenticateState, logoutThunk } from "../../../store/account";
 
 interface Props {
-  anchorEl: any;
-  open: boolean;
-  handleClose: any;
   session: any;
-  handleAccount: any;
-  handleClick2: any;
+  colors: AppBarColors;
   lightModeName: PaletteMode;
-  handleLogout: any;
-  handleLoginModalOpen: any;
   setLightMode: any;
 }
 
 export function AccountMenu({
-  anchorEl,
-  open,
-  handleClose,
   session,
-  handleAccount,
-  handleClick2,
+  colors,
   lightModeName,
-  handleLogout,
-  handleLoginModalOpen,
   setLightMode,
 }: Props) {
+  const dispatch = useDispatch();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [loginModalOpen, setLoginModalOpen] = React.useState(false);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const handleLightModeChange = (event: any) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const mode = lightModeName === "dark" ? LightMode.Light : LightMode.Dark;
+    dispatch(setLightMode(mode));
+    return false;
+  };
+
+  const handleLoginModalOpen = () => {
+    setLoginModalOpen(true);
+  };
+
+  const handleLoginModalClose = () => {
+    setLoginModalOpen(false);
+  };
+
+  const handleLogout = () => {
+    dispatch(logoutThunk({ token: session.token }));
+  };
+
+  const handleAccount = (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  };
+
+  let accountIcon;
+  if (
+    session.authenticateState === AuthenticateState.Session &&
+    session.username !== undefined
+  ) {
+    accountIcon = (
+      <Typography sx={{ color: colors.accent }}>
+        {session.username[0].toUpperCase()}
+      </Typography>
+    );
+  } else {
+    accountIcon = <Person sx={{ color: colors.accent }} fontSize="small" />;
+  }
+
   return (
-    <Menu
+    <>
+      <Tooltip title="Account settings">
+        <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
+          <Avatar sx={{ width: 32, height: 32, bgcolor: colors.primary }}>
+            {accountIcon}
+          </Avatar>
+        </IconButton>
+      </Tooltip>
+      <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
@@ -80,7 +136,7 @@ export function AccountMenu({
           </MenuItem>
         )}
         {session.username && <Divider />}
-        <MenuItem onClick={handleClick2}>
+        <MenuItem onClick={handleLightModeChange}>
           <FormControlLabel
             control={<Switch checked={lightModeName === "dark"} size="small" />}
             label="&nbsp;Dark Mode"
@@ -103,5 +159,11 @@ export function AccountMenu({
           </MenuItem>
         )}
       </Menu>
+      <LoginModal
+        open={loginModalOpen}
+        handleClose={handleLoginModalClose}
+        authenticateState={session.authenticateState}
+      />
+    </>
   );
 }

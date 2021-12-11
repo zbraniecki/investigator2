@@ -2,6 +2,10 @@ import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
 
 export const fetchPortfolios = async ({ token }: { token: string }) => {
+  const p = new Promise((resolve) => {
+    setTimeout(resolve, 3000);
+  });
+  await p;
   const data = await fetch(`${BASE_URL}profile/portfolio/`, {
     method: "GET",
     headers: {
@@ -70,6 +74,11 @@ export const logout = async ({ token }: { token: string }) => {
 };
 
 export const fetchUserInfo = async ({ token }: { token: string }) => {
+  const p = new Promise((resolve) => {
+    setTimeout(resolve, 3000);
+  });
+  await p;
+
   const data = await fetch(`${BASE_URL}profile/users/`, {
     method: "GET",
     headers: {

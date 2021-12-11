@@ -1,25 +1,19 @@
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import SsidChartIcon from "@mui/icons-material/SsidChart";
+import { AppBarColors } from "../AppBar";
 
 interface Props {
   lightModeName: string;
+  colors: AppBarColors;
 }
 
-export function Logo({ lightModeName }: Props) {
-  let logoColors = {
-    bg: "background.paper",
-    lines: "divider",
-    text: "black",
+export function Logo({ lightModeName, colors }: Props) {
+  const logoColors = {
+    bg: colors.background,
+    lines: colors.primary,
+    text: colors.primary,
   };
-
-  if (lightModeName === "light") {
-    logoColors = {
-      bg: "primary.50",
-      lines: "primary.600",
-      text: "primary.50",
-    };
-  }
 
   return (
     <>
@@ -27,14 +21,16 @@ export function Logo({ lightModeName }: Props) {
         sx={{
           marginLeft: "10px",
           marginRight: "10px",
-          bgcolor: logoColors.bg,
+          bgcolor: colors.background,
+          border: "1px solid",
+          borderColor: colors.primary,
         }}
         variant="rounded"
       >
         <SsidChartIcon
           fontSize="large"
           sx={{
-            color: logoColors.lines,
+            color: colors.primary,
           }}
         />
       </Avatar>
@@ -43,9 +39,9 @@ export function Logo({ lightModeName }: Props) {
         sx={{
           display: "flex",
           alignItems: "center",
-          color: logoColors.text,
+          color: colors.primary,
           borderBottom: "1px solid",
-          borderColor: logoColors.text,
+          borderColor: colors.primary,
           lineHeight: 1.6,
         }}
       >

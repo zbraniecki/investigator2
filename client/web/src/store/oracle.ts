@@ -107,7 +107,8 @@ export const oracleSlice = createSlice({
 });
 
 export const getAssetInfo = (state: any) => state.oracle.assets;
-export const getAssetUpdated = (state: any) => state.oracle.assetUpdated;
+export const getAssetUpdated = (state: any): Date =>
+  new Date(state.oracle.assetUpdated);
 export const getWallets = (state: any) => state.oracle.wallets;
 export const getWatchlists = (state: any) => state.oracle.watchlists;
 
