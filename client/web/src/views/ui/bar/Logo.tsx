@@ -4,17 +4,10 @@ import SsidChartIcon from "@mui/icons-material/SsidChart";
 import { AppBarColors } from "../AppBar";
 
 interface Props {
-  lightModeName: string;
   colors: AppBarColors;
 }
 
-export function Logo({ lightModeName, colors }: Props) {
-  const logoColors = {
-    bg: colors.background,
-    lines: colors.primary,
-    text: colors.primary,
-  };
-
+export function Logo({ colors }: Props) {
   return (
     <>
       <Avatar

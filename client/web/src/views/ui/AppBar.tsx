@@ -52,7 +52,7 @@ export function InvestigatorAppBar({
         padding: "0.5rem 0",
       }}
     >
-      <Logo lightModeName={lightModeName} colors={colors} />
+      <Logo colors={colors} />
       <Box sx={{ flex: 1 }} />
       <Controls
         infoDisplayMode={infoDisplayMode}

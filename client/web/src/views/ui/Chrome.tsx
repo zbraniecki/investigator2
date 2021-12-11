@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import cyan from "@mui/material/colors/cyan";
 import CssBaseline from "@mui/material/CssBaseline";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   LightMode,
   InfoDisplayMode,

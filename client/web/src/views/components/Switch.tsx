@@ -3,35 +3,39 @@ import { useTheme, Palette } from "@mui/material/styles";
 import { AppBarColors } from "../ui/AppBar";
 
 function SwitchRoot({ children }: any) {
-  return <Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      position: "relative",
-      width: "62px",
-      height: "34px",
-      padding: "7px",
-    }}
-  >
-    {children}
-  </Box>
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        position: "relative",
+        width: "62px",
+        height: "34px",
+        padding: "7px",
+      }}
+    >
+      {children}
+    </Box>
+  );
 }
 
 function SwitchInput({ onChange }: { onChange: any }) {
-  return <Box
-    sx={{
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      top: 0,
-      left: 0,
-      opacity: 0,
-      zIndex: "1",
-      margin: 0,
-      cursor: "pointer",
-    }}
-    onClick={onChange}
-  />
+  return (
+    <Box
+      sx={{
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        top: 0,
+        left: 0,
+        opacity: 0,
+        zIndex: "1",
+        margin: 0,
+        cursor: "pointer",
+      }}
+      onClick={onChange}
+    />
+  );
 }
 
 function SwitchThumb({
@@ -77,18 +81,26 @@ function SwitchThumb({
   );
 }
 
-function SwitchTrack(props: { children: any; colors: AppBarColors }) {
-  return <Box
-    sx={{
-      backgroundColor: props.colors.dent,
-      borderRadius: "10px",
-      width: "100%",
-      height: "100%",
-      display: "block",
-    }}
-  >
-    {props.children}
-  </Box>
+function SwitchTrack({
+  children,
+  colors,
+}: {
+  children: any;
+  colors: AppBarColors;
+}) {
+  return (
+    <Box
+      sx={{
+        backgroundColor: colors.dent,
+        borderRadius: "10px",
+        width: "100%",
+        height: "100%",
+        display: "block",
+      }}
+    >
+      {children}
+    </Box>
+  );
 }
 
 interface Props {
