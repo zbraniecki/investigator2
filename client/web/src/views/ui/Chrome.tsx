@@ -10,7 +10,8 @@ import {
   getLightModeName,
 } from "../../components/settings";
 import { InvestigatorAppBar } from "./AppBar";
-// import InvestigatorDrawer from "../Drawer";
+import InvestigatorDrawer from "./Drawer";
+import { getMenuItems } from "./Menu";
 // import Content from "../Content";
 import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
 
@@ -30,7 +31,8 @@ export function Chrome() {
       }),
     [lightModeName]
   );
-  // <InvestigatorDrawer menuItems={menuItems} />
+  
+  let menuItems = getMenuItems();
   // <Content menuItems={menuItems} />
   return (
     <ThemeProvider theme={theme}>
@@ -40,7 +42,10 @@ export function Chrome() {
         lightModeName={lightModeName}
         infoDisplayMode={infoDisplayMode}
       />
-      <Box sx={{ flex: 1 }} />
+      <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
+        <InvestigatorDrawer menuItems={menuItems} />
+        <Box sx={{ flex: 1 }} />
+      </Box>
     </ThemeProvider>
   );
 }

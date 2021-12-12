@@ -90,7 +90,7 @@
 //   outline: true,
 // };
 
-// export function Watchlists() {
+export function Watchlists() {
 //   const publicWatchlists: Record<string, Watchlist> = useSelector(getPublicWatchlists);
 //   const userWatchlists: Record<string, Watchlist> = useSelector(getUserWatchlists);
 //   const assetInfo = useSelector(getAssetInfo);
@@ -165,8 +165,6 @@
 //     setSearchQuery(event.target.value);
 //   };
 
-//   return (
-//     <>
 //       <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
 //         <Box sx={{ flex: 1 }}>
 //           <Box>
@@ -186,6 +184,8 @@
 //         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
 //         searchQuery={searchQuery}
 //       />
-//     </>
-//   );
-// }
+  return (
+    <>
+    </>
+  );
+}

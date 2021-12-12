@@ -1,9 +1,8 @@
 import { useSelector } from "react-redux";
-import Drawer from "@mui/material/Drawer";
+import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import Toolbar from "@mui/material/Toolbar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { MenuItem } from "./Menu";
 import { getSession } from "../../store/account";
@@ -34,17 +33,10 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
       pageState = "watchlists";
     }
   }
-
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: "border-box" },
-      }}
-    >
-      <Toolbar />
+    <Box sx={{
+      width: drawerWidth,
+    }}>
       <List sx={{ overflow: "hidden" }}>
         {menuItems.map(({ id, icon }) => (
           <ListItemButton
@@ -57,6 +49,6 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
           </ListItemButton>
         ))}
       </List>
-    </Drawer>
+    </Box>
   );
 }

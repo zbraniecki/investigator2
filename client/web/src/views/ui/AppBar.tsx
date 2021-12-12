@@ -50,6 +50,7 @@ export function InvestigatorAppBar({
         flexDirection: "row",
         alignItems: "center",
         padding: "0.5rem 0",
+        zIndex: 10,
       }}
     >
       <Logo colors={colors} />
