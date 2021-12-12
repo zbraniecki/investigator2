@@ -12,7 +12,7 @@ import {
 import { InvestigatorAppBar } from "./AppBar";
 import InvestigatorDrawer from "./Drawer";
 import { getMenuItems } from "./Menu";
-// import Content from "../Content";
+import Content from "./Content";
 import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
 
 export function Chrome() {
@@ -31,9 +31,8 @@ export function Chrome() {
       }),
     [lightModeName]
   );
-  
-  let menuItems = getMenuItems();
-  // <Content menuItems={menuItems} />
+
+  const menuItems = getMenuItems();
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -44,7 +43,7 @@ export function Chrome() {
       />
       <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
         <InvestigatorDrawer menuItems={menuItems} />
-        <Box sx={{ flex: 1 }} />
+        <Content menuItems={menuItems} />
       </Box>
     </ThemeProvider>
   );

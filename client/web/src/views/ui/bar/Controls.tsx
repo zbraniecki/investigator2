@@ -85,7 +85,9 @@ export function Controls({
             {refreshInProgress ? (
               <CircularProgress sx={{ color: colors.primary }} size="small" />
             ) : (
-              <RefreshIcon sx={{ color: session.token ? colors.primary : "" }} />
+              <RefreshIcon
+                sx={{ color: session.token ? colors.primary : "" }}
+              />
             )}
           </IconButton>
         </div>

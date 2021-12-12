@@ -9,7 +9,7 @@ interface Props {
 
 export default function Content({ menuItems }: Props) {
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+    <Box component="main" sx={{ flex: 1, p: 3 }}>
       <Toolbar />
       <Routes>
         {menuItems.map((item) => (

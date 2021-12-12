@@ -1,13 +1,11 @@
 import { useSelector } from "react-redux";
-import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
+import Drawer from "@mui/material/Drawer";
 import { useNavigate, useLocation } from "react-router-dom";
 import { MenuItem } from "./Menu";
 import { getSession } from "../../store/account";
-
-const drawerWidth = 55;
 
 interface Props {
   menuItems: Array<MenuItem>;
@@ -34,9 +32,14 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
     }
   }
   return (
-    <Box sx={{
-      width: drawerWidth,
-    }}>
+    <Drawer
+      variant="permanent"
+      sx={{
+        "& .MuiPaper-root": {
+          position: "inherit",
+        },
+      }}
+    >
       <List sx={{ overflow: "hidden" }}>
         {menuItems.map(({ id, icon }) => (
           <ListItemButton
@@ -45,10 +48,16 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
             onClick={handlePageSelect}
             data-value={id}
           >
-            <ListItemIcon>{icon}</ListItemIcon>
+            <ListItemIcon
+              sx={{
+                minWidth: "",
+              }}
+            >
+              {icon}
+            </ListItemIcon>
           </ListItemButton>
         ))}
       </List>
-    </Box>
+    </Drawer>
   );
 }

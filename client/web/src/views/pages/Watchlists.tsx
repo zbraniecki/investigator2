@@ -5,6 +5,8 @@
 // import Tabs from "@mui/material/Tabs";
 // import Tab from "@mui/material/Tab";
 // import { Component as Table, Props as TableProps } from "../components/Table";
+import { TableContainer } from "../components/table/Contrainer";
+import { TableData } from "../components/table/Data";
 // import {
 //   WatchlistTableRow,
 //   prepareWatchlistTableData,
@@ -91,101 +93,132 @@
 // };
 
 export function Watchlists() {
-//   const publicWatchlists: Record<string, Watchlist> = useSelector(getPublicWatchlists);
-//   const userWatchlists: Record<string, Watchlist> = useSelector(getUserWatchlists);
-//   const assetInfo = useSelector(getAssetInfo);
-//   const portfolios = useSelector(getPortfolios);
-//   const users = useSelector(getUsers);
-//   const session = useSelector(getSession);
-//   const infoDisplayMode = useSelector(getInfoDisplayMode);
+  //   const publicWatchlists: Record<string, Watchlist> = useSelector(getPublicWatchlists);
+  //   const userWatchlists: Record<string, Watchlist> = useSelector(getUserWatchlists);
+  //   const assetInfo = useSelector(getAssetInfo);
+  //   const portfolios = useSelector(getPortfolios);
+  //   const users = useSelector(getUsers);
+  //   const session = useSelector(getSession);
+  //   const infoDisplayMode = useSelector(getInfoDisplayMode);
 
-//   const [wIdx, setwIdx] = React.useState(0);
-//   const [searchQuery, setSearchQuery] = React.useState("");
-//   const handleChange = (event: any, newValue: any) => {
-//     setwIdx(newValue);
-//   };
+  //   const [wIdx, setwIdx] = React.useState(0);
+  //   const [searchQuery, setSearchQuery] = React.useState("");
+  //   const handleChange = (event: any, newValue: any) => {
+  //     setwIdx(newValue);
+  //   };
 
-//   const watchlists: Record<string, Watchlist> = {};
-//   for (let list of Object.values(publicWatchlists)) {
-//     watchlists[list.id] = list;
-//   }
-//   for (let list of Object.values(userWatchlists)) {
-//     watchlists[list.id] = list;
-//   }
+  //   const watchlists: Record<string, Watchlist> = {};
+  //   for (let list of Object.values(publicWatchlists)) {
+  //     watchlists[list.id] = list;
+  //   }
+  //   for (let list of Object.values(userWatchlists)) {
+  //     watchlists[list.id] = list;
+  //   }
 
-//   let tableData: Array<WatchlistTableRow> = [];
-//   let subHeaderRow: WatchlistTableRow | undefined;
+  //   let tableData: Array<WatchlistTableRow> = [];
+  //   let subHeaderRow: WatchlistTableRow | undefined;
 
-//   let tabs: {id: string, name: string}[] = [];
-//   if (session.username) {
-//     let currentUser = users[session.username];
-//     tabs = currentUser.ui.watchlists
-//     .filter((wid: string) => {
-//       return watchlists[wid] !== undefined;
-//     })
-//     .map((wid: string) => {
-//       let watchlist = watchlists[wid];
-//       return {
-//         id: watchlist.id,
-//         name: watchlist.name,
-//       };
-//     });
-//   } else {
-//     tabs = Object.values(watchlists)
-//       .map(wlist => {
-//         return {
-//           id: wlist.id,
-//           name: wlist.name,
-//         };
-//       });
-//   }
+  //   let tabs: {id: string, name: string}[] = [];
+  //   if (session.username) {
+  //     let currentUser = users[session.username];
+  //     tabs = currentUser.ui.watchlists
+  //     .filter((wid: string) => {
+  //       return watchlists[wid] !== undefined;
+  //     })
+  //     .map((wid: string) => {
+  //       let watchlist = watchlists[wid];
+  //       return {
+  //         id: watchlist.id,
+  //         name: watchlist.name,
+  //       };
+  //     });
+  //   } else {
+  //     tabs = Object.values(watchlists)
+  //       .map(wlist => {
+  //         return {
+  //           id: wlist.id,
+  //           name: wlist.name,
+  //         };
+  //       });
+  //   }
 
-//   if (tabs.length >= wIdx + 1) {
-//     const wid = tabs[wIdx].id;
-//     let data = prepareWatchlistTableData(
-//       wid,
-//       watchlists,
-//       assetInfo,
-//       portfolios
-//     );
-//     if (data !== undefined) {
-//       let { cells, children } = data;
-//       if (children !== undefined) {
-//         subHeaderRow = {
-//           cells,
-//           type: "asset",
-//         };
-//         tableData = children;
-//       }
-//     }
-//   }
+  //   if (tabs.length >= wIdx + 1) {
+  //     const wid = tabs[wIdx].id;
+  //     let data = prepareWatchlistTableData(
+  //       wid,
+  //       watchlists,
+  //       assetInfo,
+  //       portfolios
+  //     );
+  //     if (data !== undefined) {
+  //       let { cells, children } = data;
+  //       if (children !== undefined) {
+  //         subHeaderRow = {
+  //           cells,
+  //           type: "asset",
+  //         };
+  //         tableData = children;
+  //       }
+  //     }
+  //   }
 
-//   const handleSearch = (event: any) => {
-//   console.log(event);
-//     setSearchQuery(event.target.value);
-//   };
+  //   const handleSearch = (event: any) => {
+  //   console.log(event);
+  //     setSearchQuery(event.target.value);
+  //   };
 
-//       <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
-//         <Box sx={{ flex: 1 }}>
-//           <Box>
-//             <Tabs value={wIdx} onChange={handleChange}>
-//               {tabs.map((tab) => (
-//                 <Tab key={`tab-${tab.id}`} label={tab.name} />
-//               ))}
-//             </Tabs>
-//           </Box>
-//         </Box>
-//         <SearchInput handleChange={handleSearch} />
-//       </Box>
-//       <Table
-//         meta={tableMeta}
-//         data={tableData}
-//         subHeaderRow={subHeaderRow}
-//         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
-//         searchQuery={searchQuery}
-//       />
-  return (
-    <>
-    </>
-  );
+  const tableData: TableData = {
+    id: "unique-table-id",
+    headers: [
+      {
+        label: "Symbol",
+        key: "symbol",
+        width: "10%",
+      },
+      {
+        label: "Name",
+        key: "name",
+        width: "auto",
+      },
+      {
+        label: "Target",
+        key: "target",
+        width: "30%",
+        editable: true,
+      },
+    ],
+    rows: [
+      {
+        symbol: "BTC",
+        name: "Bitcoin",
+        target: "25%",
+      },
+      {
+        symbol: "ETH",
+        name: "Ethereum",
+        target: "15%",
+      },
+    ],
+  };
+
+  //       <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
+  //         <Box sx={{ flex: 1 }}>
+  //           <Box>
+  //             <Tabs value={wIdx} onChange={handleChange}>
+  //               {tabs.map((tab) => (
+  //                 <Tab key={`tab-${tab.id}`} label={tab.name} />
+  //               ))}
+  //             </Tabs>
+  //           </Box>
+  //         </Box>
+  //         <SearchInput handleChange={handleSearch} />
+  //       </Box>
+  //       <Table
+  //         meta={tableMeta}
+  //         data={tableData}
+  //         subHeaderRow={subHeaderRow}
+  //         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
+  //         searchQuery={searchQuery}
+  //       />
+  return <TableContainer data={tableData} />;
 }
