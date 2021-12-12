@@ -29,7 +29,13 @@ export function HeaderRow({ data }: Props) {
       {data.headers.map((header: any) => {
         const id = `${data.id}-header-${header.key}`;
         return (
-          <Cell key={id} id={id} width={header.width} value={header.label} align={header.align} />
+          <Cell
+            key={id}
+            id={id}
+            width={header.width}
+            value={header.label}
+            align={header.align}
+          />
         );
       })}
     </TableRow>

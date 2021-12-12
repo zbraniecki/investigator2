@@ -1,13 +1,20 @@
 import { AssetInfo, Watchlist } from "../store/oracle";
 import { Portfolio } from "../store/account";
 import { assert } from "./helpers";
-import { DataRowProps, SymbolNameCell } from "../views/components/Table";
+/* import { DataRowProps, SymbolNameCell } from "../views/components/Table"; */
+import {
+  TableData,
+  RowData,
+  CellAlign,
+  RowType,
+} from "../views/components/table/Data";
 
-export interface WatchlistTableRow extends DataRowProps {
+export interface WatchlistTableRow extends RowData {
   cells: {
     market_cap_rank?: number;
     market_cap?: number;
-    name?: SymbolNameCell | string;
+    name?: string;
+    symbol?: string;
     price?: number;
     price_change_percentage_1h?: number;
     price_change_percentage_24h?: number;
@@ -15,7 +22,7 @@ export interface WatchlistTableRow extends DataRowProps {
     price_change_percentage_30d?: number;
   };
   children?: WatchlistTableRow[];
-  type: "portfolio" | "asset";
+  type: RowType;
 }
 
 function computeHeaderData(
@@ -100,17 +107,15 @@ export function createWatchlistTableData(
       cells: {
         market_cap_rank: asset.info.market_cap_rank,
         market_cap: asset.info.market_cap,
-        name: {
-          symbol: asset.symbol,
-          name: asset.name,
-        },
+        name: asset.name,
+        symbol: asset.symbol,
         price: asset.info.value,
         price_change_percentage_1h: asset.info.price_change_percentage_1h,
         price_change_percentage_24h: asset.info.price_change_percentage_24h,
         price_change_percentage_7d: asset.info.price_change_percentage_7d,
         price_change_percentage_30d: asset.info.price_change_percentage_30d,
       },
-      type: "asset",
+      type: RowType.Asset,
     };
   });
 
@@ -119,7 +124,7 @@ export function createWatchlistTableData(
   return {
     cells,
     children: rows.length > 0 ? rows : undefined,
-    type: "asset",
+    type: RowType.Asset,
   };
 }
 

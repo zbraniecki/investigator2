@@ -16,7 +16,12 @@ Cell.defaultProps = {
   editable: false,
 };
 
-function Cell({ id, value: defaultValue, align: cellAlign, editable }: CellProps) {
+function Cell({
+  id,
+  value: defaultValue,
+  align: cellAlign,
+  editable,
+}: CellProps) {
   const [tempValue, setTempValue] = React.useState("" as CellValue);
   const [value, setValue] = React.useState(defaultValue);
   const [editing, setEditing] = React.useState(false);
@@ -63,7 +68,7 @@ function Cell({ id, value: defaultValue, align: cellAlign, editable }: CellProps
       setValue(event.target.value);
     }
   };
-  
+
   const align = cellAlign === CellAlign.Left ? "left" : "right";
 
   return (
@@ -104,9 +109,15 @@ export function Row({ id, data, headers }: Props) {
     <TableRow key={id}>
       {headers.map((header) => {
         const key = `${id}-${header.key}`;
-        const value = data[header.key];
+        const value = data.cells[header.key];
         return (
-          <Cell key={key} id={key} value={value} align={header.align} editable={header.editable} />
+          <Cell
+            key={key}
+            id={key}
+            value={value}
+            align={header.align}
+            editable={header.editable}
+          />
         );
       })}
     </TableRow>

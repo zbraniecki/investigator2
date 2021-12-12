@@ -1,27 +1,27 @@
 // import React from "react";
 // import Box from "@mui/material/Box";
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 // import Typography from "@mui/material/Typography";
 // import Tabs from "@mui/material/Tabs";
 // import Tab from "@mui/material/Tab";
 // import { Component as Table, Props as TableProps } from "../components/Table";
 import { TableContainer } from "../components/table/Contrainer";
 import { TableData, CellAlign } from "../components/table/Data";
-// import {
-//   WatchlistTableRow,
-//   prepareWatchlistTableData,
-// } from "../../utils/watchlist";
-// import {
-//   getAssetInfo,
-//   getWatchlists as getPublicWatchlists,
-//   Watchlist,
-// } from "../../store/oracle";
-// import {
-//   getPortfolios,
-//   getWatchlists as getUserWatchlists,
-//   getUsers,
-//   getSession,
-// } from "../../store/account";
+import {
+  WatchlistTableRow,
+  prepareWatchlistTableData,
+} from "../../utils/watchlist";
+import {
+  getAssetInfo,
+  getWatchlists as getPublicWatchlists,
+  Watchlist,
+} from "../../store/oracle";
+import {
+  getPortfolios,
+  getWatchlists as getUserWatchlists,
+  //   getUsers,
+  //   getSession,
+} from "../../store/account";
 // import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 // import { percent } from "../../utils/formatters";
 // import { SearchInput } from "../components/Search";
@@ -93,10 +93,12 @@ import { TableData, CellAlign } from "../components/table/Data";
 // };
 
 export function Watchlists() {
-  //   const publicWatchlists: Record<string, Watchlist> = useSelector(getPublicWatchlists);
-  //   const userWatchlists: Record<string, Watchlist> = useSelector(getUserWatchlists);
-  //   const assetInfo = useSelector(getAssetInfo);
-  //   const portfolios = useSelector(getPortfolios);
+  const publicWatchlists: Record<string, Watchlist> =
+    useSelector(getPublicWatchlists);
+  const userWatchlists: Record<string, Watchlist> =
+    useSelector(getUserWatchlists);
+  const assetInfo = useSelector(getAssetInfo);
+  const portfolios = useSelector(getPortfolios);
   //   const users = useSelector(getUsers);
   //   const session = useSelector(getSession);
   //   const infoDisplayMode = useSelector(getInfoDisplayMode);
@@ -107,14 +109,29 @@ export function Watchlists() {
   //     setwIdx(newValue);
   //   };
 
-  //   const watchlists: Record<string, Watchlist> = {};
-  //   for (let list of Object.values(publicWatchlists)) {
-  //     watchlists[list.id] = list;
-  //   }
-  //   for (let list of Object.values(userWatchlists)) {
-  //     watchlists[list.id] = list;
-  //   }
+  const watchlists: Record<string, Watchlist> = {};
+  for (const list of Object.values(publicWatchlists)) {
+    watchlists[list.id] = list;
+  }
+  for (const list of Object.values(userWatchlists)) {
+    watchlists[list.id] = list;
+  }
 
+  let wid;
+  let rows: WatchlistTableRow[] = [];
+  if (Object.keys(watchlists).length > 0) {
+    wid = Object.keys(watchlists)[0];
+    const data = prepareWatchlistTableData(
+      wid,
+      watchlists,
+      assetInfo,
+      portfolios
+    );
+
+    if (data?.children) {
+      rows = data.children.slice(0, 5);
+    }
+  }
   //   let tableData: Array<WatchlistTableRow> = [];
   //   let subHeaderRow: WatchlistTableRow | undefined;
 
@@ -183,27 +200,14 @@ export function Watchlists() {
         width: "auto",
       },
       {
-        label: "Target",
-        key: "target",
+        label: "Price",
+        key: "price",
         align: CellAlign.Right,
         width: "30%",
         editable: true,
       },
     ],
-    rows: [
-      {
-        symbol: "BTC",
-        name: "Bitcoin",
-        market_cap_rank: 1,
-        target: "25%",
-      },
-      {
-        symbol: "ETH",
-        name: "Ethereum",
-        market_cap_rank: 2,
-        target: "15%",
-      },
-    ],
+    rows,
   };
 
   //       <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>

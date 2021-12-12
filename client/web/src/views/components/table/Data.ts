@@ -1,9 +1,18 @@
 export type CellValue = string | number;
-export type RowData = Record<string, CellValue>;
+
+export enum RowType {
+  Asset,
+  Portfolio,
+}
+export interface RowData {
+  cells: Record<string, CellValue>;
+  children?: RowData[];
+  type: RowType;
+}
 
 export enum CellAlign {
   Left,
-  Right,  
+  Right,
 }
 export interface HeaderData {
   label: string;

@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import { Routes, Route } from "react-router-dom";
 import { MenuItem } from "./Menu";
 
@@ -9,8 +8,16 @@ interface Props {
 
 export default function Content({ menuItems }: Props) {
   return (
-    <Box component="main" sx={{ flex: 1, p: 3 }}>
-      <Toolbar />
+    <Box
+      component="main"
+      sx={{
+        flex: 1,
+        p: 3,
+        overflowY: "auto",
+        height: "calc(100vh - 80px)",
+        display: "block",
+      }}
+    >
       <Routes>
         {menuItems.map((item) => (
           <Route
