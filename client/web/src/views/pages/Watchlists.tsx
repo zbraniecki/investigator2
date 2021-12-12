@@ -6,7 +6,7 @@
 // import Tab from "@mui/material/Tab";
 // import { Component as Table, Props as TableProps } from "../components/Table";
 import { TableContainer } from "../components/table/Contrainer";
-import { TableData } from "../components/table/Data";
+import { TableData, CellAlign } from "../components/table/Data";
 // import {
 //   WatchlistTableRow,
 //   prepareWatchlistTableData,
@@ -168,21 +168,24 @@ export function Watchlists() {
   //   };
 
   const tableData: TableData = {
-    id: "unique-table-id",
+    id: "watchlist",
     headers: [
       {
-        label: "Symbol",
-        key: "symbol",
+        label: "#",
+        key: "market_cap_rank",
+        align: CellAlign.Right,
         width: "10%",
       },
       {
         label: "Name",
         key: "name",
+        align: CellAlign.Left,
         width: "auto",
       },
       {
         label: "Target",
         key: "target",
+        align: CellAlign.Right,
         width: "30%",
         editable: true,
       },
@@ -191,11 +194,13 @@ export function Watchlists() {
       {
         symbol: "BTC",
         name: "Bitcoin",
+        market_cap_rank: 1,
         target: "25%",
       },
       {
         symbol: "ETH",
         name: "Ethereum",
+        market_cap_rank: 2,
         target: "15%",
       },
     ],

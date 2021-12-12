@@ -3,11 +3,12 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
-import { RowData, HeadersData } from "./Data";
+import { RowData, HeadersData, CellAlign, CellValue } from "./Data";
 
 interface CellProps {
   id: string;
-  value: string;
+  value: CellValue;
+  align: CellAlign;
   editable?: boolean;
 }
 
@@ -15,8 +16,8 @@ Cell.defaultProps = {
   editable: false,
 };
 
-function Cell({ id, value: defaultValue, editable }: CellProps) {
-  const [tempValue, setTempValue] = React.useState("");
+function Cell({ id, value: defaultValue, align: cellAlign, editable }: CellProps) {
+  const [tempValue, setTempValue] = React.useState("" as CellValue);
   const [value, setValue] = React.useState(defaultValue);
   const [editing, setEditing] = React.useState(false);
 
@@ -62,12 +63,15 @@ function Cell({ id, value: defaultValue, editable }: CellProps) {
       setValue(event.target.value);
     }
   };
+  
+  const align = cellAlign === CellAlign.Left ? "left" : "right";
 
   return (
     <TableCell
       key={id}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDblClick}
+      align={align}
       sx={{
         bgcolor: editing ? "primary.900" : "inherit",
       }}
@@ -76,7 +80,7 @@ function Cell({ id, value: defaultValue, editable }: CellProps) {
         <InputBase
           autoFocus
           fullWidth
-          placeholder={tempValue}
+          placeholder={tempValue.toString()}
           onBlur={handleBlur}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -102,7 +106,7 @@ export function Row({ id, data, headers }: Props) {
         const key = `${id}-${header.key}`;
         const value = data[header.key];
         return (
-          <Cell key={key} id={key} value={value} editable={header.editable} />
+          <Cell key={key} id={key} value={value} align={header.align} editable={header.editable} />
         );
       })}
     </TableRow>

@@ -1,9 +1,15 @@
-export type RowData = Record<string, string>;
+export type CellValue = string | number;
+export type RowData = Record<string, CellValue>;
 
+export enum CellAlign {
+  Left,
+  Right,  
+}
 export interface HeaderData {
   label: string;
   key: string;
   width: string;
+  align: CellAlign;
   editable?: boolean;
 }
 
