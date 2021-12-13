@@ -4,12 +4,18 @@ import { Portfolio } from "../store/account";
 import { AssetInfo, Wallet } from "../store/oracle";
 import { getWalletAsset } from "./wallet";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
-import { DataRowProps, SymbolNameCell } from "../views/components/Table";
+import {
+  TableData,
+  RowData,
+  CellAlign,
+  RowType,
+} from "../views/components/table/Data";
 
-export interface PortfolioTableRow extends DataRowProps {
+export interface PortfolioTableRow extends RowData {
   cells: {
     id: string;
-    name?: SymbolNameCell | string;
+    name?: string;
+    symbol?: string;
     price?: number;
     quantity?: number;
     value?: number;
@@ -17,7 +23,7 @@ export interface PortfolioTableRow extends DataRowProps {
     yield?: number;
   };
   children?: PortfolioTableRow[];
-  type: "portfolio" | "asset";
+  type: RowType;
 }
 
 function computeHeaderData(
@@ -65,15 +71,13 @@ export function buildPortfolioTableData(
       return {
         cells: {
           id,
-          name: {
-            name: asset.name,
-            symbol: asset.symbol,
-          },
+          name: asset.name,
+          symbol: asset.symbol,
           price: asset.info.value,
           quantity,
           value: asset.info.value * quantity,
         },
-        type: "asset",
+        type: RowType.Asset,
       };
     }
   );
@@ -86,7 +90,7 @@ export function buildPortfolioTableData(
         name: subPortfolio.name,
       },
       children: buildPortfolioTableData(subPortfolio, portfolios, assetInfo),
-      type: "portfolio",
+      type: RowType.Portfolio,
     };
   });
   rows.push(...res2);
@@ -113,17 +117,15 @@ export function createPortfolioTableData(
       return {
         cells: {
           id,
-          name: {
-            name: asset.name,
-            symbol: asset.symbol,
-          },
+          name: asset.name,
+          symbol: asset.symbol,
           price: asset.info.value,
           quantity,
           value: asset.info.value * quantity,
           wallet: wallet?.name,
           yield: walletAsset?.apy,
         },
-        type: "asset",
+        type: RowType.Asset,
       };
     }
   );
@@ -147,7 +149,7 @@ export function createPortfolioTableData(
   return {
     cells,
     children: rows.length > 0 ? rows : undefined,
-    type: "portfolio",
+    type: RowType.Portfolio,
   };
 }
 
@@ -170,20 +172,20 @@ export function preparePortfolioTableData(
     wallets,
     true
   );
-  if (data.children !== undefined) {
-    data.children = groupTableDataByColumn(
-      data.children,
-      "id",
-      [
-        { key: "name", strategy: GroupingStrategy.IfSame },
-        { key: "price", strategy: GroupingStrategy.IfSame },
-        { key: "wallet", strategy: GroupingStrategy.IfSame },
-        { key: "yield", strategy: GroupingStrategy.IfSame },
-        { key: "quantity", strategy: GroupingStrategy.Sum },
-      ],
-      false
-    ) as PortfolioTableRow[];
-  }
+  // if (data.children !== undefined) {
+  //   data.children = groupTableDataByColumn(
+  //     data.children,
+  //     "id",
+  //     [
+  //       { key: "name", strategy: GroupingStrategy.IfSame },
+  //       { key: "price", strategy: GroupingStrategy.IfSame },
+  //       { key: "wallet", strategy: GroupingStrategy.IfSame },
+  //       { key: "yield", strategy: GroupingStrategy.IfSame },
+  //       { key: "quantity", strategy: GroupingStrategy.Sum },
+  //     ],
+  //     false
+  //   ) as PortfolioTableRow[];
+  // }
 
   return data;
 }

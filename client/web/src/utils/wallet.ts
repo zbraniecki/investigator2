@@ -2,7 +2,12 @@ import { Portfolio } from "../store/account";
 import { AssetInfo, Wallet, WalletAsset } from "../store/oracle";
 import { createPortfolioTableData } from "./portfolio";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
-import { SymbolNameCell } from "../views/components/Table";
+import {
+  TableData,
+  RowData,
+  CellAlign,
+  RowType,
+} from "../views/components/table/Data";
 
 export function getWalletAsset(
   walletId: string,
@@ -21,17 +26,18 @@ export function getWalletAsset(
   return null;
 }
 
-export interface WalletTableRow {
+export interface WalletTableRow extends RowData {
   cells: {
     id: string;
     wallet?: string;
-    name?: SymbolNameCell | string;
+    name?: string;
+    symbol?: string;
     quantity?: number;
     yield?: number;
     value?: number;
   };
   children?: WalletTableRow[];
-  type: "portfolio" | "asset";
+  type: RowType;
 }
 
 export function prepareWalletTableData(
@@ -54,17 +60,17 @@ export function prepareWalletTableData(
     true
   ) as WalletTableRow;
 
-  if (data.children !== undefined) {
-    data.children = groupTableDataByColumn(
-      data.children,
-      "wallet",
-      [
-        { key: "name", strategy: GroupingStrategy.IfSame },
-        { key: "wallet", strategy: GroupingStrategy.IfSame },
-      ],
-      true
-    ) as WalletTableRow[];
-  }
+  // if (data.children !== undefined) {
+  //   data.children = groupTableDataByColumn(
+  //     data.children,
+  //     "wallet",
+  //     [
+  //       { key: "name", strategy: GroupingStrategy.IfSame },
+  //       { key: "wallet", strategy: GroupingStrategy.IfSame },
+  //     ],
+  //     true
+  //   ) as WalletTableRow[];
+  // }
 
   return data;
 }

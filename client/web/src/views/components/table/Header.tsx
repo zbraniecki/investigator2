@@ -27,7 +27,7 @@ export function HeaderRow({ data }: Props) {
   return (
     <TableRow>
       {data.headers.map((header: any) => {
-        const id = `${data.id}-header-${header.key}`;
+        const id = `${data.name}-header-${header.key}`;
         return (
           <Cell
             key={id}

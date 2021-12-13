@@ -7,6 +7,7 @@ import {
   authenticate,
   logout,
   fetchUserInfo,
+  updateCell,
 } from "../api/account";
 import { Watchlist } from "./oracle";
 import { getFromLocalStorage } from "./main";
@@ -32,6 +33,11 @@ export const fetchUserInfoThunk = createAsyncThunk(
 );
 
 export const logoutThunk = createAsyncThunk("account/logout", logout);
+
+export const updateCellThunk = createAsyncThunk(
+  "account/portfolio/update/cell",
+  updateCell
+);
 
 export interface Holding {
   id: string;
@@ -148,6 +154,24 @@ export const accountSlice = createSlice({
         if (state.session.username === undefined && item.current) {
           state.session.username = item.username;
           state.session.authenticateState = AuthenticateState.Session;
+        }
+      }
+    });
+    builder.addCase(updateCellThunk.fulfilled, (state, action) => {
+      if (action.payload.error !== null) {
+        console.log(`action failed`);
+        return;
+      }
+      const pid = "5842aa4b-a7c7-4300-866d-16a3812ef78a";
+      const assetId = "bitcoin";
+      const accountId = "hodlnaut-wallet";
+      console.log("STATUS UPDATED");
+      const portfolio = state.portfolios[pid];
+      for (const holding of portfolio.holdings) {
+        if (holding.id === assetId && holding.account === accountId) {
+          holding.quantity = action.payload.value;
+          console.log("updating value");
+          break;
         }
       }
     });

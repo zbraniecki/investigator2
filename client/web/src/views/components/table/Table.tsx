@@ -12,12 +12,20 @@ export interface Props {
 export function Table({ data }: Props) {
   return (
     <MUITable>
-      <TableHead>
+      <TableHead
+        sx={{
+          position: "sticky",
+          top: 0,
+          bgcolor: "background.paper",
+          backgroundImage:
+            "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
+        }}
+      >
         <HeaderRow data={data} />
       </TableHead>
       <TableBody>
-        {data.rows.map((row, idx) => {
-          const id = `${data.id}-row-${idx}`;
+        {data.rows?.map((row, idx) => {
+          const id = `${data.name}-row-${idx}`;
           return <Row id={id} key={id} data={row} headers={data.headers} />;
         })}
       </TableBody>

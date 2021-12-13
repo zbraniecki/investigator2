@@ -13,9 +13,7 @@ export default function Content({ menuItems }: Props) {
       sx={{
         flex: 1,
         p: 3,
-        overflowY: "auto",
         height: "calc(100vh - 80px)",
-        display: "block",
       }}
     >
       <Routes>

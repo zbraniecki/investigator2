@@ -3,7 +3,7 @@ import { assert } from "../utils/helpers";
 
 export const fetchPortfolios = async ({ token }: { token: string }) => {
   const p = new Promise((resolve) => {
-    setTimeout(resolve, 3000);
+    setTimeout(resolve, 500);
   });
   await p;
   const data = await fetch(`${BASE_URL}profile/portfolio/`, {
@@ -75,7 +75,7 @@ export const logout = async ({ token }: { token: string }) => {
 
 export const fetchUserInfo = async ({ token }: { token: string }) => {
   const p = new Promise((resolve) => {
-    setTimeout(resolve, 3000);
+    setTimeout(resolve, 500);
   });
   await p;
 
@@ -88,4 +88,15 @@ export const fetchUserInfo = async ({ token }: { token: string }) => {
   });
   const resp = await data.json();
   return resp;
+};
+
+export const updateCell = async ({ value }: { value: number }) => {
+  const p = new Promise((resolve) => {
+    setTimeout(resolve, 3000);
+  });
+  await p;
+  return {
+    error: null,
+    value,
+  };
 };

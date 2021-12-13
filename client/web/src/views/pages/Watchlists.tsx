@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 // import Tab from "@mui/material/Tab";
 // import { Component as Table, Props as TableProps } from "../components/Table";
 import { TableContainer } from "../components/table/Contrainer";
-import { TableData, CellAlign } from "../components/table/Data";
+import { TableData, Formatter, CellAlign } from "../components/table/Data";
 import {
   WatchlistTableRow,
   prepareWatchlistTableData,
@@ -26,71 +26,72 @@ import {
 // import { percent } from "../../utils/formatters";
 // import { SearchInput } from "../components/Search";
 
-// const tableMeta: TableProps["meta"] = {
-//   id: "watchlist",
-//   sort: {
-//     column: "market_cap",
-//     direction: "desc",
-//   },
-//   nested: false,
-//   headers: [
-//     {
-//       label: "#",
-//       id: "market_cap_rank",
-//       align: "right",
-//       width: 0.01,
-//     },
-//     {
-//       label: "Name",
-//       id: "name",
-//       align: "left",
-//       width: 0.15,
-//       formatter: "symbol",
-//     },
-//     {
-//       label: "Price",
-//       id: "price",
-//       align: "left",
-//       width: "auto",
-//       formatter: "currency",
-//     },
-//     {
-//       label: "1h",
-//       id: "price_change_percentage_1h",
-//       align: "left",
-//       width: 0.1,
-//       formatter: "percent",
-//       colorDiff: true,
-//     },
-//     {
-//       label: "24h",
-//       id: "price_change_percentage_24h",
-//       align: "left",
-//       width: 0.1,
-//       formatter: "percent",
-//       colorDiff: true,
-//     },
-//     {
-//       label: "7d",
-//       id: "price_change_percentage_7d",
-//       align: "left",
-//       width: 0.1,
-//       formatter: "percent",
-//       colorDiff: true,
-//     },
-//     {
-//       label: "30d",
-//       id: "price_change_percentage_30d",
-//       align: "left",
-//       width: 0.1,
-//       formatter: "percent",
-//       colorDiff: true,
-//     },
-//   ],
-//   pager: true,
-//   header: true,
-//   outline: true,
-// };
+const tableMeta: TableData = {
+  name: "watchlist",
+  // sort: {
+  //   column: "market_cap",
+  //   direction: "desc",
+  // },
+  // nested: false,
+  headers: [
+    {
+      label: "#",
+      key: "market_cap_rank",
+      align: CellAlign.Right,
+      width: "10%",
+    },
+    {
+      label: "Name",
+      key: "name",
+      align: CellAlign.Left,
+      width: "15%",
+      formatter: Formatter.Symbol,
+    },
+    {
+      label: "Price",
+      key: "price",
+      align: CellAlign.Left,
+      width: "auto",
+      formatter: Formatter.Currency,
+      editable: true,
+    },
+    {
+      label: "1h",
+      key: "price_change_percentage_1h",
+      align: CellAlign.Left,
+      width: "10%",
+      formatter: Formatter.Percent,
+      // colorDiff: true,
+    },
+    {
+      label: "24h",
+      key: "price_change_percentage_24h",
+      align: CellAlign.Left,
+      width: "10%",
+      formatter: Formatter.Percent,
+      // colorDiff: true,
+    },
+    {
+      label: "7d",
+      key: "price_change_percentage_7d",
+      align: CellAlign.Left,
+      width: "10%",
+      formatter: Formatter.Percent,
+      // colorDiff: true,
+    },
+    {
+      label: "30d",
+      key: "price_change_percentage_30d",
+      align: CellAlign.Left,
+      width: "10%",
+      formatter: Formatter.Percent,
+      // colorDiff: true,
+    },
+  ],
+  // pager: true,
+  // header: true,
+  // outline: true,
+};
 
 export function Watchlists() {
   const publicWatchlists: Record<string, Watchlist> =
@@ -117,10 +118,13 @@ export function Watchlists() {
     watchlists[list.id] = list;
   }
 
-  let wid;
-  let rows: WatchlistTableRow[] = [];
+  const tableData = {
+    rows: [],
+    ...tableMeta,
+  };
+
   if (Object.keys(watchlists).length > 0) {
-    wid = Object.keys(watchlists)[0];
+    const wid = Object.keys(watchlists)[0];
     const data = prepareWatchlistTableData(
       wid,
       watchlists,
@@ -129,7 +133,7 @@ export function Watchlists() {
     );
 
     if (data?.children) {
-      rows = data.children.slice(0, 5);
+      tableData.rows = data.children;
     }
   }
   //   let tableData: Array<WatchlistTableRow> = [];
@@ -183,32 +187,6 @@ export function Watchlists() {
   //   console.log(event);
   //     setSearchQuery(event.target.value);
   //   };
-
-  const tableData: TableData = {
-    id: "watchlist",
-    headers: [
-      {
-        label: "#",
-        key: "market_cap_rank",
-        align: CellAlign.Right,
-        width: "10%",
-      },
-      {
-        label: "Name",
-        key: "name",
-        align: CellAlign.Left,
-        width: "auto",
-      },
-      {
-        label: "Price",
-        key: "price",
-        align: CellAlign.Right,
-        width: "30%",
-        editable: true,
-      },
-    ],
-    rows,
-  };
 
   //       <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
   //         <Box sx={{ flex: 1 }}>

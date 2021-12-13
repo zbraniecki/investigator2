@@ -119,38 +119,39 @@ export function prepareStrategyTableData(
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>
 ): StrategyTableRow | undefined {
-  const strategy = strategies[sid];
-  assert(strategy);
-  if (
-    Object.keys(assetInfo).length === 0 ||
-    Object.keys(portfolios).length === 0
-  ) {
-    return undefined;
-  }
+  // const strategy = strategies[sid];
+  // assert(strategy);
+  // if (
+  //   Object.keys(assetInfo).length === 0 ||
+  //   Object.keys(portfolios).length === 0
+  // ) {
+  //   return undefined;
+  // }
 
-  const portfolio = portfolios[strategy.portfolio];
-  assert(portfolio);
+  // const portfolio = portfolios[strategy.portfolio];
+  // assert(portfolio);
 
-  const portfolioData = buildPortfolioTableData(
-    portfolio,
-    portfolios,
-    assetInfo
-  );
-  const groupedPortfolioData = groupTableDataByColumn2(
-    portfolioData,
-    "id",
-    true
-  );
-  const computedTableData = computeGroupedTableData(groupedPortfolioData, [
-    "value",
-  ]);
+  // const portfolioData = buildPortfolioTableData(
+  //   portfolio,
+  //   portfolios,
+  //   assetInfo
+  // );
+  // const groupedPortfolioData = groupTableDataByColumn2(
+  //   portfolioData,
+  //   "id",
+  //   true
+  // );
+  // const computedTableData = computeGroupedTableData(groupedPortfolioData, [
+  //   "value",
+  // ]);
 
-  const data = createStrategyTableData(
-    strategy,
-    portfolios,
-    assetInfo,
-    computedTableData
-  );
+  // const data = createStrategyTableData(
+  //   strategy,
+  //   portfolios,
+  //   assetInfo,
+  //   computedTableData
+  // );
 
-  return data;
+  // return data;
+  return undefined;
 }

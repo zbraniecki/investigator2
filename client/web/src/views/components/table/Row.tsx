@@ -3,39 +3,61 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
-import { RowData, HeadersData, CellAlign, CellValue } from "./Data";
+import { useDispatch } from "react-redux";
+import { RowData, HeadersData, CellAlign, CellValue, Formatter } from "./Data";
+import { percent, currency } from "../../../utils/formatters";
+import { updateCellThunk } from "../../../store/account";
 
 interface CellProps {
   id: string;
   value: CellValue;
   align: CellAlign;
-  editable?: boolean;
+  formatter?: Formatter;
+  onCellUpdate?: any;
 }
 
 Cell.defaultProps = {
-  editable: false,
+  formatter: undefined,
+  onCellUpdate: undefined,
 };
+
+function tryParseNumber(input: string): number | undefined {
+  if (input.length === 0) {
+    return 0;
+  }
+
+  if (input === "-") {
+    return -0;
+  }
+  if (input.endsWith(".")) {
+    input += "0";
+  }
+  const parsed = parseFloat(input);
+  if (Number.isNaN(parsed)) {
+    return undefined;
+  }
+  return parsed;
+}
 
 function Cell({
   id,
-  value: defaultValue,
+  value,
   align: cellAlign,
-  editable,
+  formatter,
+  onCellUpdate,
 }: CellProps) {
-  const [tempValue, setTempValue] = React.useState("" as CellValue);
-  const [value, setValue] = React.useState(defaultValue);
+  const [tempValue, setTempValue] = React.useState(null as string | null);
   const [editing, setEditing] = React.useState(false);
+  const [updateInProgress, setUpdateInProgress] = React.useState(false);
 
   const handleDblClick = (event: any) => {
-    if (!editable) {
+    if (updateInProgress || !onCellUpdate || editing) {
       return;
     }
     event.preventDefault();
     event.stopPropagation();
-    if (!editing) {
-      setTempValue(value);
-    }
-    setEditing(!editing);
+    setTempValue(value.toString());
+    setEditing(true);
   };
 
   const handleMouseDown = (event: any) => {
@@ -44,11 +66,34 @@ function Cell({
     }
   };
 
-  const handleBlur = () => {
-    if (editing) {
-      setTempValue("");
-      setEditing(false);
+  const cancelEdit = () => {
+    setEditing(false);
+    setTempValue(null);
+  };
+
+  const tryCommitChange = () => {
+    if (tempValue === null || tempValue === value) {
+      return;
     }
+
+    const result = tryParseNumber(tempValue);
+
+    if (result !== undefined) {
+      setUpdateInProgress(true);
+      onCellUpdate("cell-id", result).then(
+        ({ payload }: { payload: { error: string | null } }) => {
+          if (payload.error !== null) {
+          }
+          setTempValue(null);
+          setUpdateInProgress(false);
+        }
+      );
+    }
+  };
+
+  const handleBlur = () => {
+    tryCommitChange();
+    setEditing(false);
   };
 
   const handleKeyDown = (event: any) => {
@@ -56,44 +101,84 @@ function Cell({
       return;
     }
     if (event.key === "Enter") {
-      event.target.blur();
+      tryCommitChange();
+      setEditing(false);
     } else if (event.key === "Escape") {
-      setValue(tempValue);
-      event.target.blur();
+      cancelEdit();
     }
   };
 
   const handleChange = (event: any) => {
     if (editing) {
-      setValue(event.target.value);
+      switch (formatter) {
+        case Formatter.Currency: {
+          const result = tryParseNumber(event.target.value);
+          if (result !== undefined) {
+            setTempValue(event.target.value);
+          }
+          break;
+        }
+        case Formatter.Number: {
+          const result = tryParseNumber(event.target.value);
+          if (result !== undefined) {
+            setTempValue(event.target.value);
+          }
+          break;
+        }
+        default: {
+          setTempValue(event.target.value);
+          break;
+        }
+      }
     }
   };
 
   const align = cellAlign === CellAlign.Left ? "left" : "right";
 
+  function formatValue(input: CellValue): string {
+    let formattedValue: string;
+    if (input === undefined) {
+      return "";
+    }
+    switch (formatter) {
+      case Formatter.Currency: {
+        formattedValue = currency(input);
+        break;
+      }
+      case Formatter.Percent: {
+        formattedValue = percent(input);
+        break;
+      }
+      default: {
+        formattedValue = input.toString();
+        break;
+      }
+    }
+    return formattedValue;
+  }
+
+  const visibleValue = tempValue === null ? value : tempValue;
   return (
     <TableCell
       key={id}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDblClick}
       align={align}
-      sx={{
-        bgcolor: editing ? "primary.900" : "inherit",
-      }}
+      sx={{ color: updateInProgress ? "action.disabled" : "inherit" }}
     >
       {editing ? (
         <InputBase
           autoFocus
           fullWidth
-          placeholder={tempValue.toString()}
+          placeholder={visibleValue.toString()}
           onBlur={handleBlur}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          sx={{ "& input": { padding: 0 } }}
-          value={value}
+          sx={{ color: "primary.500", "& input": { padding: 0 } }}
+          value={visibleValue}
         />
       ) : (
-        <Typography>{value}</Typography>
+        <Typography>{formatValue(visibleValue)}</Typography>
       )}
     </TableCell>
   );
@@ -105,6 +190,13 @@ export interface Props {
   headers: HeadersData;
 }
 export function Row({ id, data, headers }: Props) {
+  const dispatch = useDispatch();
+
+  const handleCellUpdate = async (id: string, value: number) => {
+    console.log("handling cell update");
+    return dispatch(updateCellThunk({ value }));
+  };
+
   return (
     <TableRow key={id}>
       {headers.map((header) => {
@@ -116,7 +208,8 @@ export function Row({ id, data, headers }: Props) {
             id={key}
             value={value}
             align={header.align}
-            editable={header.editable}
+            formatter={header.formatter}
+            onCellUpdate={header.editable ? handleCellUpdate : undefined}
           />
         );
       })}

@@ -1,80 +1,91 @@
 // import React from "react";
 // import Box from "@mui/material/Box";
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 // import Typography from "@mui/material/Typography";
 // import Tabs from "@mui/material/Tabs";
 // import Tab from "@mui/material/Tab";
 // import { Component as Table, Props as TableProps } from "../components/Table";
-// import { PortfolioTableRow, preparePortfolioTableData } from "../../utils/portfolio";
-// import { Portfolio, getPortfolios, getUsers, getSession } from "../../store/account";
-// import { getAssetInfo, getWallets } from "../../store/oracle";
+import { TableContainer } from "../components/table/Contrainer";
+import { TableData, Formatter, CellAlign } from "../components/table/Data";
+import {
+  PortfolioTableRow,
+  preparePortfolioTableData,
+} from "../../utils/portfolio";
+import {
+  Portfolio,
+  getPortfolios,
+  getUsers,
+  getSession,
+} from "../../store/account";
+import { getAssetInfo, getWallets } from "../../store/oracle";
 // import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 // import { currency, percent } from "../../utils/formatters";
 
-// const tableMeta: TableProps["meta"] = {
-//   id: "portfolio",
-//   sort: {
-//     column: "value",
-//     direction: "desc",
-//   },
-//   nested: true,
-//   headers: [
-//     {
-//       label: "Name",
-//       id: "name",
-//       align: "left",
-//       width: 0.15,
-//       formatter: "symbol",
-//     },
-//     {
-//       label: "Price",
-//       id: "price",
-//       align: "left",
-//       width: "auto",
-//       formatter: "currency",
-//     },
-//     {
-//       label: "Wallet",
-//       id: "wallet",
-//       align: "right",
-//       width: 0.2,
-//     },
-//     {
-//       label: "Quantity",
-//       id: "quantity",
-//       align: "right",
-//       width: 0.1,
-//       formatter: "number",
-//       sensitive: true,
-//     },
-//     {
-//       label: "Yield",
-//       id: "yield",
-//       align: "right",
-//       width: 0.1,
-//       formatter: "percent",
-//       sensitive: true,
-//     },
-//     {
-//       label: "Value",
-//       id: "value",
-//       align: "right",
-//       width: 0.1,
-//       formatter: "currency",
-//       sensitive: true,
-//     },
-//   ],
-//   pager: true,
-//   header: true,
-//   outline: true,
-// };
+const tableMeta: TableData = {
+  name: "portfolio",
+  //   sort: {
+  //     column: "value",
+  //     direction: "desc",
+  //   },
+  //   nested: true,
+  headers: [
+    {
+      label: "Name",
+      key: "name",
+      align: CellAlign.Left,
+      width: "15%",
+      formatter: Formatter.Symbol,
+    },
+    {
+      label: "Price",
+      key: "price",
+      align: CellAlign.Left,
+      width: "auto",
+      formatter: Formatter.Currency,
+    },
+    //     {
+    //       label: "Wallet",
+    //       id: "wallet",
+    //       align: "right",
+    //       width: 0.2,
+    //     },
+    {
+      label: "Quantity",
+      key: "quantity",
+      align: CellAlign.Right,
+      width: "10%",
+      formatter: Formatter.Number,
+      editable: true,
+      /* sensitive: true, */
+    },
+    //     {
+    //       label: "Yield",
+    //       id: "yield",
+    //       align: "right",
+    //       width: 0.1,
+    //       formatter: "percent",
+    //       sensitive: true,
+    //     },
+    //     {
+    //       label: "Value",
+    //       id: "value",
+    //       align: "right",
+    //       width: 0.1,
+    //       formatter: "currency",
+    //       sensitive: true,
+    //     },
+  ],
+  //   pager: true,
+  //   header: true,
+  //   outline: true,
+};
 
 export function Portfolios() {
-  //   const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
-  //   const assetInfo = useSelector(getAssetInfo);
-  //   const wallets = useSelector(getWallets);
-  //   const users = useSelector(getUsers);
-  //   const session = useSelector(getSession);
+  const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
+  const assetInfo = useSelector(getAssetInfo);
+  const wallets = useSelector(getWallets);
+  const users = useSelector(getUsers);
+  const session = useSelector(getSession);
   //   const infoDisplayMode = useSelector(getInfoDisplayMode);
 
   //   const [pIdx, setpIdx] = React.useState(0);
@@ -120,6 +131,19 @@ export function Portfolios() {
   //     }
   //   }
 
+  const tableData = {
+    rows: [],
+    ...tableMeta,
+  };
+
+  if (Object.keys(portfolios).length > 0) {
+    const pid = Object.keys(portfolios)[5];
+    const data = preparePortfolioTableData(pid, portfolios, assetInfo, wallets);
+    if (data?.children) {
+      tableData.rows = data.children;
+    }
+  }
+
   //       <Box sx={{ display: "flex", flexDirection: "row" }}>
   //         <Box sx={{ flexGrow: 1 }}>
   //           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -137,5 +161,5 @@ export function Portfolios() {
   //         subHeaderRow={subHeaderRow}
   //         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
   //       />
-  return <></>;
+  return <TableContainer data={tableData} />;
 }

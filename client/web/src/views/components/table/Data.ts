@@ -4,6 +4,13 @@ export enum RowType {
   Asset,
   Portfolio,
 }
+
+export enum Formatter {
+  Percent,
+  Currency,
+  Symbol,
+  Number,
+}
 export interface RowData {
   cells: Record<string, CellValue>;
   children?: RowData[];
@@ -19,6 +26,7 @@ export interface HeaderData {
   key: string;
   width: string;
   align: CellAlign;
+  formatter?: Formatter;
   editable?: boolean;
 }
 
@@ -26,7 +34,7 @@ export type HeadersData = HeaderData[];
 export type RowsData = RowData[];
 
 export interface TableData {
-  id: string;
+  name: string;
   headers: HeadersData;
-  rows: RowsData;
+  rows?: RowsData;
 }
