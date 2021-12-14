@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
 import { useDispatch } from "react-redux";
 import { RowData, HeadersData, CellAlign, CellValue, Formatter } from "./Data";
-import { percent, currency } from "../../../utils/formatters";
+import { percent, currency, number } from "../../../utils/formatters";
 import { updateCellThunk } from "../../../store/account";
 
 interface CellProps {
@@ -147,6 +147,10 @@ function Cell({
       }
       case Formatter.Percent: {
         formattedValue = percent(input);
+        break;
+      }
+      case Formatter.Number: {
+        formattedValue = number(input);
         break;
       }
       default: {

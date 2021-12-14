@@ -11,11 +11,12 @@ export interface TabInfo {
 }
 
 interface Props {
+  page: string;
   tabs: TabInfo[];
   idx: number;
 }
 
-export function TabRow({ tabs, idx }: Props) {
+export function TabRow({ page, tabs, idx }: Props) {
   const handleSearch = () => {};
 
   return (
@@ -33,7 +34,7 @@ export function TabRow({ tabs, idx }: Props) {
           {tabs.map((tab) => (
             <Tab
               component={NavLink}
-              to={`/watchlists/${tab.id}`}
+              to={`/${page}/${tab.id}`}
               key={`tab-${tab.id}`}
               label={tab.label}
             />

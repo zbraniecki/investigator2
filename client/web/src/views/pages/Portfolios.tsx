@@ -1,12 +1,7 @@
-// import React from "react";
-// import Box from "@mui/material/Box";
 import { useSelector } from "react-redux";
-// import Typography from "@mui/material/Typography";
-// import Tabs from "@mui/material/Tabs";
-// import Tab from "@mui/material/Tab";
-// import { Component as Table, Props as TableProps } from "../components/Table";
+import { useParams } from "react-router-dom";
 import { TableContainer } from "../components/table/Contrainer";
-import { TableData, Formatter, CellAlign } from "../components/table/Data";
+import { TableData, Formatter, CellAlign, SortDirection } from "../components/table/Data";
 import {
   PortfolioTableRow,
   preparePortfolioTableData,
@@ -20,13 +15,16 @@ import {
 import { getAssetInfo, getWallets } from "../../store/oracle";
 // import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 // import { currency, percent } from "../../utils/formatters";
+import { TabRow, TabInfo } from "../components/Tabs";
 
 const tableMeta: TableData = {
   name: "portfolio",
-  //   sort: {
-  //     column: "value",
-  //     direction: "desc",
-  //   },
+  sort: [
+    {
+      column: "value",
+      direction: SortDirection.Desc,
+    },
+  ],
   //   nested: true,
   headers: [
     {
@@ -43,12 +41,12 @@ const tableMeta: TableData = {
       width: "auto",
       formatter: Formatter.Currency,
     },
-    //     {
-    //       label: "Wallet",
-    //       id: "wallet",
-    //       align: "right",
-    //       width: 0.2,
-    //     },
+     {
+       label: "Wallet",
+       key: "wallet",
+       align: CellAlign.Right,
+       width: "20%",
+     },
     {
       label: "Quantity",
       key: "quantity",
@@ -58,22 +56,22 @@ const tableMeta: TableData = {
       editable: true,
       /* sensitive: true, */
     },
-    //     {
-    //       label: "Yield",
-    //       id: "yield",
-    //       align: "right",
-    //       width: 0.1,
-    //       formatter: "percent",
-    //       sensitive: true,
-    //     },
-    //     {
-    //       label: "Value",
-    //       id: "value",
-    //       align: "right",
-    //       width: 0.1,
-    //       formatter: "currency",
-    //       sensitive: true,
-    //     },
+     {
+       label: "Yield",
+       key: "yield",
+       align: CellAlign.Right,
+       width: "10%",
+       formatter: Formatter.Percent,
+       /* sensitive: true, */
+     },
+     {
+       label: "Value",
+       key: "value",
+       align: CellAlign.Right,
+       width: "10%",
+       formatter: Formatter.Currency,
+       /* sensitive: true, */
+     },
   ],
   //   pager: true,
   //   header: true,
@@ -81,85 +79,47 @@ const tableMeta: TableData = {
 };
 
 export function Portfolios() {
+  const { id } = useParams();
+
   const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
   const assetInfo = useSelector(getAssetInfo);
   const wallets = useSelector(getWallets);
-  const users = useSelector(getUsers);
-  const session = useSelector(getSession);
-  //   const infoDisplayMode = useSelector(getInfoDisplayMode);
-
-  //   const [pIdx, setpIdx] = React.useState(0);
-  //   const handleChange = (event: any, newValue: any) => {
-  //     setpIdx(newValue);
-  //   };
-
-  //   let tableData: Array<PortfolioTableRow> = [];
-  //   let subHeaderRow: PortfolioTableRow | undefined;
-
-  //   let currentUser = session.username ? users[session.username] : undefined;
-  //   let plists = currentUser?.ui.portfolios || [];
-
-  //   let tabs: {id: string, name: string}[] = plists
-  //     .filter((pid: string) => {
-  //       return portfolios[pid] !== undefined;
-  //     })
-  //     .map((pid: string) => {
-  //       let portfolio = portfolios[pid];
-  //       return {
-  //         id: portfolio.id,
-  //         name: portfolio.name,
-  //       };
-  //     });
-
-  //   if (tabs.length >= pIdx + 1) {
-  //     const pid = tabs[pIdx].id;
-  //     let data = preparePortfolioTableData(
-  //       pid,
-  //       portfolios,
-  //       assetInfo,
-  //       wallets
-  //     );
-  //     if (data !== undefined) {
-  //       let { cells, children } = data;
-  //       if (children !== undefined) {
-  //         subHeaderRow = {
-  //           cells,
-  //           type: "asset",
-  //         };
-  //         tableData = children;
-  //       }
-  //     }
-  //   }
 
   const tableData = {
     rows: [],
     ...tableMeta,
   };
+  let tabs: TabInfo[] = [];
+  let tabIdx = 0;
 
   if (Object.keys(portfolios).length > 0) {
-    const pid = Object.keys(portfolios)[5];
-    const data = preparePortfolioTableData(pid, portfolios, assetInfo, wallets);
+    tabs = Object.values(portfolios).map((portfolio) => ({
+      id: portfolio.id,
+      label: portfolio.name,
+    }));
+
+    if (id) {
+      const idx = tabs.findIndex((tab) => tab.id === id);
+      tabIdx = idx === -1 ? 0 : idx;
+    }
+    const pid = tabs[tabIdx].id;
+
+    const data = preparePortfolioTableData(
+      pid,
+      portfolios,
+      assetInfo,
+      wallets,
+    );
+
     if (data?.children) {
       tableData.rows = data.children;
     }
   }
 
-  //       <Box sx={{ display: "flex", flexDirection: "row" }}>
-  //         <Box sx={{ flexGrow: 1 }}>
-  //           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-  //             <Tabs value={pIdx} onChange={handleChange}>
-  //               {tabs.map((tab) => (
-  //                 <Tab key={`tab-${tab.id}`} label={tab.name} />
-  //               ))}
-  //             </Tabs>
-  //           </Box>
-  //         </Box>
-  //       </Box>
-  //       <Table
-  //         meta={tableMeta}
-  //         data={tableData}
-  //         subHeaderRow={subHeaderRow}
-  //         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
-  //       />
-  return <TableContainer data={tableData} />;
+  return (
+    <>
+      <TabRow page="portfolios" tabs={tabs} idx={tabIdx} />
+      <TableContainer data={tableData} />
+    </>
+  );
 }

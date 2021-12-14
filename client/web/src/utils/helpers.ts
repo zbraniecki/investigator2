@@ -1,4 +1,4 @@
-import { DataRowProps, SymbolNameCell } from "../views/components/Table";
+import { RowData, RowsData, RowType } from "../views/components/table/Data";
 
 const CATCH_ALL_KEY = "?";
 
@@ -15,25 +15,22 @@ export enum GroupingStrategy {
 }
 
 function isSame(
-  a: SymbolNameCell | string | number | undefined,
-  b: SymbolNameCell | string | number | undefined
+  a: string | number | undefined,
+  b: string | number | undefined
 ): boolean {
   if (typeof a !== typeof b) {
     return false;
-  }
-  if (typeof a === "object" && typeof b === "object") {
-    return a.name === b.name && a.symbol === b.symbol;
   }
   return a === b;
 }
 
 function groupRows(
-  row: DataRowProps,
+  row: RowData,
   keyColumn: string,
-  grouped: Record<string, DataRowProps[]>,
+  grouped: Record<string, RowsData>,
   flattenPortfolios: boolean
 ) {
-  if (row.type === "portfolio" && flattenPortfolios) {
+  if (row.type === RowType.Portfolio && flattenPortfolios) {
     if (row.children !== undefined) {
       row.children.forEach((subRow) =>
         groupRows(subRow, keyColumn, grouped, flattenPortfolios)
@@ -48,9 +45,6 @@ function groupRows(
       }
       grouped[CATCH_ALL_KEY].push(row);
     } else {
-      if (typeof key === "object") {
-        key = `${key.name}/${key.symbol}`;
-      }
       if (!(key in grouped)) {
         grouped[key] = [];
       }
@@ -60,11 +54,11 @@ function groupRows(
 }
 
 export function groupTableDataByColumn2(
-  data: DataRowProps[],
+  data: RowsData,
   keyColumn: string,
   flattenPortfolios: boolean
-): Record<string, DataRowProps[]> {
-  const grouped: Record<string, DataRowProps[]> = {};
+): Record<string, RowsData> {
+  const grouped: Record<string, RowsData> = {};
 
   data.forEach((row) => groupRows(row, keyColumn, grouped, flattenPortfolios));
 
@@ -72,7 +66,7 @@ export function groupTableDataByColumn2(
 }
 
 export function computeGroupedTableData(
-  data: Record<string, DataRowProps[]>,
+  data: Record<string, RowsData>,
   columns: string[]
 ): Record<string, any> {
   const result: Record<string, Record<string, any>> = {};
@@ -89,14 +83,14 @@ export function computeGroupedTableData(
 }
 
 export function groupTableDataByColumn(
-  data: DataRowProps[],
+  data: RowsData,
   keyColumn: string,
   groupColumns: { key: string; strategy: GroupingStrategy }[],
   flattenPortfolios: boolean
-): DataRowProps[] {
+): RowsData {
   const grouped = groupTableDataByColumn2(data, keyColumn, flattenPortfolios);
 
-  const result: DataRowProps[] = Object.values(grouped).map((children) => {
+  const result: RowsData = Object.values(grouped).map((children) => {
     assert(children.length > 0);
     if (children.length === 1) {
       return children[0];
@@ -120,7 +114,7 @@ export function groupTableDataByColumn(
       return total + curr.cells.yield * perc;
     }, 0);
 
-    const cells: DataRowProps["cells"] = {
+    const cells: RowData["cells"] = {
       value: totalValue,
       yield: totalYield,
     };
@@ -140,10 +134,10 @@ export function groupTableDataByColumn(
           if (allSame && firstValue) {
             cells[groupColumn.key] = firstValue;
             children.forEach((child) => {
-              child.cells[groupColumn.key] = undefined;
+              delete child.cells[groupColumn.key];
             });
           } else {
-            cells[groupColumn.key] = undefined;
+            delete cells[groupColumn.key];
           }
           break;
         }
@@ -171,7 +165,7 @@ export function groupTableDataByColumn(
     return {
       cells,
       children,
-      type: "asset",
+      type: RowType.Asset,
     };
   });
 

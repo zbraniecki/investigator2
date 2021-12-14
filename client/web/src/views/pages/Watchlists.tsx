@@ -1,9 +1,7 @@
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-// import Typography from "@mui/material/Typography";
-// import { Component as Table, Props as TableProps } from "../components/Table";
 import { TableContainer } from "../components/table/Contrainer";
-import { TableData, Formatter, CellAlign } from "../components/table/Data";
+import { TableData, Formatter, CellAlign, SortDirection } from "../components/table/Data";
 import {
   prepareWatchlistTableData,
 } from "../../utils/watchlist";
@@ -24,10 +22,12 @@ import { TabRow, TabInfo } from "../components/Tabs";
 
 const tableMeta: TableData = {
   name: "watchlist",
-  // sort: {
-  //   column: "market_cap",
-  //   direction: "desc",
-  // },
+  sort: [
+    {
+      column: "market_cap",
+      direction: SortDirection.Desc,
+    },
+  ],
   // nested: false,
   headers: [
     {
@@ -98,15 +98,6 @@ export function Watchlists() {
     useSelector(getUserWatchlists);
   const assetInfo = useSelector(getAssetInfo);
   const portfolios = useSelector(getPortfolios);
-  //   const users = useSelector(getUsers);
-  //   const session = useSelector(getSession);
-  //   const infoDisplayMode = useSelector(getInfoDisplayMode);
-
-  //   const [wIdx, setwIdx] = React.useState(0);
-  //   const [searchQuery, setSearchQuery] = React.useState("");
-  //   const handleChange = (event: any, newValue: any) => {
-  //     setwIdx(newValue);
-  //   };
 
   const watchlists: Record<string, Watchlist> = {};
   for (const list of Object.values(publicWatchlists)) {
@@ -148,7 +139,7 @@ export function Watchlists() {
   }
   return (
     <>
-      <TabRow tabs={tabs} idx={tabIdx} />
+      <TabRow page="watchlists" tabs={tabs} idx={tabIdx} />
       <TableContainer data={tableData} />
     </>
   );

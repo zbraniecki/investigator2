@@ -5,6 +5,11 @@ export enum RowType {
   Portfolio,
 }
 
+export enum SortDirection {
+  Asc,
+  Desc,
+}
+
 export enum Formatter {
   Percent,
   Currency,
@@ -35,6 +40,10 @@ export type RowsData = RowData[];
 
 export interface TableData {
   name: string;
+  sort: {
+    column: string;
+    direction: SortDirection;
+  }[];
   headers: HeadersData;
   rows?: RowsData;
 }
