@@ -11,6 +11,7 @@ import { Portfolios } from "../pages/Portfolios";
 
 export interface MenuItem {
   id: string;
+  paths: string[];
   icon: React.ReactNode;
   element: React.ReactElement;
   default?: boolean;
@@ -24,11 +25,13 @@ const menuItems: Array<MenuItem> = [
   // },
   {
     id: "watchlists",
+    paths: ["watchlists", ":id"],
     icon: <TrendingUpIcon />,
     element: <Watchlists />,
   },
   {
     id: "portfolios",
+    paths: ["portfolios", ":id"],
     icon: <MonetizationOnIcon />,
     element: <Portfolios />,
   },

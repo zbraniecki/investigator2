@@ -20,7 +20,6 @@ export function App() {
   const session = useSelector(getSession);
   const assetInfo = useSelector(getAssetInfo);
 
-  console.log(session);
   useEffect(() => {
     console.log("in effect");
     if (session.token && session.username === undefined) {

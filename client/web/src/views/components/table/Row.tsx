@@ -137,7 +137,7 @@ function Cell({
 
   function formatValue(input: CellValue): string {
     let formattedValue: string;
-    if (input === undefined) {
+    if (input === undefined || input === null) {
       return "";
     }
     switch (formatter) {

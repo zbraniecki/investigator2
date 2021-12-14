@@ -1,14 +1,10 @@
-// import React from "react";
-// import Box from "@mui/material/Box";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 // import Typography from "@mui/material/Typography";
-// import Tabs from "@mui/material/Tabs";
-// import Tab from "@mui/material/Tab";
 // import { Component as Table, Props as TableProps } from "../components/Table";
 import { TableContainer } from "../components/table/Contrainer";
 import { TableData, Formatter, CellAlign } from "../components/table/Data";
 import {
-  WatchlistTableRow,
   prepareWatchlistTableData,
 } from "../../utils/watchlist";
 import {
@@ -24,7 +20,7 @@ import {
 } from "../../store/account";
 // import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 // import { percent } from "../../utils/formatters";
-// import { SearchInput } from "../components/Search";
+import { TabRow, TabInfo } from "../components/Tabs";
 
 const tableMeta: TableData = {
   name: "watchlist",
@@ -38,7 +34,7 @@ const tableMeta: TableData = {
       label: "#",
       key: "market_cap_rank",
       align: CellAlign.Right,
-      width: "10%",
+      width: "80px",
     },
     {
       label: "Name",
@@ -94,6 +90,8 @@ const tableMeta: TableData = {
 };
 
 export function Watchlists() {
+  const { id } = useParams();
+
   const publicWatchlists: Record<string, Watchlist> =
     useSelector(getPublicWatchlists);
   const userWatchlists: Record<string, Watchlist> =
@@ -122,9 +120,21 @@ export function Watchlists() {
     rows: [],
     ...tableMeta,
   };
+  let tabs: TabInfo[] = [];
+  let tabIdx = 0;
 
   if (Object.keys(watchlists).length > 0) {
-    const wid = Object.keys(watchlists)[0];
+    tabs = Object.values(watchlists).map((watchlist) => ({
+      id: watchlist.id,
+      label: watchlist.name,
+    }));
+
+    if (id) {
+      const idx = tabs.findIndex((tab) => tab.id === id);
+      tabIdx = idx === -1 ? 0 : idx;
+    }
+    const wid = tabs[tabIdx].id;
+
     const data = prepareWatchlistTableData(
       wid,
       watchlists,
@@ -136,76 +146,10 @@ export function Watchlists() {
       tableData.rows = data.children;
     }
   }
-  //   let tableData: Array<WatchlistTableRow> = [];
-  //   let subHeaderRow: WatchlistTableRow | undefined;
-
-  //   let tabs: {id: string, name: string}[] = [];
-  //   if (session.username) {
-  //     let currentUser = users[session.username];
-  //     tabs = currentUser.ui.watchlists
-  //     .filter((wid: string) => {
-  //       return watchlists[wid] !== undefined;
-  //     })
-  //     .map((wid: string) => {
-  //       let watchlist = watchlists[wid];
-  //       return {
-  //         id: watchlist.id,
-  //         name: watchlist.name,
-  //       };
-  //     });
-  //   } else {
-  //     tabs = Object.values(watchlists)
-  //       .map(wlist => {
-  //         return {
-  //           id: wlist.id,
-  //           name: wlist.name,
-  //         };
-  //       });
-  //   }
-
-  //   if (tabs.length >= wIdx + 1) {
-  //     const wid = tabs[wIdx].id;
-  //     let data = prepareWatchlistTableData(
-  //       wid,
-  //       watchlists,
-  //       assetInfo,
-  //       portfolios
-  //     );
-  //     if (data !== undefined) {
-  //       let { cells, children } = data;
-  //       if (children !== undefined) {
-  //         subHeaderRow = {
-  //           cells,
-  //           type: "asset",
-  //         };
-  //         tableData = children;
-  //       }
-  //     }
-  //   }
-
-  //   const handleSearch = (event: any) => {
-  //   console.log(event);
-  //     setSearchQuery(event.target.value);
-  //   };
-
-  //       <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
-  //         <Box sx={{ flex: 1 }}>
-  //           <Box>
-  //             <Tabs value={wIdx} onChange={handleChange}>
-  //               {tabs.map((tab) => (
-  //                 <Tab key={`tab-${tab.id}`} label={tab.name} />
-  //               ))}
-  //             </Tabs>
-  //           </Box>
-  //         </Box>
-  //         <SearchInput handleChange={handleSearch} />
-  //       </Box>
-  //       <Table
-  //         meta={tableMeta}
-  //         data={tableData}
-  //         subHeaderRow={subHeaderRow}
-  //         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
-  //         searchQuery={searchQuery}
-  //       />
-  return <TableContainer data={tableData} />;
+  return (
+    <>
+      <TabRow tabs={tabs} idx={tabIdx} />
+      <TableContainer data={tableData} />
+    </>
+  );
 }

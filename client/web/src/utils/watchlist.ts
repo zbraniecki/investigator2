@@ -1,11 +1,8 @@
 import { AssetInfo, Watchlist } from "../store/oracle";
 import { Portfolio } from "../store/account";
 import { assert } from "./helpers";
-/* import { DataRowProps, SymbolNameCell } from "../views/components/Table"; */
 import {
-  TableData,
   RowData,
-  CellAlign,
   RowType,
 } from "../views/components/table/Data";
 
