@@ -8,6 +8,8 @@ from investigator.oracle.models import (
     PassiveType,
     PassiveChange,
     PassiveChangeType,
+    Category,
+    Tag
 )
 
 from investigator.profile.models import (
@@ -217,6 +219,9 @@ def upload_portfolio_data(data, dt, dry=False):
     parsed_toml = toml.loads(data)
     inputs = parsed_toml["holding"]
 
+    asset_class = Category.objects.get(name="asset_class")
+    crypto_tag = Tag.objects.get(name="crypto", category__in=[asset_class])
+
     input_accounts = {}
     current_accounts = {}
 
@@ -243,7 +248,9 @@ def upload_portfolio_data(data, dt, dry=False):
         name = account.service.provider.name.lower()
         current_accounts[name] = {}
 
-        holdings = account.holdings.all()
+        holdings = account.holdings.filter(
+            asset__tags__in=[crypto_tag]
+        )
         for holding in holdings:
             symbol = holding.asset.symbol.lower()
             if symbol not in current_accounts[name]:
