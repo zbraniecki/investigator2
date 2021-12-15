@@ -38,7 +38,7 @@ function groupRows(
       row.children = undefined;
     }
   } else {
-    let key = row.cells[keyColumn];
+    const key = row.cells[keyColumn];
     if (key === undefined) {
       if (!(CATCH_ALL_KEY in grouped)) {
         grouped[CATCH_ALL_KEY] = [];

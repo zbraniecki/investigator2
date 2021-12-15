@@ -4,10 +4,7 @@ import { Portfolio } from "../store/account";
 import { AssetInfo, Wallet } from "../store/oracle";
 import { getWalletAsset } from "./wallet";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
-import {
-  RowData,
-  RowType,
-} from "../views/components/table/Data";
+import { RowData, RowType } from "../views/components/table/Data";
 
 export interface PortfolioTableRow extends RowData {
   cells: {
@@ -170,19 +167,19 @@ export function preparePortfolioTableData(
     wallets,
     true
   );
-   if (data.children !== undefined) {
-     data.children = groupTableDataByColumn(
-       data.children,
-       "id",
-       [
-         { key: "name", strategy: GroupingStrategy.IfSame },
-         { key: "price", strategy: GroupingStrategy.IfSame },
-         { key: "wallet", strategy: GroupingStrategy.IfSame },
-         { key: "yield", strategy: GroupingStrategy.IfSame },
-         { key: "quantity", strategy: GroupingStrategy.Sum },
-       ],
-       false
-     ) as PortfolioTableRow[];
+  if (data.children !== undefined) {
+    data.children = groupTableDataByColumn(
+      data.children,
+      "id",
+      [
+        { key: "name", strategy: GroupingStrategy.IfSame },
+        { key: "price", strategy: GroupingStrategy.IfSame },
+        { key: "wallet", strategy: GroupingStrategy.IfSame },
+        { key: "yield", strategy: GroupingStrategy.IfSame },
+        { key: "quantity", strategy: GroupingStrategy.Sum },
+      ],
+      false
+    ) as PortfolioTableRow[];
   }
 
   return data;

@@ -1,10 +1,13 @@
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { TableContainer } from "../components/table/Contrainer";
-import { TableData, Formatter, CellAlign, SortDirection } from "../components/table/Data";
 import {
-  prepareWatchlistTableData,
-} from "../../utils/watchlist";
+  TableData,
+  Formatter,
+  CellAlign,
+  SortDirection,
+} from "../components/table/Data";
+import { prepareWatchlistTableData } from "../../utils/watchlist";
 import {
   getAssetInfo,
   getWatchlists as getPublicWatchlists,
@@ -13,11 +16,10 @@ import {
 import {
   getPortfolios,
   getWatchlists as getUserWatchlists,
-  //   getUsers,
-  //   getSession,
+  getUsers,
+  getSession,
 } from "../../store/account";
 // import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
-// import { percent } from "../../utils/formatters";
 import { TabRow, TabInfo } from "../components/Tabs";
 
 const tableMeta: TableData = {
@@ -98,13 +100,17 @@ export function Watchlists() {
     useSelector(getUserWatchlists);
   const assetInfo = useSelector(getAssetInfo);
   const portfolios = useSelector(getPortfolios);
+  const users = useSelector(getUsers);
+  const session = useSelector(getSession);
 
   const watchlists: Record<string, Watchlist> = {};
   for (const list of Object.values(publicWatchlists)) {
     watchlists[list.id] = list;
   }
-  for (const list of Object.values(userWatchlists)) {
-    watchlists[list.id] = list;
+  if (session.username) {
+    for (const list of Object.values(userWatchlists)) {
+      watchlists[list.id] = list;
+    }
   }
 
   const tableData = {
@@ -115,10 +121,19 @@ export function Watchlists() {
   let tabIdx = 0;
 
   if (Object.keys(watchlists).length > 0) {
-    tabs = Object.values(watchlists).map((watchlist) => ({
-      id: watchlist.id,
-      label: watchlist.name,
-    }));
+    const wids: string[] = session.username
+      ? users[session.username].ui.watchlists
+      : Object.keys(watchlists);
+
+    tabs = wids
+      .filter((wid) => wid in watchlists)
+      .map((wid) => {
+        const watchlist = watchlists[wid];
+        return {
+          id: watchlist.id,
+          label: watchlist.name,
+        };
+      });
 
     if (id) {
       const idx = tabs.findIndex((tab) => tab.id === id);

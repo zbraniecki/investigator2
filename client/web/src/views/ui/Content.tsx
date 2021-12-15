@@ -18,20 +18,20 @@ export default function Content({ menuItems }: Props) {
     >
       <Routes>
         {menuItems.map((item) => (
-            <Route
-              key={`route-${item.id}-${item.paths[0]}`}
-              path={item.paths[0]}
-              element={item.element}
-            >
-              {item.paths.slice(1).map((path) => (
-                <Route
-                  key={`route-${item.id}-${path}`}
-                  path={path}
-                  element={item.element}
-                />
-              ))}
-            </Route>
-          ))}
+          <Route
+            key={`route-${item.id}-${item.paths[0]}`}
+            path={item.paths[0]}
+            element={item.element}
+          >
+            {item.paths.slice(1).map((path) => (
+              <Route
+                key={`route-${item.id}-${path}`}
+                path={path}
+                element={item.element}
+              />
+            ))}
+          </Route>
+        ))}
       </Routes>
     </Box>
   );

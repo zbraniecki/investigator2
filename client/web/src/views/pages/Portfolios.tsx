@@ -1,11 +1,13 @@
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { TableContainer } from "../components/table/Contrainer";
-import { TableData, Formatter, CellAlign, SortDirection } from "../components/table/Data";
 import {
-  PortfolioTableRow,
-  preparePortfolioTableData,
-} from "../../utils/portfolio";
+  TableData,
+  Formatter,
+  CellAlign,
+  SortDirection,
+} from "../components/table/Data";
+import { preparePortfolioTableData } from "../../utils/portfolio";
 import {
   Portfolio,
   getPortfolios,
@@ -14,7 +16,6 @@ import {
 } from "../../store/account";
 import { getAssetInfo, getWallets } from "../../store/oracle";
 // import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
-// import { currency, percent } from "../../utils/formatters";
 import { TabRow, TabInfo } from "../components/Tabs";
 
 const tableMeta: TableData = {
@@ -41,12 +42,12 @@ const tableMeta: TableData = {
       width: "auto",
       formatter: Formatter.Currency,
     },
-     {
-       label: "Wallet",
-       key: "wallet",
-       align: CellAlign.Right,
-       width: "20%",
-     },
+    {
+      label: "Wallet",
+      key: "wallet",
+      align: CellAlign.Right,
+      width: "20%",
+    },
     {
       label: "Quantity",
       key: "quantity",
@@ -56,22 +57,22 @@ const tableMeta: TableData = {
       editable: true,
       /* sensitive: true, */
     },
-     {
-       label: "Yield",
-       key: "yield",
-       align: CellAlign.Right,
-       width: "10%",
-       formatter: Formatter.Percent,
-       /* sensitive: true, */
-     },
-     {
-       label: "Value",
-       key: "value",
-       align: CellAlign.Right,
-       width: "10%",
-       formatter: Formatter.Currency,
-       /* sensitive: true, */
-     },
+    {
+      label: "Yield",
+      key: "yield",
+      align: CellAlign.Right,
+      width: "10%",
+      formatter: Formatter.Percent,
+      /* sensitive: true, */
+    },
+    {
+      label: "Value",
+      key: "value",
+      align: CellAlign.Right,
+      width: "10%",
+      formatter: Formatter.Currency,
+      /* sensitive: true, */
+    },
   ],
   //   pager: true,
   //   header: true,
@@ -84,6 +85,8 @@ export function Portfolios() {
   const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
   const assetInfo = useSelector(getAssetInfo);
   const wallets = useSelector(getWallets);
+  const users = useSelector(getUsers);
+  const session = useSelector(getSession);
 
   const tableData = {
     rows: [],
@@ -93,10 +96,18 @@ export function Portfolios() {
   let tabIdx = 0;
 
   if (Object.keys(portfolios).length > 0) {
-    tabs = Object.values(portfolios).map((portfolio) => ({
-      id: portfolio.id,
-      label: portfolio.name,
-    }));
+    const currentUser = session.username ? users[session.username] : undefined;
+    const plists: string[] = currentUser?.ui.portfolios || [];
+
+    tabs = plists
+      .filter((pid) => pid in portfolios)
+      .map((pid) => {
+        const portfolio = portfolios[pid];
+        return {
+          id: portfolio.id,
+          label: portfolio.name,
+        };
+      });
 
     if (id) {
       const idx = tabs.findIndex((tab) => tab.id === id);
@@ -104,12 +115,7 @@ export function Portfolios() {
     }
     const pid = tabs[tabIdx].id;
 
-    const data = preparePortfolioTableData(
-      pid,
-      portfolios,
-      assetInfo,
-      wallets,
-    );
+    const data = preparePortfolioTableData(pid, portfolios, assetInfo, wallets);
 
     if (data?.children) {
       tableData.rows = data.children;
