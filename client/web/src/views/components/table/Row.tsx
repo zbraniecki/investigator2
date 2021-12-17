@@ -203,20 +203,22 @@ export function Row({ id, data, headers }: Props) {
 
   return (
     <TableRow key={id}>
-      {headers.map((header) => {
-        const key = `${id}-${header.key}`;
-        const value = data.cells[header.key];
-        return (
-          <Cell
-            key={key}
-            id={key}
-            value={value}
-            align={header.align}
-            formatter={header.formatter}
-            onCellUpdate={header.editable ? handleCellUpdate : undefined}
-          />
-        );
-      })}
+      {headers
+        .filter((header) => header.visible)
+        .map((header) => {
+          const key = `${id}-${header.key}`;
+          const value = data.cells[header.key];
+          return (
+            <Cell
+              key={key}
+              id={key}
+              value={value}
+              align={header.align}
+              formatter={header.formatter}
+              onCellUpdate={header.editable ? handleCellUpdate : undefined}
+            />
+          );
+        })}
     </TableRow>
   );
 }

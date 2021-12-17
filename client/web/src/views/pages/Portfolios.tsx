@@ -20,57 +20,64 @@ import { TabRow, TabInfo } from "../components/Tabs";
 
 const tableMeta: TableData = {
   name: "portfolio",
-  sort: [
-    {
-      column: "value",
-      direction: SortDirection.Desc,
-    },
-  ],
+  sortColumns: ["value"],
   //   nested: true,
   headers: [
     {
       label: "Name",
       key: "name",
       align: CellAlign.Left,
+      sort: SortDirection.Asc,
       width: "15%",
       formatter: Formatter.Symbol,
+      visible: true,
     },
     {
       label: "Price",
       key: "price",
       align: CellAlign.Left,
+      sort: SortDirection.Desc,
       width: "auto",
       formatter: Formatter.Currency,
+      visible: true,
     },
     {
       label: "Wallet",
       key: "wallet",
       align: CellAlign.Right,
+      sort: SortDirection.Asc,
       width: "20%",
+      visible: true,
     },
     {
       label: "Quantity",
       key: "quantity",
       align: CellAlign.Right,
+      sort: SortDirection.Desc,
       width: "10%",
       formatter: Formatter.Number,
       editable: true,
+      visible: true,
       /* sensitive: true, */
     },
     {
       label: "Yield",
       key: "yield",
       align: CellAlign.Right,
+      sort: SortDirection.Desc,
       width: "10%",
       formatter: Formatter.Percent,
+      visible: true,
       /* sensitive: true, */
     },
     {
       label: "Value",
       key: "value",
       align: CellAlign.Right,
+      sort: SortDirection.Desc,
       width: "10%",
       formatter: Formatter.Currency,
+      visible: true,
       /* sensitive: true, */
     },
   ],

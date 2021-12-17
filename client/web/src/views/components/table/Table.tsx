@@ -1,46 +1,86 @@
+import React from "react";
 import MUITable from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableHead from "@mui/material/TableHead";
 import { Row } from "./Row";
 import { HeaderRow } from "./Header";
-import { TableData } from "./Data";
+import {
+  TableData,
+  SortColumn,
+  SortDirection,
+  HeadersData,
+  HeaderData,
+} from "./Data";
 import { assert } from "../../../utils/helpers";
 
-function sortFunc(
-  orderBy: string[],
-  sortDirection: any,
-  a: any,
-  b: any
-): number {
-  const orderKey = orderBy[0];
-  assert(orderKey);
+function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
+  const sortColumn = sortColumns[0];
+  assert(sortColumn);
 
-  const bottom = sortDirection === "asc" ? Infinity : -Infinity;
+  const bottom =
+    sortColumn.direction === SortDirection.Asc ? Infinity : -Infinity;
 
-  let aval = a.cells[orderKey];
-  if (aval === undefined || aval === null || a.type === "catch-all") {
+  let aval = a.cells[sortColumn.column];
+  if (aval === undefined || aval === null) {
     aval = bottom;
   }
-  let bval = b.cells[orderKey];
-  if (bval === undefined || bval === null || b.type === "catch-all") {
+  let bval = b.cells[sortColumn.column];
+  if (bval === undefined || bval === null) {
     bval = bottom;
   }
-  if (aval === bval && orderBy.length > 1) {
-    return sortFunc(orderBy.slice(1), sortDirection, a, b);
+
+  const sign = sortColumn.direction === SortDirection.Asc ? 1 : -1;
+
+  if (aval < bval) {
+    return -1 * sign;
   }
 
-  if (sortDirection === "asc") {
-    return aval - bval;
+  if (aval > bval) {
+    return 1 * sign;
   }
-  return bval - aval;
+
+  if (sortColumns.length > 1) {
+    return sortFunc(sortColumns.slice(1), a, b);
+  }
+
+  return 0;
 }
 export interface Props {
   data: TableData;
 }
 
+function findColumn(key: string, headers: HeadersData): HeaderData | undefined {
+  for (const header of headers) {
+    if (header.key === key) {
+      return header;
+    }
+  }
+  return undefined;
+}
+
 export function Table({ data }: Props) {
+  const [customSortOrder, setCustomSortOrder] = React.useState(
+    undefined as undefined | SortColumn
+  );
+
+  const sortOrder: SortColumn[] = [];
+
+  for (const column of data.sortColumns) {
+    const header = findColumn(column, data.headers);
+    if (header !== undefined) {
+      sortOrder.push({
+        column,
+        direction: header.sort,
+      });
+    }
+  }
+
+  if (customSortOrder !== undefined) {
+    sortOrder.unshift(customSortOrder);
+  }
+
   if (data.rows) {
-    data.rows.sort(sortFunc.bind(undefined, ["value", "current"], "desc"));
+    data.rows.sort(sortFunc.bind(undefined, sortOrder));
   }
 
   return (
@@ -54,7 +94,11 @@ export function Table({ data }: Props) {
             "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
         }}
       >
-        <HeaderRow data={data} />
+        <HeaderRow
+          data={data}
+          sortOrder={sortOrder}
+          setCustomSortOrder={setCustomSortOrder}
+        />
       </TableHead>
       <TableBody>
         {data.rows?.map((row, idx) => {

@@ -6,8 +6,8 @@ export enum RowType {
 }
 
 export enum SortDirection {
-  Asc,
-  Desc,
+  Asc = "asc",
+  Desc = "desc",
 }
 
 export enum Formatter {
@@ -31,19 +31,23 @@ export interface HeaderData {
   key: string;
   width: string;
   align: CellAlign;
+  sort: SortDirection;
   formatter?: Formatter;
   editable?: boolean;
+  visible?: boolean;
 }
 
 export type HeadersData = HeaderData[];
 export type RowsData = RowData[];
 
+export interface SortColumn {
+  column: string;
+  direction: SortDirection;
+}
+
 export interface TableData {
   name: string;
-  sort: {
-    column: string;
-    direction: SortDirection;
-  }[];
+  sortColumns: string[];
   headers: HeadersData;
   rows?: RowsData;
 }

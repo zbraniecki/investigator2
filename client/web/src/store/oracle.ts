@@ -82,11 +82,17 @@ export const oracleSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchAssetInfoThunk.fulfilled, (state, action) => {
+      let lastUpdated = null;
       for (const item of action.payload) {
         if (item.info.last_updated) {
-          state.assetUpdated = item.info.last_updated;
-          break;
+          if (lastUpdated === null || lastUpdated < item.info.last_updated) {
+            lastUpdated = item.info.last_updated;
+          }
         }
+      }
+
+      if (lastUpdated !== null) {
+        state.assetUpdated = lastUpdated;
       }
       state.assets = {};
       for (const item of action.payload) {

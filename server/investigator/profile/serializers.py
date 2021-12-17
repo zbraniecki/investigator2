@@ -9,7 +9,7 @@ from .models import (
     WatchlistUI,
     User,
 )
-from investigator.oracle.models import Tag
+from investigator.oracle.models import Asset, Tag
 from investigator.strategy.models import StrategyUI
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -97,8 +97,17 @@ class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
         return "dynamic"
 
     def get_assets(self, obj):
+        user = self.context["request"].user
+
         if obj.type == WatchlistType.DYNAMIC:
             return get_dynamic_assets(obj.dynamic)
+        if obj.type == WatchlistType.TAG:
+            tag = obj.tag
+            assets = Asset.objects.filter(
+                tags__in=[tag],
+                holding__account__owner=user
+            )
+            return [asset.id for asset in assets]
         else:
             return []
 
