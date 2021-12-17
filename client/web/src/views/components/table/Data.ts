@@ -18,7 +18,7 @@ export enum Formatter {
 }
 export interface RowData {
   cells: Record<string, CellValue>;
-  children?: RowData[];
+  children?: RowsData;
   type: RowType;
 }
 

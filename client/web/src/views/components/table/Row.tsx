@@ -3,15 +3,21 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
+import IconButton from "@mui/material/IconButton";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import Collapse from "@mui/material/Collapse";
 import { useDispatch } from "react-redux";
-import { RowData, HeadersData, CellAlign, CellValue, Formatter } from "./Data";
+import { RowData, TableData, CellAlign, CellValue, Formatter } from "./Data";
 import { percent, currency, number } from "../../../utils/formatters";
 import { updateCellThunk } from "../../../store/account";
+import { Table } from "./Table";
 
 interface CellProps {
   id: string;
   value: CellValue;
   align: CellAlign;
+  width: string;
   formatter?: Formatter;
   onCellUpdate?: any;
 }
@@ -43,6 +49,7 @@ function Cell({
   id,
   value,
   align: cellAlign,
+  width,
   formatter,
   onCellUpdate,
 }: CellProps) {
@@ -168,7 +175,7 @@ function Cell({
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDblClick}
       align={align}
-      sx={{ color: updateInProgress ? "action.disabled" : "inherit" }}
+      sx={{ color: updateInProgress ? "action.disabled" : "inherit", width }}
     >
       {editing ? (
         <InputBase
@@ -191,9 +198,12 @@ function Cell({
 export interface Props {
   id: string;
   data: RowData;
-  headers: HeadersData;
+  tableData: TableData;
+  nested: boolean;
 }
-export function Row({ id, data, headers }: Props) {
+export function Row({ id, data, tableData, nested }: Props) {
+  const [open, setOpen] = React.useState(false);
+
   const dispatch = useDispatch();
 
   const handleCellUpdate = async (id: string, value: number) => {
@@ -202,23 +212,60 @@ export function Row({ id, data, headers }: Props) {
   };
 
   return (
-    <TableRow key={id}>
-      {headers
-        .filter((header) => header.visible)
-        .map((header) => {
-          const key = `${id}-${header.key}`;
-          const value = data.cells[header.key];
-          return (
-            <Cell
-              key={key}
-              id={key}
-              value={value}
-              align={header.align}
-              formatter={header.formatter}
-              onCellUpdate={header.editable ? handleCellUpdate : undefined}
-            />
-          );
-        })}
-    </TableRow>
+    <>
+      <TableRow key={id}>
+        {nested && (
+          <TableCell sx={{ width: "66px" }}>
+            {data.children && (
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => setOpen(!open)}
+              >
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            )}
+          </TableCell>
+        )}
+        {tableData.headers
+          .filter((header) => header.visible)
+          .map((header) => {
+            const key = `${id}-${header.key}`;
+            const value = data.cells[header.key];
+            return (
+              <Cell
+                key={key}
+                id={key}
+                value={value}
+                align={header.align}
+                width={header.width}
+                formatter={header.formatter}
+                onCellUpdate={header.editable ? handleCellUpdate : undefined}
+              />
+            );
+          })}
+      </TableRow>
+      {data.children && (
+        <TableRow>
+          <TableCell
+            style={{ padding: 0 }}
+            colSpan={tableData.headers.length + 1}
+          >
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Table
+                data={{
+                  name: `${id}-sub`,
+                  sortColumns: tableData.sortColumns,
+                  headers: tableData.headers,
+                  rows: data.children,
+                }}
+                headers={false}
+                nested={nested}
+              />
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   );
 }

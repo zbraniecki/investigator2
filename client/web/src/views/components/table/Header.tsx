@@ -98,13 +98,27 @@ export interface Props {
   data: TableData;
   sortOrder: SortColumn[];
   setCustomSortOrder: any;
+  nested: boolean;
 }
 
-export function HeaderRow({ data, sortOrder, setCustomSortOrder }: Props) {
+export function HeaderRow({
+  data,
+  sortOrder,
+  setCustomSortOrder,
+  nested,
+}: Props) {
   const sort = sortOrder.length > 0 ? sortOrder[0] : undefined;
 
   return (
     <TableRow>
+      {nested && (
+        <TableCell
+          sx={{
+            borderBottom: 0,
+            width: "66px",
+          }}
+        />
+      )}
       {data.headers
         .filter((header) => header.visible)
         .map((header: any) => {

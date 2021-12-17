@@ -8,12 +8,14 @@ export interface Props {
 }
 
 export function TableContainer({ data }: Props) {
+  const nested = Boolean(data.rows?.some((row) => row.children));
+
   return (
     <MUITableContainer
       component={Paper}
       sx={{ height: "100%", overflowY: "auto" }}
     >
-      <Table data={data} />
+      <Table data={data} headers nested={nested} />
     </MUITableContainer>
   );
 }

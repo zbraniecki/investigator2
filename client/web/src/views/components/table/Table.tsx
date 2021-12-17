@@ -47,6 +47,8 @@ function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
 }
 export interface Props {
   data: TableData;
+  headers: boolean;
+  nested: boolean;
 }
 
 function findColumn(key: string, headers: HeadersData): HeaderData | undefined {
@@ -58,7 +60,7 @@ function findColumn(key: string, headers: HeadersData): HeaderData | undefined {
   return undefined;
 }
 
-export function Table({ data }: Props) {
+export function Table({ data, headers, nested }: Props) {
   const [customSortOrder, setCustomSortOrder] = React.useState(
     undefined as undefined | SortColumn
   );
@@ -85,25 +87,30 @@ export function Table({ data }: Props) {
 
   return (
     <MUITable>
-      <TableHead
-        sx={{
-          position: "sticky",
-          top: 0,
-          bgcolor: "background.paper",
-          backgroundImage:
-            "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
-        }}
-      >
-        <HeaderRow
-          data={data}
-          sortOrder={sortOrder}
-          setCustomSortOrder={setCustomSortOrder}
-        />
-      </TableHead>
+      {headers && (
+        <TableHead
+          sx={{
+            position: "sticky",
+            top: 0,
+            bgcolor: "background.paper",
+            backgroundImage:
+              "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
+          }}
+        >
+          <HeaderRow
+            data={data}
+            sortOrder={sortOrder}
+            setCustomSortOrder={setCustomSortOrder}
+            nested={nested}
+          />
+        </TableHead>
+      )}
       <TableBody>
         {data.rows?.map((row, idx) => {
           const id = `${data.name}-row-${idx}`;
-          return <Row id={id} key={id} data={row} headers={data.headers} />;
+          return (
+            <Row id={id} key={id} data={row} tableData={data} nested={nested} />
+          );
         })}
       </TableBody>
     </MUITable>
