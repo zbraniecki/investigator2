@@ -166,6 +166,7 @@ export function Watchlists() {
     );
 
     if (data?.children) {
+      tableData.summary = data.cells;
       tableData.rows = data.children;
     }
   }

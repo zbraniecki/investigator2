@@ -126,6 +126,7 @@ export function Portfolios() {
 
     if (data?.children) {
       tableData.rows = data.children;
+      tableData.summary = data.cells;
     }
   }
 

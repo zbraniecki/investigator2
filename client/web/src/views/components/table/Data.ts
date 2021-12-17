@@ -1,3 +1,5 @@
+import { percent, currency, number } from "../../../utils/formatters";
+
 export type CellValue = string | number;
 
 export enum RowType {
@@ -23,8 +25,8 @@ export interface RowData {
 }
 
 export enum CellAlign {
-  Left,
-  Right,
+  Left = "left",
+  Right = "right",
 }
 export interface HeaderData {
   label: string;
@@ -48,6 +50,40 @@ export interface SortColumn {
 export interface TableData {
   name: string;
   sortColumns: string[];
+  summary?: Record<string, CellValue>;
   headers: HeadersData;
   rows?: RowsData;
+}
+
+export function formatValue(
+  input: CellValue | undefined,
+  formatter: Formatter | undefined
+): string {
+  if (input === undefined) {
+    return "";
+  }
+
+  let formattedValue: string;
+  if (input === undefined || input === null) {
+    return "";
+  }
+  switch (formatter) {
+    case Formatter.Currency: {
+      formattedValue = currency(input);
+      break;
+    }
+    case Formatter.Percent: {
+      formattedValue = percent(input);
+      break;
+    }
+    case Formatter.Number: {
+      formattedValue = number(input);
+      break;
+    }
+    default: {
+      formattedValue = input.toString();
+      break;
+    }
+  }
+  return formattedValue;
 }

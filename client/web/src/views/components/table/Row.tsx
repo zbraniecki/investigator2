@@ -8,8 +8,14 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
 import { useDispatch } from "react-redux";
-import { RowData, TableData, CellAlign, CellValue, Formatter } from "./Data";
-import { percent, currency, number } from "../../../utils/formatters";
+import {
+  RowData,
+  TableData,
+  CellAlign,
+  CellValue,
+  Formatter,
+  formatValue,
+} from "./Data";
 import { updateCellThunk } from "../../../store/account";
 import { Table } from "./Table";
 
@@ -142,32 +148,6 @@ function Cell({
 
   const align = cellAlign === CellAlign.Left ? "left" : "right";
 
-  function formatValue(input: CellValue): string {
-    let formattedValue: string;
-    if (input === undefined || input === null) {
-      return "";
-    }
-    switch (formatter) {
-      case Formatter.Currency: {
-        formattedValue = currency(input);
-        break;
-      }
-      case Formatter.Percent: {
-        formattedValue = percent(input);
-        break;
-      }
-      case Formatter.Number: {
-        formattedValue = number(input);
-        break;
-      }
-      default: {
-        formattedValue = input.toString();
-        break;
-      }
-    }
-    return formattedValue;
-  }
-
   const visibleValue = tempValue === null ? value : tempValue;
   return (
     <TableCell
@@ -189,7 +169,7 @@ function Cell({
           value={visibleValue}
         />
       ) : (
-        <Typography>{formatValue(visibleValue)}</Typography>
+        <Typography>{formatValue(visibleValue, formatter)}</Typography>
       )}
     </TableCell>
   );

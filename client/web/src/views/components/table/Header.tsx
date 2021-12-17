@@ -4,13 +4,21 @@ import TableCell, {
   SortDirection as MUISortDirection,
 } from "@mui/material/TableCell";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import { TableData, CellAlign, SortColumn, SortDirection } from "./Data";
+import {
+  TableData,
+  CellAlign,
+  CellValue,
+  SortColumn,
+  SortDirection,
+  Formatter,
+  formatValue,
+} from "./Data";
 
 interface CellProps {
   id: string;
   columnName: string;
   width: string;
-  value: string;
+  value?: CellValue;
   align: CellAlign;
   defaultSortDirection: SortDirection;
   sort?: SortDirection;
@@ -18,6 +26,7 @@ interface CellProps {
 }
 
 Cell.defaultProps = {
+  value: undefined,
   sort: undefined,
 };
 
@@ -36,13 +45,11 @@ function Cell({
   columnName,
   width,
   value,
-  align: cellAlign,
+  align,
   defaultSortDirection,
   sort,
   setCustomSortOrder,
 }: CellProps) {
-  const align = cellAlign === CellAlign.Left ? "left" : "right";
-
   let sortDirection: MUISortDirection | false = false;
   let active = false;
 
@@ -94,6 +101,37 @@ function Cell({
   );
 }
 
+interface SubHeaderCellProps {
+  id: string;
+  width: string;
+  value?: CellValue;
+  align: CellAlign;
+  formatter?: Formatter;
+}
+
+SubHeaderCell.defaultProps = {
+  value: undefined,
+  formatter: undefined,
+};
+
+function SubHeaderCell({
+  id,
+  width,
+  value,
+  align,
+  formatter,
+}: SubHeaderCellProps) {
+  return (
+    <TableCell
+      key={id}
+      align={align}
+      sx={{ width, color: "text.disabled", fontSize: "small" }}
+    >
+      {formatValue(value, formatter)}
+    </TableCell>
+  );
+}
+
 export interface Props {
   data: TableData;
   sortOrder: SortColumn[];
@@ -110,33 +148,62 @@ export function HeaderRow({
   const sort = sortOrder.length > 0 ? sortOrder[0] : undefined;
 
   return (
-    <TableRow>
-      {nested && (
-        <TableCell
-          sx={{
-            borderBottom: 0,
-            width: "66px",
-          }}
-        />
-      )}
-      {data.headers
-        .filter((header) => header.visible)
-        .map((header: any) => {
-          const id = `${data.name}-header-${header.key}`;
-          return (
-            <Cell
-              key={id}
-              id={id}
-              columnName={header.key}
-              width={header.width}
-              value={header.label}
-              align={header.align}
-              defaultSortDirection={header.sort}
-              sort={sort?.column === header.key ? sort?.direction : undefined}
-              setCustomSortOrder={setCustomSortOrder}
-            />
-          );
-        })}
-    </TableRow>
+    <>
+      <TableRow>
+        {nested && (
+          <TableCell
+            sx={{
+              borderBottom: 0,
+              width: "66px",
+            }}
+          />
+        )}
+        {data.headers
+          .filter((header) => header.visible)
+          .map((header: any) => {
+            const id = `${data.name}-header-${header.key}`;
+            return (
+              <Cell
+                key={id}
+                id={id}
+                columnName={header.key}
+                width={header.width}
+                value={header.label}
+                align={header.align}
+                defaultSortDirection={header.sort}
+                sort={sort?.column === header.key ? sort?.direction : undefined}
+                setCustomSortOrder={setCustomSortOrder}
+              />
+            );
+          })}
+      </TableRow>
+
+      <TableRow>
+        {nested && (
+          <TableCell
+            sx={{
+              borderBottom: 0,
+              width: "66px",
+            }}
+          />
+        )}
+        {data.headers
+          .filter((header) => header.visible)
+          .map((header: any) => {
+            const id = `${data.name}-header-${header.key}`;
+            const value = data?.summary ? data?.summary[header.key] : undefined;
+            return (
+              <SubHeaderCell
+                key={id}
+                id={id}
+                width={header.width}
+                value={value}
+                formatter={header.formatter}
+                align={header.align}
+              />
+            );
+          })}
+      </TableRow>
+    </>
   );
 }
