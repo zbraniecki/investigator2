@@ -51,6 +51,7 @@ export interface TableMeta {
   name: string;
   sortColumns: string[];
   headers: HeadersData;
+  nested: boolean;
 }
 
 export interface TableData {

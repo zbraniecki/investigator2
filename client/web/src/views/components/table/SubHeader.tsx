@@ -49,17 +49,16 @@ function SubHeaderCell({
 export interface Props {
   summary?: TableSummaryRow;
   meta: TableMeta;
-  nested: boolean;
 }
 
 SubHeaderRow.defaultProps = {
   summary: undefined,
 };
 
-export function SubHeaderRow({ summary, meta, nested }: Props) {
+export function SubHeaderRow({ summary, meta }: Props) {
   return (
     <TableRow>
-      {nested && (
+      {meta.nested && (
         <TableCell
           sx={{
             borderBottom: 0,

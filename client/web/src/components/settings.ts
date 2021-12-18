@@ -13,11 +13,11 @@ export enum InfoDisplayMode {
 }
 
 export enum RowsPerPageOption {
-  Count5,
-  Count10,
-  Count30,
-  Count50,
-  All,
+  Count5 = 5,
+  Count10 = 10,
+  Count30 = 30,
+  Count50 = 50,
+  All = -1,
 }
 
 export function getLightModeName(storedLightMode: LightMode): PaletteMode {

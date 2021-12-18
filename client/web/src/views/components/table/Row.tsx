@@ -15,9 +15,8 @@ export interface Props {
   id: string;
   data: RowData;
   tableMeta: TableMeta;
-  nested: boolean;
 }
-export function Row({ id, data, tableMeta, nested }: Props) {
+export function Row({ id, data, tableMeta }: Props) {
   const [open, setOpen] = React.useState(false);
 
   const dispatch = useDispatch();
@@ -30,7 +29,7 @@ export function Row({ id, data, tableMeta, nested }: Props) {
   return (
     <>
       <TableRow key={id}>
-        {nested && (
+        {tableMeta.nested && (
           <TableCell sx={{ width: "66px" }}>
             {data.children && (
               <IconButton
@@ -86,11 +85,11 @@ export function Row({ id, data, tableMeta, nested }: Props) {
                   name: `${id}-sub`,
                   headers: tableMeta.headers,
                   sortColumns: tableMeta.sortColumns,
+                  nested: tableMeta.nested,
                 }}
                 state={{
                   showHeaders: false,
                 }}
-                nested={nested}
               />
             </Collapse>
           </TableCell>

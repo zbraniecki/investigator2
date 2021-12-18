@@ -108,7 +108,6 @@ export interface Props {
   summary?: TableSummaryRow;
   sortOrder: SortColumn[];
   setCustomSortOrder: any;
-  nested: boolean;
 }
 
 export function HeaderRow({
@@ -116,7 +115,6 @@ export function HeaderRow({
   summary,
   sortOrder,
   setCustomSortOrder,
-  nested,
 }: Props) {
   const sort = sortOrder.length > 0 ? sortOrder[0] : undefined;
 
@@ -131,7 +129,7 @@ export function HeaderRow({
   return (
     <>
       <TableRow>
-        {nested && (
+        {meta.nested && (
           <TableCell
             sx={{
               borderBottom: 0,
@@ -160,9 +158,7 @@ export function HeaderRow({
             );
           })}
       </TableRow>
-      {subHeader && (
-        <SubHeaderRow summary={summary} meta={meta} nested={nested} />
-      )}
+      {subHeader && <SubHeaderRow summary={summary} meta={meta} />}
     </>
   );
 }

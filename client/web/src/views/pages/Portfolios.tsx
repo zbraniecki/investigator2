@@ -21,6 +21,7 @@ import { TabInfo } from "../components/Tabs";
 const tableMeta: TableMeta = {
   name: "portfolios",
   sortColumns: ["value"],
+  nested: true,
   headers: [
     {
       label: "Name",

@@ -25,6 +25,7 @@ import { TabInfo } from "../components/Tabs";
 const tableMeta: TableMeta = {
   name: "watchlists",
   sortColumns: ["market_cap_rank", "market_cap"],
+  nested: false,
   headers: [
     {
       label: "#",

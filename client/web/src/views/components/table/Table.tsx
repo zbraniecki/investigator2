@@ -53,7 +53,7 @@ export interface Props {
   state: TableState;
   summary?: TableSummaryRow;
   rows?: RowsData;
-  nested: boolean;
+  slice?: [number, number];
 }
 
 function findColumn(key: string, headers: HeadersData): HeaderData | undefined {
@@ -65,7 +65,7 @@ function findColumn(key: string, headers: HeadersData): HeaderData | undefined {
   return undefined;
 }
 
-export function Table({ meta, state, summary, rows, nested }: Props) {
+export function Table({ meta, state, summary, rows, slice }: Props) {
   const [customSortOrder, setCustomSortOrder] = React.useState(
     undefined as undefined | SortColumn
   );
@@ -90,6 +90,8 @@ export function Table({ meta, state, summary, rows, nested }: Props) {
     rows.sort(sortFunc.bind(undefined, sortOrder));
   }
 
+  const visibleRows = slice && rows ? rows.slice(slice[0], slice[1]) : rows;
+
   return (
     <MUITable>
       {state.showHeaders && (
@@ -107,16 +109,13 @@ export function Table({ meta, state, summary, rows, nested }: Props) {
             summary={summary}
             sortOrder={sortOrder}
             setCustomSortOrder={setCustomSortOrder}
-            nested={nested}
           />
         </TableHead>
       )}
       <TableBody>
-        {rows?.map((row, idx) => {
+        {visibleRows?.map((row, idx) => {
           const id = `${meta.name}-row-${idx}`;
-          return (
-            <Row id={id} key={id} data={row} tableMeta={meta} nested={nested} />
-          );
+          return <Row id={id} key={id} data={row} tableMeta={meta} />;
         })}
       </TableBody>
     </MUITable>
