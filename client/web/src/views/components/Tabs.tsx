@@ -14,10 +14,21 @@ interface Props {
   page: string;
   tabs: TabInfo[];
   idx: number;
+  setFilter: any;
 }
 
-export function TabRow({ page, tabs, idx }: Props) {
-  const handleSearch = () => {};
+export function TabRow({ page, tabs, idx, setFilter }: Props) {
+  const handleSearch = (event: any) => {
+    const query = event.target.value.trim();
+    if (query.length === 0) {
+      setFilter(undefined);
+    } else {
+      setFilter({
+        name: query,
+        symbol: query,
+      });
+    }
+  };
 
   return (
     <Box

@@ -79,7 +79,7 @@ interface AccountState {
     username?: string;
   };
   portfolios: Record<string, Portfolio>;
-  watchlists: Record<string, Watchlist>;
+  watchlists?: Record<string, Watchlist>;
   users: Record<string, User>;
 }
 
@@ -89,7 +89,6 @@ const initialState = {
     token: getFromLocalStorage("token", "string", undefined),
   },
   portfolios: {},
-  watchlists: {},
   users: {},
 } as AccountState;
 
@@ -98,7 +97,7 @@ function cleanSlice(state: any) {
   state.session.username = undefined;
   state.session.token = undefined;
   state.portfolios = {};
-  state.watchlists = {};
+  state.watchlists = undefined;
   state.users = {};
 }
 

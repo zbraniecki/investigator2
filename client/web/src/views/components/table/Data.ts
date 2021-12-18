@@ -47,12 +47,21 @@ export interface SortColumn {
   direction: SortDirection;
 }
 
-export interface TableData {
+export interface TableMeta {
   name: string;
   sortColumns: string[];
-  summary?: Record<string, CellValue>;
   headers: HeadersData;
+}
+
+export interface TableData {
+  summary?: TableSummaryRow;
   rows?: RowsData;
+}
+
+export type TableSummaryRow = Record<string, CellValue>;
+export interface TableState {
+  showHeaders: boolean;
+  filter?: Record<string, string>;
 }
 
 export function formatValue(

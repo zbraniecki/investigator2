@@ -5,11 +5,14 @@ import TableHead from "@mui/material/TableHead";
 import { Row } from "./Row";
 import { HeaderRow } from "./Header";
 import {
-  TableData,
+  TableMeta,
+  TableState,
+  RowsData,
   SortColumn,
   SortDirection,
   HeadersData,
   HeaderData,
+  TableSummaryRow,
 } from "./Data";
 import { assert } from "../../../utils/helpers";
 
@@ -46,8 +49,10 @@ function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
   return 0;
 }
 export interface Props {
-  data: TableData;
-  headers: boolean;
+  meta: TableMeta;
+  state: TableState;
+  summary?: TableSummaryRow;
+  rows?: RowsData;
   nested: boolean;
 }
 
@@ -60,15 +65,15 @@ function findColumn(key: string, headers: HeadersData): HeaderData | undefined {
   return undefined;
 }
 
-export function Table({ data, headers, nested }: Props) {
+export function Table({ meta, state, summary, rows, nested }: Props) {
   const [customSortOrder, setCustomSortOrder] = React.useState(
     undefined as undefined | SortColumn
   );
 
   const sortOrder: SortColumn[] = [];
 
-  for (const column of data.sortColumns) {
-    const header = findColumn(column, data.headers);
+  for (const column of meta.sortColumns) {
+    const header = findColumn(column, meta.headers);
     if (header !== undefined) {
       sortOrder.push({
         column,
@@ -81,13 +86,13 @@ export function Table({ data, headers, nested }: Props) {
     sortOrder.unshift(customSortOrder);
   }
 
-  if (data.rows) {
-    data.rows.sort(sortFunc.bind(undefined, sortOrder));
+  if (rows) {
+    rows.sort(sortFunc.bind(undefined, sortOrder));
   }
 
   return (
     <MUITable>
-      {headers && (
+      {state.showHeaders && (
         <TableHead
           sx={{
             position: "sticky",
@@ -98,7 +103,8 @@ export function Table({ data, headers, nested }: Props) {
           }}
         >
           <HeaderRow
-            data={data}
+            meta={meta}
+            summary={summary}
             sortOrder={sortOrder}
             setCustomSortOrder={setCustomSortOrder}
             nested={nested}
@@ -106,10 +112,10 @@ export function Table({ data, headers, nested }: Props) {
         </TableHead>
       )}
       <TableBody>
-        {data.rows?.map((row, idx) => {
-          const id = `${data.name}-row-${idx}`;
+        {rows?.map((row, idx) => {
+          const id = `${meta.name}-row-${idx}`;
           return (
-            <Row id={id} key={id} data={row} tableData={data} nested={nested} />
+            <Row id={id} key={id} data={row} tableMeta={meta} nested={nested} />
           );
         })}
       </TableBody>

@@ -1,18 +1,17 @@
-import React from "react";
 import TableRow from "@mui/material/TableRow";
 import TableCell, {
   SortDirection as MUISortDirection,
 } from "@mui/material/TableCell";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import {
-  TableData,
+  TableMeta,
+  TableSummaryRow,
   CellAlign,
   CellValue,
   SortColumn,
   SortDirection,
-  Formatter,
-  formatValue,
 } from "./Data";
+import { SubHeaderRow } from "./SubHeader";
 
 interface CellProps {
   id: string;
@@ -23,11 +22,13 @@ interface CellProps {
   defaultSortDirection: SortDirection;
   sort?: SortDirection;
   setCustomSortOrder: any;
+  sx?: any;
 }
 
 Cell.defaultProps = {
   value: undefined,
   sort: undefined,
+  sx: undefined,
 };
 
 function getSortDirection(
@@ -49,6 +50,7 @@ function Cell({
   defaultSortDirection,
   sort,
   setCustomSortOrder,
+  sx,
 }: CellProps) {
   let sortDirection: MUISortDirection | false = false;
   let active = false;
@@ -88,7 +90,7 @@ function Cell({
       key={id}
       align={align}
       sortDirection={sortDirection}
-      sx={{ width }}
+      sx={{ width, ...sx }}
     >
       <TableSortLabel
         direction={getSortDirection(sort, defaultSortDirection)}
@@ -101,51 +103,30 @@ function Cell({
   );
 }
 
-interface SubHeaderCellProps {
-  id: string;
-  width: string;
-  value?: CellValue;
-  align: CellAlign;
-  formatter?: Formatter;
-}
-
-SubHeaderCell.defaultProps = {
-  value: undefined,
-  formatter: undefined,
-};
-
-function SubHeaderCell({
-  id,
-  width,
-  value,
-  align,
-  formatter,
-}: SubHeaderCellProps) {
-  return (
-    <TableCell
-      key={id}
-      align={align}
-      sx={{ width, color: "text.disabled", fontSize: "small" }}
-    >
-      {formatValue(value, formatter)}
-    </TableCell>
-  );
-}
-
 export interface Props {
-  data: TableData;
+  meta: TableMeta;
+  summary?: TableSummaryRow;
   sortOrder: SortColumn[];
   setCustomSortOrder: any;
   nested: boolean;
 }
 
 export function HeaderRow({
-  data,
+  meta,
+  summary,
   sortOrder,
   setCustomSortOrder,
   nested,
 }: Props) {
   const sort = sortOrder.length > 0 ? sortOrder[0] : undefined;
+
+  const subHeader = summary !== undefined;
+
+  const cellSx = subHeader
+    ? {
+        paddingBottom: 0,
+      }
+    : {};
 
   return (
     <>
@@ -155,13 +136,14 @@ export function HeaderRow({
             sx={{
               borderBottom: 0,
               width: "66px",
+              ...cellSx,
             }}
           />
         )}
-        {data.headers
+        {meta.headers
           .filter((header) => header.visible)
           .map((header: any) => {
-            const id = `${data.name}-header-${header.key}`;
+            const id = `${meta.name}-header-${header.key}`;
             return (
               <Cell
                 key={id}
@@ -173,37 +155,14 @@ export function HeaderRow({
                 defaultSortDirection={header.sort}
                 sort={sort?.column === header.key ? sort?.direction : undefined}
                 setCustomSortOrder={setCustomSortOrder}
+                sx={cellSx}
               />
             );
           })}
       </TableRow>
-
-      <TableRow>
-        {nested && (
-          <TableCell
-            sx={{
-              borderBottom: 0,
-              width: "66px",
-            }}
-          />
-        )}
-        {data.headers
-          .filter((header) => header.visible)
-          .map((header: any) => {
-            const id = `${data.name}-header-${header.key}`;
-            const value = data?.summary ? data?.summary[header.key] : undefined;
-            return (
-              <SubHeaderCell
-                key={id}
-                id={id}
-                width={header.width}
-                value={value}
-                formatter={header.formatter}
-                align={header.align}
-              />
-            );
-          })}
-      </TableRow>
+      {subHeader && (
+        <SubHeaderRow summary={summary} meta={meta} nested={nested} />
+      )}
     </>
   );
 }

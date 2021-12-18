@@ -1,8 +1,8 @@
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { TableContainer } from "../components/table/Contrainer";
 import {
-  TableData,
+  RowData,
+  TableMeta,
   Formatter,
   CellAlign,
   SortDirection,
@@ -20,12 +20,11 @@ import {
   getSession,
 } from "../../store/account";
 // import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
-import { TabRow, TabInfo } from "../components/Tabs";
+import { TabInfo } from "../components/Tabs";
 
-const tableMeta: TableData = {
-  name: "watchlist",
+const tableMeta: TableMeta = {
+  name: "watchlists",
   sortColumns: ["market_cap_rank", "market_cap"],
-  // nested: false,
   headers: [
     {
       label: "#",
@@ -109,11 +108,9 @@ const tableMeta: TableData = {
 };
 
 export function Watchlists() {
-  const { id } = useParams();
-
   const publicWatchlists: Record<string, Watchlist> =
     useSelector(getPublicWatchlists);
-  const userWatchlists: Record<string, Watchlist> =
+  const userWatchlists: Record<string, Watchlist> | undefined =
     useSelector(getUserWatchlists);
   const assetInfo = useSelector(getAssetInfo);
   const portfolios = useSelector(getPortfolios);
@@ -124,20 +121,19 @@ export function Watchlists() {
   for (const list of Object.values(publicWatchlists)) {
     watchlists[list.id] = list;
   }
-  if (session.username) {
+  if (userWatchlists !== undefined) {
     for (const list of Object.values(userWatchlists)) {
       watchlists[list.id] = list;
     }
   }
 
-  const tableData = {
-    rows: [],
-    ...tableMeta,
-  };
   let tabs: TabInfo[] = [];
-  let tabIdx = 0;
 
-  if (Object.keys(watchlists).length > 0) {
+  const ready = session.token
+    ? userWatchlists !== undefined && Object.keys(users).length > 0
+    : Object.keys(watchlists).length > 0;
+
+  if (ready) {
     const wids: string[] = session.username
       ? users[session.username].ui.watchlists
       : Object.keys(watchlists);
@@ -151,29 +147,11 @@ export function Watchlists() {
           label: watchlist.name,
         };
       });
-
-    if (id) {
-      const idx = tabs.findIndex((tab) => tab.id === id);
-      tabIdx = idx === -1 ? 0 : idx;
-    }
-    const wid = tabs[tabIdx].id;
-
-    const data = prepareWatchlistTableData(
-      wid,
-      watchlists,
-      assetInfo,
-      portfolios
-    );
-
-    if (data?.children) {
-      tableData.summary = data.cells;
-      tableData.rows = data.children;
-    }
   }
+
+  const getTableData = (id: string): RowData | undefined =>
+    prepareWatchlistTableData(id, watchlists, assetInfo, portfolios);
   return (
-    <>
-      <TabRow page="watchlists" tabs={tabs} idx={tabIdx} />
-      <TableContainer data={tableData} />
-    </>
+    <TableContainer tabs={tabs} meta={tableMeta} getTableData={getTableData} />
   );
 }

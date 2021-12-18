@@ -1,8 +1,8 @@
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { TableContainer } from "../components/table/Contrainer";
 import {
-  TableData,
+  TableMeta,
+  RowData,
   Formatter,
   CellAlign,
   SortDirection,
@@ -16,12 +16,11 @@ import {
 } from "../../store/account";
 import { getAssetInfo, getWallets } from "../../store/oracle";
 // import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
-import { TabRow, TabInfo } from "../components/Tabs";
+import { TabInfo } from "../components/Tabs";
 
-const tableMeta: TableData = {
-  name: "portfolio",
+const tableMeta: TableMeta = {
+  name: "portfolios",
   sortColumns: ["value"],
-  //   nested: true,
   headers: [
     {
       label: "Name",
@@ -87,20 +86,13 @@ const tableMeta: TableData = {
 };
 
 export function Portfolios() {
-  const { id } = useParams();
-
   const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
   const assetInfo = useSelector(getAssetInfo);
   const wallets = useSelector(getWallets);
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
 
-  const tableData = {
-    rows: [],
-    ...tableMeta,
-  };
   let tabs: TabInfo[] = [];
-  let tabIdx = 0;
 
   if (Object.keys(portfolios).length > 0) {
     const currentUser = session.username ? users[session.username] : undefined;
@@ -115,25 +107,10 @@ export function Portfolios() {
           label: portfolio.name,
         };
       });
-
-    if (id) {
-      const idx = tabs.findIndex((tab) => tab.id === id);
-      tabIdx = idx === -1 ? 0 : idx;
-    }
-    const pid = tabs[tabIdx].id;
-
-    const data = preparePortfolioTableData(pid, portfolios, assetInfo, wallets);
-
-    if (data?.children) {
-      tableData.rows = data.children;
-      tableData.summary = data.cells;
-    }
   }
-
+  const getTableData = (id: string): RowData | undefined =>
+    preparePortfolioTableData(id, portfolios, assetInfo, wallets);
   return (
-    <>
-      <TabRow page="portfolios" tabs={tabs} idx={tabIdx} />
-      <TableContainer data={tableData} />
-    </>
+    <TableContainer tabs={tabs} meta={tableMeta} getTableData={getTableData} />
   );
 }
