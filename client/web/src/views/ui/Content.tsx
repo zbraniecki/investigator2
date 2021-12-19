@@ -1,12 +1,22 @@
+import React from "react";
 import Box from "@mui/material/Box";
 import { Routes, Route } from "react-router-dom";
 import { MenuItem } from "./Menu";
+import { Component as Card } from "../components/Card";
 
 interface Props {
   menuItems: Array<MenuItem>;
 }
 
 export default function Content({ menuItems }: Props) {
+  const [assetCard, setAssetCard] = React.useState(
+    undefined as string | undefined
+  );
+
+  const handleCloseCard = () => {
+    setAssetCard(undefined);
+  };
+
   return (
     <Box
       component="main"
@@ -34,6 +44,10 @@ export default function Content({ menuItems }: Props) {
           </Route>
         ))}
       </Routes>
+      <Card
+        meta={{ id: "foo", assetCard, handleCloseCard }}
+        data={{ name: { name: "Foo" } }}
+      />
     </Box>
   );
 }

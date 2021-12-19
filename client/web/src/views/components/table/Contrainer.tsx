@@ -5,10 +5,11 @@ import Paper from "@mui/material/Paper";
 import TablePagination from "@mui/material/TablePagination";
 import { useParams } from "react-router-dom";
 import { Table } from "./Table";
-import { TableMeta, RowData, RowsData } from "./Data";
+import { TableMeta, RowsData } from "./Data";
 import { TabRow, TabInfo } from "../Tabs";
 import { assert } from "../../../utils/helpers";
 import { getRowsPerPageOption, setRowsPerPageOption } from "../../../store/ui";
+import { TableMenu } from "./Menu";
 
 export interface Props {
   meta: TableMeta;
@@ -22,6 +23,7 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
     undefined as Record<string, string> | undefined
   );
   const [page, setPage] = React.useState(0);
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
 
   const { id } = useParams();
   const rpp = useSelector(getRowsPerPageOption);
@@ -91,6 +93,18 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
   const slice: [number, number] | undefined =
     rpp === -1 ? undefined : [page * rpp, page * rpp + rpp];
 
+  const handleMenuOpen = (event: any) => {
+    if (menuAnchorEl) {
+      setMenuAnchorEl(null);
+    } else {
+      setMenuAnchorEl(event.currentTarget);
+    }
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+
   return (
     <>
       <TabRow
@@ -98,6 +112,7 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
         tabs={tabs}
         idx={tabIdx}
         setFilter={handleSetFilter}
+        handleMenuOpen={handleMenuOpen}
       />
 
       <MUITableContainer
@@ -123,6 +138,7 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       )}
+      <TableMenu anchorEl={menuAnchorEl} handleMenuClose={handleMenuClose} />
     </>
   );
 }

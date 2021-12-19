@@ -16,7 +16,7 @@ export function getFromLocalStorage(
   }
   switch (type) {
     case "enum": {
-      return parseInt(value, 10);
+      return value;
     }
     case "string": {
       return value;

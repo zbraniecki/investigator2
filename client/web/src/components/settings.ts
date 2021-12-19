@@ -2,14 +2,14 @@ import { PaletteMode } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 export enum LightMode {
-  Automatic,
-  Light,
-  Dark,
+  Automatic = "auto",
+  Light = "light",
+  Dark = "dark",
 }
 
 export enum InfoDisplayMode {
-  ShowAll,
-  HideValues,
+  ShowAll = "show_all",
+  HideValues = "hide_values",
 }
 
 export enum RowsPerPageOption {
@@ -25,17 +25,9 @@ export function getLightModeName(storedLightMode: LightMode): PaletteMode {
     noSsr: true,
   });
 
-  let lightModeName: PaletteMode = prefersDarkMode ? "dark" : "light";
+  const autoLightMode = prefersDarkMode ? LightMode.Dark : LightMode.Light;
+  const lightModeName: PaletteMode =
+    storedLightMode === LightMode.Automatic ? autoLightMode : storedLightMode;
 
-  switch (storedLightMode) {
-    case LightMode.Light:
-      lightModeName = "light";
-      break;
-    case LightMode.Dark:
-      lightModeName = "dark";
-      break;
-    default:
-      break;
-  }
   return lightModeName;
 }

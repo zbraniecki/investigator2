@@ -10,8 +10,8 @@ const Search = styled("div")(({ theme }) => ({
     backgroundColor: alpha(theme.palette.common.white, 0.1),
   },
   transition: theme.transitions.create("width"),
-  width: "80px",
-  height: "24px",
+  width: "100px",
+  height: "28px",
   "&:focus-within": {
     width: "120px",
   },
@@ -20,7 +20,7 @@ const Search = styled("div")(({ theme }) => ({
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   "& .MuiInputBase-input": {
-    fontSize: "10px",
+    fontSize: "14px",
     paddingLeft: "6px",
     "&::placeholder": {
       color: alpha(theme.palette.common.white, 0.5),

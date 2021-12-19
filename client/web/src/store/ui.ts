@@ -9,15 +9,15 @@ import {
 export const uiSlice = createSlice({
   name: "ui",
   initialState: {
-    lightMode: getFromLocalStorage("lightMode", "enum", LightMode.Automatic),
+    lightMode: getFromLocalStorage("lightMode", "string", LightMode.Automatic),
     infoDisplayMode: getFromLocalStorage(
       "info-display-mode",
-      "enum",
+      "string",
       InfoDisplayMode.ShowAll
     ),
     rowsPerPageOption: getFromLocalStorage(
       "rows-per-page-option",
-      "enum",
+      "number",
       RowsPerPageOption.Count30
     ),
   },

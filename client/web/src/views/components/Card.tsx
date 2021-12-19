@@ -40,23 +40,21 @@ const ExpandMore = styled(() => <IconButton />)(({ theme }) => ({
 export interface Props {
   meta: {
     id: string;
-    openModal: any;
-    setOpenModal: any;
+    assetCard: string | undefined;
+    handleCloseCard: any;
   };
   data: {
     name: SymbolNameCell;
   };
 }
 
-export function Component({ meta: { openModal, setOpenModal } }: Props) {
+export function Component({ meta: { assetCard, handleCloseCard } }: Props) {
   const [expanded, setExpanded] = React.useState(false);
-
-  const handleClose = () => setOpenModal(false);
 
   return (
     <Modal
-      open={openModal}
-      onClose={handleClose}
+      open={Boolean(assetCard)}
+      onClose={handleCloseCard}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
