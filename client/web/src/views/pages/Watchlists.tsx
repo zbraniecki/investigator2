@@ -28,6 +28,14 @@ const tableMeta: TableMeta = {
   nested: false,
   headers: [
     {
+      label: "ID",
+      key: "id",
+      align: CellAlign.Right,
+      sort: SortDirection.Asc,
+      width: "80px",
+      visible: false,
+    },
+    {
       label: "#",
       key: "market_cap_rank",
       align: CellAlign.Right,

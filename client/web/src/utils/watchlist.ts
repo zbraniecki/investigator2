@@ -5,6 +5,7 @@ import { RowData, RowType } from "../views/components/table/Data";
 
 export interface WatchlistTableRow extends RowData {
   cells: {
+    id?: string;
     market_cap_rank?: number;
     market_cap?: number;
     name?: string;
@@ -99,6 +100,7 @@ export function createWatchlistTableData(
 
     return {
       cells: {
+        id: asset.id,
         market_cap_rank: asset.info.market_cap_rank,
         market_cap: asset.info.market_cap,
         name: asset.name,

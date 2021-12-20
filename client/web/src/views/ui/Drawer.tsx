@@ -13,6 +13,17 @@ interface Props {
 
 export default function InvestigatorDrawer({ menuItems }: Props) {
   /* const session = useSelector(getSession); */
+  const index = Boolean(useMatch(`/`));
+
+  function isSelected(item: MenuItem): boolean {
+    if (useMatch(`/${item.id}/*`)) {
+      return true;
+    }
+    if (item.default) {
+      return index;
+    }
+    return false;
+  }
 
   return (
     <Drawer
@@ -24,19 +35,19 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
       }}
     >
       <List sx={{ overflow: "hidden" }}>
-        {menuItems.map(({ id, icon }) => (
+        {menuItems.map((item) => (
           <ListItemButton
-            selected={Boolean(useMatch(`/${id}/*`))}
+            selected={isSelected(item)}
             component={NavLink}
-            to={`/${id}`}
-            key={`drawer-list-item-${id}`}
+            to={`/${item.id}`}
+            key={`drawer-list-item-${item.id}`}
           >
             <ListItemIcon
               sx={{
                 minWidth: "",
               }}
             >
-              {icon}
+              {item.icon}
             </ListItemIcon>
           </ListItemButton>
         ))}

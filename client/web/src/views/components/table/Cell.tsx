@@ -2,10 +2,13 @@ import React from "react";
 import TableCell from "@mui/material/TableCell";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
+import { getOutletContext } from "../../ui/Content";
 import { CellAlign, CellValue, Formatter, formatValue } from "./Data";
 
 interface CellProps {
   id: string;
+  column: string;
+  rowId: string;
   value: CellValue;
   align: CellAlign;
   width: string;
@@ -16,10 +19,26 @@ Cell.defaultProps = {
   formatter: undefined,
 };
 
-export function Cell({ id, value, align, width, formatter }: CellProps) {
+export function Cell({
+  id,
+  column,
+  rowId,
+  value,
+  align,
+  width,
+  formatter,
+}: CellProps) {
+  const { setAssetCard } = getOutletContext();
+
+  const handleClick = () => {
+    setAssetCard(rowId);
+  };
+
   return (
     <TableCell key={id} align={align} sx={{ width }}>
-      <Typography>{formatValue(value, formatter)}</Typography>
+      <Typography onClick={column === "name" ? handleClick : undefined}>
+        {formatValue(value, formatter)}
+      </Typography>
     </TableCell>
   );
 }

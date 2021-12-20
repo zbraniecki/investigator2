@@ -63,6 +63,8 @@ export function Row({ id, data, tableMeta }: Props) {
             return (
               <Cell
                 key={key}
+                column={header.key}
+                rowId={data.cells.id as string}
                 id={key}
                 value={value}
                 align={header.align}

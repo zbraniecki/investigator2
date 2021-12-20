@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import cyan from "@mui/material/colors/cyan";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useSelector } from "react-redux";
+import { useRoutes } from "react-router-dom";
 import {
   LightMode,
   InfoDisplayMode,
@@ -33,6 +34,34 @@ export function Chrome() {
   );
 
   const menuItems = getMenuItems();
+
+  const children = [];
+
+  for (const item of menuItems) {
+    if (item.default) {
+      children.push({
+        index: true,
+        element: item.element,
+      });
+    }
+    children.push({
+      path: item.id,
+      element: item.element,
+      children: item.paths.map((path) => ({
+        path,
+        element: item.element,
+      })),
+    });
+  }
+
+  const routes = useRoutes([
+    {
+      path: "/",
+      element: <Content />,
+      children,
+    },
+  ]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -43,7 +72,7 @@ export function Chrome() {
       />
       <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
         <InvestigatorDrawer menuItems={menuItems} />
-        <Content menuItems={menuItems} />
+        {routes}
       </Box>
     </ThemeProvider>
   );

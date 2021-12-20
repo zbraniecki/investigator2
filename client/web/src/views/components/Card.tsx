@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -16,6 +17,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Modal from "@mui/material/Modal";
 import { SymbolNameCell } from "./Table";
+import { getAssetInfo } from "../../store/oracle";
+import { assert } from "../../utils/helpers";
 
 const style: any = {
   position: "absolute",
@@ -49,7 +52,10 @@ export interface Props {
 }
 
 export function Component({ meta: { assetCard, handleCloseCard } }: Props) {
+  const assetInfo = useSelector(getAssetInfo);
   const [expanded, setExpanded] = React.useState(false);
+
+  const asset = assetCard ? assetInfo[assetCard] : undefined;
 
   return (
     <Modal
@@ -62,7 +68,7 @@ export function Component({ meta: { assetCard, handleCloseCard } }: Props) {
         <CardHeader
           avatar={
             <Avatar sx={{ bgcolor: orange[500] }} aria-label="recipe">
-              B
+              {asset?.symbol[0].toUpperCase()}
             </Avatar>
           }
           action={
@@ -70,8 +76,8 @@ export function Component({ meta: { assetCard, handleCloseCard } }: Props) {
               <MoreVertIcon />
             </IconButton>
           }
-          title="BTC"
-          subheader="Bitcoin"
+          title={asset?.symbol.toUpperCase()}
+          subheader={asset?.name}
         />
         <CardMedia
           component="img"

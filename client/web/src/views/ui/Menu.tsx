@@ -25,13 +25,14 @@ const menuItems: Array<MenuItem> = [
   // },
   {
     id: "watchlists",
-    paths: ["watchlists", ":id"],
+    paths: [":id"],
     icon: <TrendingUpIcon />,
     element: <Watchlists />,
+    default: true,
   },
   {
     id: "portfolios",
-    paths: ["portfolios", ":id"],
+    paths: [":id"],
     icon: <MonetizationOnIcon />,
     element: <Portfolios />,
   },
