@@ -24,6 +24,10 @@ export function Row({ id, data, tableMeta }: Props) {
 
   const handleCellUpdate = async (cid: string, value: number) => {
     console.log("handling cell update");
+    // XXX: We want to get holding ID and carry it into rows.
+    const rid = data.cells.id;
+    console.log(cid);
+    console.log(value);
     return dispatch(updateCellThunk({ value }));
   };
 
@@ -49,10 +53,11 @@ export function Row({ id, data, tableMeta }: Props) {
             const key = `${id}-${column.key}`;
             const value = data.cells[column.key];
             const hideValue = column.sensitive && tableMeta.hideSensitive;
-            if (column.editable && !hideValue) {
+            if (column.editable && !hideValue && data.cells.id) {
               return (
                 <EditableCell
                   key={key}
+                  column={column.key}
                   id={key}
                   value={value}
                   align={column.align}

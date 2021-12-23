@@ -49,6 +49,7 @@ export function Cell({
 
 interface EditableCellProps {
   id: string;
+  column: string;
   value: CellValue;
   align: CellAlign;
   width: string;
@@ -80,6 +81,7 @@ function tryParseNumber(input: string): number | undefined {
 
 export function EditableCell({
   id,
+  column,
   value,
   align,
   width,
@@ -120,7 +122,7 @@ export function EditableCell({
 
     if (result !== undefined) {
       setUpdateInProgress(true);
-      onCellUpdate("cell-id", result).then(
+      onCellUpdate(column, result).then(
         ({ payload }: { payload: { error: string | null } }) => {
           if (payload.error !== null) {
           }
