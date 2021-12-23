@@ -62,7 +62,6 @@ const baseTableMeta: BaseTableMeta = {
       align: CellAlign.Right,
       sortDirection: SortDirection.Desc,
       formatter: Formatter.Currency,
-      editable: true,
       width: "auto",
     },
     price_change_percentage_1h: {

@@ -28,14 +28,19 @@ function groupRows(
   row: RowData,
   keyColumn: string,
   grouped: Record<string, RowsData>,
+  ungrouped: RowsData,
   flattenPortfolios: boolean
 ) {
-  if (row.type === RowType.Portfolio && flattenPortfolios) {
-    if (row.children !== undefined) {
-      row.children.forEach((subRow) =>
-        groupRows(subRow, keyColumn, grouped, flattenPortfolios)
-      );
-      row.children = undefined;
+  if (row.type === RowType.Portfolio) {
+    if (flattenPortfolios) {
+      if (row.children !== undefined) {
+        row.children.forEach((subRow) =>
+          groupRows(subRow, keyColumn, grouped, ungrouped, flattenPortfolios)
+        );
+        row.children = undefined;
+      }
+    } else {
+      ungrouped.push(row);
     }
   } else {
     const key = row.cells[keyColumn];
@@ -57,12 +62,18 @@ export function groupTableDataByColumn2(
   data: RowsData,
   keyColumn: string,
   flattenPortfolios: boolean
-): Record<string, RowsData> {
+): { grouped: Record<string, RowsData>; ungrouped: RowsData } {
   const grouped: Record<string, RowsData> = {};
+  const ungrouped: RowsData = [];
 
-  data.forEach((row) => groupRows(row, keyColumn, grouped, flattenPortfolios));
+  data.forEach((row) =>
+    groupRows(row, keyColumn, grouped, ungrouped, flattenPortfolios)
+  );
 
-  return grouped;
+  return {
+    grouped,
+    ungrouped,
+  };
 }
 
 export function computeGroupedTableData(
@@ -88,7 +99,11 @@ export function groupTableDataByColumn(
   groupColumns: { key: string; strategy: GroupingStrategy }[],
   flattenPortfolios: boolean
 ): RowsData {
-  const grouped = groupTableDataByColumn2(data, keyColumn, flattenPortfolios);
+  const { grouped, ungrouped } = groupTableDataByColumn2(
+    data,
+    keyColumn,
+    flattenPortfolios
+  );
 
   const result: RowsData = Object.values(grouped).map((children) => {
     assert(children.length > 0);
@@ -168,6 +183,10 @@ export function groupTableDataByColumn(
       type: RowType.Asset,
     };
   });
+
+  for (const row of ungrouped) {
+    result.push(row);
+  }
 
   return result;
 }

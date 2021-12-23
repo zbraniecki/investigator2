@@ -8,7 +8,7 @@ import { RowData, RowType } from "../views/components/table/data/Row";
 
 export interface PortfolioTableRow extends RowData {
   cells: {
-    id: string;
+    id?: string;
     name?: string;
     symbol?: string;
     price?: number;
@@ -27,7 +27,6 @@ function computeHeaderData(
   topLevel: boolean
 ): PortfolioTableRow["cells"] {
   const cells: PortfolioTableRow["cells"] = {
-    id: `header-${portfolio.id}`,
     value:
       portfolio.value !== undefined
         ? portfolio.value
