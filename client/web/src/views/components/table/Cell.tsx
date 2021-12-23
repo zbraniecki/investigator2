@@ -4,13 +4,13 @@ import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
 import { getOutletContext } from "../../ui/Content";
 import { CellAlign, Formatter, formatValue } from "./data/Column";
-import { CellValue } from "./data/Row";
+import { CellData, CellValue } from "./data/Row";
 
 interface CellProps {
   id: string;
   column: string;
   rowId: string;
-  value: CellValue;
+  data?: CellData<CellValue>;
   align: CellAlign;
   width: string;
   formatter?: Formatter;
@@ -19,13 +19,14 @@ interface CellProps {
 
 Cell.defaultProps = {
   formatter: undefined,
+  data: undefined,
 };
 
 export function Cell({
   id,
   column,
   rowId,
-  value,
+  data,
   align,
   width,
   formatter,
@@ -37,10 +38,19 @@ export function Cell({
     setAssetCard(rowId);
   };
 
-  const displayValue = showValue ? formatValue(value, formatter) : "*";
+  const displayValue = data?.value
+    ? showValue
+      ? formatValue(data.value, formatter)
+      : "*"
+    : "";
+
+  const sx: Record<string, any> = {};
+  if (data?.color) {
+    sx.color = data.color;
+  }
   return (
     <TableCell key={id} align={align} sx={{ width }}>
-      <Typography onClick={column === "name" ? handleClick : undefined}>
+      <Typography sx={sx} onClick={column === "name" ? handleClick : undefined}>
         {displayValue}
       </Typography>
     </TableCell>
@@ -50,7 +60,7 @@ export function Cell({
 interface EditableCellProps {
   id: string;
   column: string;
-  value: CellValue;
+  data: CellData<CellValue>;
   align: CellAlign;
   width: string;
   formatter?: Formatter;
@@ -82,7 +92,7 @@ function tryParseNumber(input: string): number | undefined {
 export function EditableCell({
   id,
   column,
-  value,
+  data,
   align,
   width,
   formatter,
@@ -98,7 +108,7 @@ export function EditableCell({
     }
     event.preventDefault();
     event.stopPropagation();
-    setTempValue(value.toString());
+    setTempValue(data.value.toString());
     setEditing(true);
   };
 
@@ -114,7 +124,7 @@ export function EditableCell({
   };
 
   const tryCommitChange = () => {
-    if (tempValue === null || tempValue === value) {
+    if (tempValue === null || tempValue === data.value) {
       return;
     }
 
@@ -175,7 +185,7 @@ export function EditableCell({
     }
   };
 
-  const visibleValue = tempValue === null ? value : tempValue;
+  const visibleValue = tempValue === null ? data?.value : tempValue;
   return (
     <TableCell
       key={id}

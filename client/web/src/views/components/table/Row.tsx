@@ -7,14 +7,14 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
 import { useDispatch } from "react-redux";
 import { TableMeta } from "./data/Table";
-import { RowData } from "./data/Row";
+import { StyledRowData } from "./data/Row";
 import { updateCellThunk } from "../../../store/account";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 
 export interface Props {
   id: string;
-  data: RowData;
+  data: StyledRowData;
   tableMeta: TableMeta;
 }
 export function Row({ id, data, tableMeta }: Props) {
@@ -51,15 +51,15 @@ export function Row({ id, data, tableMeta }: Props) {
           .filter((columns) => columns.visible)
           .map((column) => {
             const key = `${id}-${column.key}`;
-            const value = data.cells[column.key];
+            const cell = data.cells[column.key];
             const hideValue = column.sensitive && tableMeta.hideSensitive;
-            if (column.editable && !hideValue && data.cells.id) {
+            if (column.editable && !hideValue && cell && data.cells.id) {
               return (
                 <EditableCell
                   key={key}
                   column={column.key}
                   id={key}
-                  value={value}
+                  data={cell}
                   align={column.align}
                   width={column.width}
                   formatter={column.formatter}
@@ -71,9 +71,9 @@ export function Row({ id, data, tableMeta }: Props) {
               <Cell
                 key={key}
                 column={column.key}
-                rowId={data.cells.id as string}
+                rowId={data.cells.id?.value as string}
                 id={key}
-                value={value}
+                data={cell}
                 align={column.align}
                 width={column.width}
                 formatter={column.formatter}

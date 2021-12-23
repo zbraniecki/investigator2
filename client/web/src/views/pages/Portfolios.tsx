@@ -6,8 +6,11 @@ import {
   Formatter,
 } from "../components/table/data/Column";
 import { BaseTableMeta, TableSettings } from "../components/table/data/Table";
-import { RowData } from "../components/table/data/Row";
-import { preparePortfolioTableData } from "../../utils/portfolio";
+import { StyledRowData } from "../components/table/data/Row";
+import {
+  preparePortfolioTableData,
+  computePortfolioTableDataStyle,
+} from "../../utils/portfolio";
 import {
   Portfolio,
   getPortfolios,
@@ -131,8 +134,13 @@ export function Portfolios() {
         };
       });
   }
-  const getTableData = (id: string): RowData | undefined =>
-    preparePortfolioTableData(id, portfolios, assetInfo, wallets);
+  const getTableData = (id: string): StyledRowData | undefined => {
+    const data = preparePortfolioTableData(id, portfolios, assetInfo, wallets);
+    if (data === undefined) {
+      return undefined;
+    }
+    return computePortfolioTableDataStyle(data);
+  };
   return (
     <TableContainer
       tabs={tabs}

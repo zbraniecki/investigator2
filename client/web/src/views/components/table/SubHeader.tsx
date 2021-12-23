@@ -2,28 +2,36 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { CellAlign, Formatter, formatValue } from "./data/Column";
 import { TableMeta, TableSummaryRow } from "./data/Table";
-import { CellValue } from "./data/Row";
+import { CellData, CellValue } from "./data/Row";
 
 interface SubHeaderCellProps {
   id: string;
   width: string;
-  value?: CellValue;
+  data?: CellData<CellValue>;
   align: CellAlign;
   formatter?: Formatter;
+  showValue: boolean;
 }
 
 SubHeaderCell.defaultProps = {
-  value: undefined,
+  data: undefined,
   formatter: undefined,
 };
 
 function SubHeaderCell({
   id,
   width,
-  value,
+  data,
   align,
   formatter,
+  showValue,
 }: SubHeaderCellProps) {
+  const displayValue = data
+    ? showValue
+      ? formatValue(data.value, formatter)
+      : "*"
+    : "";
+
   return (
     <TableCell
       key={id}
@@ -36,7 +44,7 @@ function SubHeaderCell({
         paddingBottom: 0,
       }}
     >
-      {formatValue(value, formatter)}
+      {displayValue}
     </TableCell>
   );
 }
@@ -65,15 +73,17 @@ export function SubHeaderRow({ summary, tableMeta }: Props) {
         .filter((column) => column.visible)
         .map((column: any) => {
           const id = `${tableMeta.name}-header-${column.key}`;
-          const value = summary ? summary[column.key] : undefined;
+          const data = summary ? summary[column.key] : undefined;
+          const hideValue = column.sensitive && tableMeta.hideSensitive;
           return (
             <SubHeaderCell
               key={id}
               id={id}
               width={column.width}
-              value={value}
+              data={data}
               formatter={column.formatter}
               align={column.align}
+              showValue={!hideValue}
             />
           );
         })}

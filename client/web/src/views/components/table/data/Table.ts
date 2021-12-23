@@ -4,7 +4,7 @@ import {
   ColumnMeta,
   buildColumnMeta,
 } from "./Column";
-import { CellValue } from "./Row";
+import { CellData, CellValue } from "./Row";
 
 export interface BaseTableMeta {
   name: string;
@@ -30,7 +30,7 @@ export interface TableMeta {
   hideSensitive: boolean;
 }
 
-export type TableSummaryRow = Record<string, CellValue>;
+export type TableSummaryRow = Record<string, CellData<CellValue>>;
 
 export function buildTableMeta(
   base: BaseTableMeta,

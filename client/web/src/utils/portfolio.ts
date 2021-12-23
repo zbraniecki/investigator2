@@ -4,7 +4,13 @@ import { Portfolio } from "../store/account";
 import { AssetInfo, Wallet } from "../store/oracle";
 import { getWalletAsset } from "./wallet";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
-import { RowData, RowType } from "../views/components/table/data/Row";
+import {
+  RowData,
+  RowType,
+  CellData,
+  StyledRowData,
+  newCellData,
+} from "../views/components/table/data/Row";
 
 export interface PortfolioTableRow extends RowData {
   cells: {
@@ -18,6 +24,20 @@ export interface PortfolioTableRow extends RowData {
     yield?: number;
   };
   children?: PortfolioTableRow[];
+  type: RowType;
+}
+export interface StyledPortfolioTableRow extends StyledRowData {
+  cells: {
+    id?: CellData<string>;
+    name?: CellData<string>;
+    symbol?: CellData<string>;
+    price?: CellData<number>;
+    quantity?: CellData<number>;
+    value?: CellData<number>;
+    wallet?: CellData<string>;
+    yield?: CellData<number>;
+  };
+  children?: StyledPortfolioTableRow[];
   type: RowType;
 }
 
@@ -182,4 +202,52 @@ export function preparePortfolioTableData(
   }
 
   return data;
+}
+
+interface StylingColumnData {
+  mean: number;
+  stdev: number;
+}
+
+type StylingTableData = Record<string, StylingColumnData>;
+
+export function computePortfolioTableDataStyle(
+  data: PortfolioTableRow
+): StyledPortfolioTableRow {
+  const stylingInfo: StylingTableData = {
+    // price: {
+    //   mean: 0.005,
+    //   stdev: 0.005,
+    // },
+  };
+
+  const result: StyledPortfolioTableRow = {
+    cells: {
+      id: newCellData(data.cells.id),
+      name: newCellData(data.cells.name),
+      symbol: newCellData(data.cells.symbol),
+      price: newCellData(data.cells.price),
+      quantity: newCellData(data.cells.quantity),
+      value: newCellData(data.cells.value),
+      wallet: newCellData(data.cells.wallet),
+      yield: newCellData(data.cells.yield),
+    },
+    children: data.children?.map((row) => computePortfolioTableDataStyle(row)),
+    type: data.type,
+  };
+
+  for (const [key, cell] of Object.entries(result.cells)) {
+    const info = stylingInfo[key];
+    if (info === undefined) {
+      continue;
+    }
+    assert(typeof cell.value === "number");
+    if (cell.value > info.mean + info.stdev) {
+      cell.color = "green";
+    } else if (cell.value < (info.mean + info.stdev) * -1) {
+      cell.color = "red";
+    }
+  }
+
+  return result;
 }

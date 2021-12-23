@@ -11,7 +11,7 @@ import {
   ColumnsMeta,
 } from "./data/Column";
 import { TableMeta, TableSummaryRow } from "./data/Table";
-import { RowsData } from "./data/Row";
+import { StyledRowsData } from "./data/Row";
 import { assert } from "../../../utils/helpers";
 
 function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
@@ -49,7 +49,7 @@ function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
 export interface Props {
   meta: TableMeta;
   summary?: TableSummaryRow;
-  rows?: RowsData;
+  rows?: StyledRowsData;
   slice?: [number, number];
 }
 

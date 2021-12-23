@@ -1,7 +1,13 @@
 import { AssetInfo, Watchlist } from "../store/oracle";
 import { Portfolio } from "../store/account";
 import { assert } from "./helpers";
-import { RowData, RowType } from "../views/components/table/data/Row";
+import {
+  RowData,
+  RowType,
+  CellData,
+  StyledRowData,
+  newCellData,
+} from "../views/components/table/data/Row";
 
 export interface WatchlistTableRow extends RowData {
   cells: {
@@ -17,6 +23,22 @@ export interface WatchlistTableRow extends RowData {
     price_change_percentage_30d?: number;
   };
   children?: WatchlistTableRow[];
+  type: RowType;
+}
+export interface StyledWatchlistTableRow extends StyledRowData {
+  cells: {
+    id?: CellData<string>;
+    market_cap_rank?: CellData<number>;
+    market_cap?: CellData<number>;
+    name?: CellData<string>;
+    symbol?: CellData<string>;
+    price?: CellData<number>;
+    price_change_percentage_1h?: CellData<number>;
+    price_change_percentage_24h?: CellData<number>;
+    price_change_percentage_7d?: CellData<number>;
+    price_change_percentage_30d?: CellData<number>;
+  };
+  children?: StyledWatchlistTableRow[];
   type: RowType;
 }
 
@@ -153,4 +175,74 @@ export function prepareWatchlistTableData(
     portfolios
   );
   return data;
+}
+
+interface StylingColumnData {
+  mean: number;
+  stdev: number;
+}
+
+type StylingTableData = Record<string, StylingColumnData>;
+
+export function computeWatchlistTableDataStyle(
+  data: WatchlistTableRow
+): StyledWatchlistTableRow {
+  const stylingInfo: StylingTableData = {
+    price_change_percentage_1h: {
+      mean: 0.005,
+      stdev: 0.005,
+    },
+    price_change_percentage_24h: {
+      mean: 0.01,
+      stdev: 0.02,
+    },
+    price_change_percentage_7d: {
+      mean: 0.05,
+      stdev: 0.03,
+    },
+    price_change_percentage_30d: {
+      mean: 0.17,
+      stdev: 0.05,
+    },
+  };
+
+  const result: StyledWatchlistTableRow = {
+    cells: {
+      id: newCellData(data.cells.id),
+      market_cap_rank: newCellData(data.cells.market_cap_rank),
+      market_cap: newCellData(data.cells.market_cap),
+      name: newCellData(data.cells.name),
+      symbol: newCellData(data.cells.symbol),
+      price: newCellData(data.cells.price),
+      price_change_percentage_1h: newCellData(
+        data.cells.price_change_percentage_1h
+      ),
+      price_change_percentage_24h: newCellData(
+        data.cells.price_change_percentage_24h
+      ),
+      price_change_percentage_7d: newCellData(
+        data.cells.price_change_percentage_7d
+      ),
+      price_change_percentage_30d: newCellData(
+        data.cells.price_change_percentage_30d
+      ),
+    },
+    children: data.children?.map((row) => computeWatchlistTableDataStyle(row)),
+    type: data.type,
+  };
+
+  for (const [key, cell] of Object.entries(result.cells)) {
+    const info = stylingInfo[key];
+    if (info === undefined) {
+      continue;
+    }
+    assert(typeof cell.value === "number");
+    if (cell.value > info.mean + info.stdev) {
+      cell.color = "green";
+    } else if (cell.value < (info.mean + info.stdev) * -1) {
+      cell.color = "red";
+    }
+  }
+
+  return result;
 }

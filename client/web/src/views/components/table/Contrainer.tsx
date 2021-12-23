@@ -6,7 +6,7 @@ import TablePagination from "@mui/material/TablePagination";
 import { useParams } from "react-router-dom";
 import { Table } from "./Table";
 import { BaseTableMeta, TableSettings, buildTableMeta } from "./data/Table";
-import { RowsData } from "./data/Row";
+import { StyledRowsData } from "./data/Row";
 import { TabRow, TabInfo } from "../Tabs";
 import { assert } from "../../../utils/helpers";
 import {
@@ -69,8 +69,8 @@ export function TableContainer({
     tabIdx = idx === -1 ? 0 : idx;
   }
 
-  let allRows: RowsData | undefined;
-  let visibleRows: RowsData | undefined;
+  let allRows: StyledRowsData | undefined;
+  let visibleRows: StyledRowsData | undefined;
   let summary;
 
   if (tabIdx < tabs.length) {
@@ -86,10 +86,12 @@ export function TableContainer({
       visibleRows = allRows.filter((row) => {
         for (const [key, query] of Object.entries(tableMeta.filter || {})) {
           if (key in row.cells) {
-            const value = row.cells[key];
-            assert(typeof value === "string");
+            const cell = row.cells[key];
+            assert(typeof cell.value === "string");
             const hasUpperCase = query.toLowerCase() !== query;
-            const matchingValue = hasUpperCase ? value : value.toLowerCase();
+            const matchingValue = hasUpperCase
+              ? cell.value
+              : cell.value.toLowerCase();
             const matches = matchingValue.includes(query);
             if (matches) {
               return true;

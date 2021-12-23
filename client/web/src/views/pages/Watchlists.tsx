@@ -6,8 +6,11 @@ import {
   Formatter,
 } from "../components/table/data/Column";
 import { BaseTableMeta, TableSettings } from "../components/table/data/Table";
-import { RowData } from "../components/table/data/Row";
-import { prepareWatchlistTableData } from "../../utils/watchlist";
+import { StyledRowData } from "../components/table/data/Row";
+import {
+  prepareWatchlistTableData,
+  computeWatchlistTableDataStyle,
+} from "../../utils/watchlist";
 import {
   getAssetInfo,
   getWatchlists as getPublicWatchlists,
@@ -174,8 +177,19 @@ export function Watchlists() {
       });
   }
 
-  const getTableData = (id: string): RowData | undefined =>
-    prepareWatchlistTableData(id, watchlists, assetInfo, portfolios);
+  const getTableData = (id: string): StyledRowData | undefined => {
+    const data = prepareWatchlistTableData(
+      id,
+      watchlists,
+      assetInfo,
+      portfolios
+    );
+    if (data === undefined) {
+      return undefined;
+    }
+    return computeWatchlistTableDataStyle(data);
+  };
+
   return (
     <TableContainer
       tabs={tabs}
