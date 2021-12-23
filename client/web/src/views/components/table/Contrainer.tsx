@@ -5,28 +5,63 @@ import Paper from "@mui/material/Paper";
 import TablePagination from "@mui/material/TablePagination";
 import { useParams } from "react-router-dom";
 import { Table } from "./Table";
-import { TableMeta, RowsData } from "./Data";
+import { BaseTableMeta, TableSettings, buildTableMeta } from "./data/Table";
+import { RowsData } from "./data/Row";
 import { TabRow, TabInfo } from "../Tabs";
 import { assert } from "../../../utils/helpers";
-import { getRowsPerPageOption, setRowsPerPageOption } from "../../../store/ui";
+import {
+  getRowsPerPageOption,
+  setRowsPerPageOption,
+  getInfoDisplayMode,
+} from "../../../store/ui";
 import { TableMenu } from "./Menu";
+import { InfoDisplayMode } from "../../../components/settings";
 
 export interface Props {
-  meta: TableMeta;
+  baseMeta: BaseTableMeta;
+  settings: TableSettings;
   tabs: TabInfo[];
   getTableData: any;
 }
 
-export function TableContainer({ meta, tabs, getTableData }: Props) {
-  const dispatch = useDispatch();
-  const [filter, setFilter] = React.useState(
-    undefined as Record<string, string> | undefined
+export function TableContainer({
+  tabs,
+  baseMeta,
+  settings,
+  getTableData,
+}: Props) {
+  const [tableSettings, setTableSettings] = React.useState(settings);
+
+  const tableMeta = React.useMemo(
+    () => buildTableMeta(baseMeta, tableSettings),
+    [buildTableMeta, baseMeta, tableSettings]
   );
+
+  const setFilter = (query: Record<string, string> | undefined) => {
+    const newSettings = JSON.parse(
+      JSON.stringify(tableSettings)
+    ) as TableSettings;
+    newSettings.filter = query;
+    setTableSettings(newSettings);
+  };
+
+  const dispatch = useDispatch();
   const [page, setPage] = React.useState(0);
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
 
   const { id } = useParams();
   const rpp = useSelector(getRowsPerPageOption);
+
+  const infoDisplayMode = useSelector(getInfoDisplayMode);
+
+  {
+    const hideSensitive = infoDisplayMode === InfoDisplayMode.HideValues;
+    if (hideSensitive !== Boolean(tableSettings.hideSensitive)) {
+      const newSettings = JSON.parse(JSON.stringify(tableSettings));
+      newSettings.hideSensitive = hideSensitive;
+      setTableSettings(newSettings);
+    }
+  }
 
   let tabIdx = 0;
   if (id) {
@@ -47,9 +82,9 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
   }
 
   if (allRows) {
-    if (filter) {
+    if (tableMeta.filter !== null) {
       visibleRows = allRows.filter((row) => {
-        for (const [key, query] of Object.entries(filter)) {
+        for (const [key, query] of Object.entries(tableMeta.filter || {})) {
           if (key in row.cells) {
             const value = row.cells[key];
             assert(typeof value === "string");
@@ -67,11 +102,6 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
       visibleRows = allRows;
     }
   }
-
-  const state = {
-    showHeaders: true,
-    filter,
-  };
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
@@ -105,10 +135,47 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
     setMenuAnchorEl(null);
   };
 
+  const handleColumnVisibilityChange = (key: string) => {
+    const newSettings = JSON.parse(
+      JSON.stringify(tableSettings)
+    ) as TableSettings;
+    if (newSettings.columns === undefined) {
+      newSettings.columns = [
+        {
+          key,
+          visible: true,
+        },
+      ];
+    } else {
+      const current = newSettings.columns.find((column) => column.key === key);
+      if (current) {
+        current.visible = !current.visible;
+      } else {
+        const allKeys = Object.keys(baseMeta.columns);
+        const totalIdx = allKeys.findIndex((k) => k === key);
+        assert(totalIdx !== undefined);
+        let newIdx = 0;
+        for (const k of allKeys.slice(0, totalIdx)) {
+          if (
+            newSettings.columns.length > newIdx &&
+            newSettings.columns[newIdx].key === k
+          ) {
+            newIdx += 1;
+          }
+        }
+        newSettings.columns.splice(newIdx, 0, {
+          key,
+          visible: true,
+        });
+      }
+    }
+    setTableSettings(newSettings);
+  };
+
   return (
     <>
       <TabRow
-        page={meta.name}
+        page={tableMeta.name}
         tabs={tabs}
         idx={tabIdx}
         setFilter={handleSetFilter}
@@ -120,10 +187,9 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
         sx={{ height: showPager ? "97%" : "100%", overflowY: "auto" }}
       >
         <Table
-          meta={meta}
+          meta={tableMeta}
           rows={visibleRows}
           slice={slice}
-          state={state}
           summary={summary}
         />
       </MUITableContainer>
@@ -138,7 +204,13 @@ export function TableContainer({ meta, tabs, getTableData }: Props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       )}
-      <TableMenu anchorEl={menuAnchorEl} handleMenuClose={handleMenuClose} />
+      <TableMenu
+        anchorEl={menuAnchorEl}
+        handleMenuClose={handleMenuClose}
+        baseMeta={baseMeta}
+        tableMeta={tableMeta}
+        handleColumnVisibilityChange={handleColumnVisibilityChange}
+      />
     </>
   );
 }

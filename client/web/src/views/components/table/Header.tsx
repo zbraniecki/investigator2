@@ -4,13 +4,13 @@ import TableCell, {
 } from "@mui/material/TableCell";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import {
-  TableMeta,
-  TableSummaryRow,
   CellAlign,
-  CellValue,
   SortColumn,
   SortDirection,
-} from "./Data";
+  ColumnMeta,
+} from "./data/Column";
+import { TableMeta, TableSummaryRow } from "./data/Table";
+import { CellValue } from "./data/Row";
 import { SubHeaderRow } from "./SubHeader";
 
 interface CellProps {
@@ -104,14 +104,14 @@ function Cell({
 }
 
 export interface Props {
-  meta: TableMeta;
+  tableMeta: TableMeta;
   summary?: TableSummaryRow;
   sortOrder: SortColumn[];
   setCustomSortOrder: any;
 }
 
 export function HeaderRow({
-  meta,
+  tableMeta,
   summary,
   sortOrder,
   setCustomSortOrder,
@@ -129,7 +129,7 @@ export function HeaderRow({
   return (
     <>
       <TableRow>
-        {meta.nested && (
+        {tableMeta.nested && (
           <TableCell
             sx={{
               borderBottom: 0,
@@ -138,27 +138,27 @@ export function HeaderRow({
             }}
           />
         )}
-        {meta.headers
-          .filter((header) => header.visible)
-          .map((header: any) => {
-            const id = `${meta.name}-header-${header.key}`;
+        {tableMeta.columns
+          .filter((column: ColumnMeta) => column.visible)
+          .map((column: ColumnMeta) => {
+            const id = `${tableMeta.name}-header-${column.key}`;
             return (
               <Cell
                 key={id}
                 id={id}
-                columnName={header.key}
-                width={header.width}
-                value={header.label}
-                align={header.align}
-                defaultSortDirection={header.sort}
-                sort={sort?.column === header.key ? sort?.direction : undefined}
+                columnName={column.key}
+                width={column.width}
+                value={column.label}
+                align={column.align}
+                defaultSortDirection={column.sortDirection}
+                sort={sort?.column === column.key ? sort?.direction : undefined}
                 setCustomSortOrder={setCustomSortOrder}
                 sx={cellSx}
               />
             );
           })}
       </TableRow>
-      {subHeader && <SubHeaderRow summary={summary} meta={meta} />}
+      {subHeader && <SubHeaderRow summary={summary} tableMeta={tableMeta} />}
     </>
   );
 }

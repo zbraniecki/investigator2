@@ -3,7 +3,8 @@ import TableCell from "@mui/material/TableCell";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
 import { getOutletContext } from "../../ui/Content";
-import { CellAlign, CellValue, Formatter, formatValue } from "./Data";
+import { CellAlign, Formatter, formatValue } from "./data/Column";
+import { CellValue } from "./data/Row";
 
 interface CellProps {
   id: string;
@@ -13,6 +14,7 @@ interface CellProps {
   align: CellAlign;
   width: string;
   formatter?: Formatter;
+  showValue: boolean;
 }
 
 Cell.defaultProps = {
@@ -27,6 +29,7 @@ export function Cell({
   align,
   width,
   formatter,
+  showValue,
 }: CellProps) {
   const { setAssetCard } = getOutletContext();
 
@@ -34,10 +37,11 @@ export function Cell({
     setAssetCard(rowId);
   };
 
+  const displayValue = showValue ? formatValue(value, formatter) : "*";
   return (
     <TableCell key={id} align={align} sx={{ width }}>
       <Typography onClick={column === "name" ? handleClick : undefined}>
-        {formatValue(value, formatter)}
+        {displayValue}
       </Typography>
     </TableCell>
   );

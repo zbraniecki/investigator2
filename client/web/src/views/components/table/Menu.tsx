@@ -9,13 +9,28 @@ import SubjectIcon from "@mui/icons-material/Subject";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import Divider from "@mui/material/Divider";
 import Checkbox from "@mui/material/Checkbox";
+import { BaseTableMeta, TableMeta } from "./data/Table";
 
 export interface Props {
   anchorEl: any;
   handleMenuClose: any;
+  baseMeta: BaseTableMeta;
+  tableMeta: TableMeta;
+  handleColumnVisibilityChange: any;
 }
 
-export function TableMenu({ anchorEl, handleMenuClose }: Props) {
+export function TableMenu({
+  anchorEl,
+  handleMenuClose,
+  baseMeta,
+  tableMeta,
+  handleColumnVisibilityChange,
+}: Props) {
+  const handleCheckedChange = (event: any) => {
+    const key = event.currentTarget.value;
+    handleColumnVisibilityChange(key);
+  };
+
   return (
     <Menu
       id="table-menu"
@@ -51,99 +66,40 @@ export function TableMenu({ anchorEl, handleMenuClose }: Props) {
         </ListItemIcon>
       </MenuItem>
       <Divider />
-      <MenuItem
-        sx={{
-          display: "flex",
-        }}
-      >
-        <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
-          Market Cap Rank
-        </ListItemText>
-        <ListItemIcon
-          sx={{
-            marginRight: "-10px",
-            marginLeft: "20px",
-            width: "100px",
-            display: "flex",
-            flexDirection: "row-reverse",
-          }}
-        >
-          <Checkbox />
-        </ListItemIcon>
-      </MenuItem>
-      <MenuItem sx={{ display: "flex" }}>
-        <ListItemText sx={{ minWidth: "100px", flex: 1 }}>1h</ListItemText>
-        <ListItemIcon
-          sx={{
-            marginRight: "-10px",
-            marginLeft: "20px",
-            width: "100px",
-            display: "flex",
-            flexDirection: "row-reverse",
-          }}
-        >
-          <Checkbox />
-        </ListItemIcon>
-      </MenuItem>
-      <MenuItem sx={{ display: "flex" }}>
-        <ListItemText sx={{ minWidth: "100px", flex: 1 }}>24h</ListItemText>
-        <ListItemIcon
-          sx={{
-            marginRight: "-10px",
-            marginLeft: "20px",
-            width: "100px",
-            display: "flex",
-            flexDirection: "row-reverse",
-          }}
-        >
-          <Checkbox />
-        </ListItemIcon>
-      </MenuItem>
-      <MenuItem sx={{ display: "flex" }}>
-        <ListItemText sx={{ minWidth: "100px", flex: 1 }}>7d</ListItemText>
-        <ListItemIcon
-          sx={{
-            marginRight: "-10px",
-            marginLeft: "20px",
-            width: "100px",
-            display: "flex",
-            flexDirection: "row-reverse",
-          }}
-        >
-          <Checkbox />
-        </ListItemIcon>
-      </MenuItem>
-      <MenuItem sx={{ display: "flex" }}>
-        <ListItemText sx={{ minWidth: "100px", flex: 1 }}>30d</ListItemText>
-        <ListItemIcon
-          sx={{
-            marginRight: "-10px",
-            marginLeft: "20px",
-            width: "100px",
-            display: "flex",
-            flexDirection: "row-reverse",
-          }}
-        >
-          <Checkbox />
-        </ListItemIcon>
-      </MenuItem>
-      <Divider />
-      <MenuItem sx={{ display: "flex" }}>
-        <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
-          Default layout
-        </ListItemText>
-        <ListItemIcon
-          sx={{
-            marginRight: "-10px",
-            marginLeft: "20px",
-            width: "100px",
-            display: "flex",
-            flexDirection: "row-reverse",
-          }}
-        >
-          <Checkbox />
-        </ListItemIcon>
-      </MenuItem>
+      {Object.entries(baseMeta.columns).map(([key, column]) => {
+        const current = tableMeta.columns.find((c) => c.key === key);
+        const visible = Boolean(current?.visible);
+        const disabled = key === "name";
+
+        return (
+          <MenuItem
+            key={`table-menu-visibility-${key}`}
+            sx={{
+              display: "flex",
+            }}
+          >
+            <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
+              {column.label}
+            </ListItemText>
+            <ListItemIcon
+              sx={{
+                marginRight: "-10px",
+                marginLeft: "20px",
+                width: "100px",
+                display: "flex",
+                flexDirection: "row-reverse",
+              }}
+            >
+              <Checkbox
+                value={key}
+                checked={visible}
+                disabled={disabled}
+                onChange={handleCheckedChange}
+              />
+            </ListItemIcon>
+          </MenuItem>
+        );
+      })}
     </Menu>
   );
 }

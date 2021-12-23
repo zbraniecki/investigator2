@@ -1,4 +1,4 @@
-import { RowData, RowsData, RowType } from "../views/components/table/Data";
+import { RowData, RowsData, RowType } from "../views/components/table/data/Row";
 
 const CATCH_ALL_KEY = "?";
 

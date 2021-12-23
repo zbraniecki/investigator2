@@ -4,7 +4,7 @@ import { Portfolio } from "../store/account";
 import { AssetInfo, Wallet } from "../store/oracle";
 import { getWalletAsset } from "./wallet";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
-import { RowData, RowType } from "../views/components/table/Data";
+import { RowData, RowType } from "../views/components/table/data/Row";
 
 export interface PortfolioTableRow extends RowData {
   cells: {

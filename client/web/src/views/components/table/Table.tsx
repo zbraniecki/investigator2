@@ -5,15 +5,13 @@ import TableHead from "@mui/material/TableHead";
 import { Row } from "./Row";
 import { HeaderRow } from "./Header";
 import {
-  TableMeta,
-  TableState,
-  RowsData,
   SortColumn,
   SortDirection,
-  HeadersData,
-  HeaderData,
-  TableSummaryRow,
-} from "./Data";
+  ColumnMeta,
+  ColumnsMeta,
+} from "./data/Column";
+import { TableMeta, TableSummaryRow } from "./data/Table";
+import { RowsData } from "./data/Row";
 import { assert } from "../../../utils/helpers";
 
 function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
@@ -50,13 +48,12 @@ function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
 }
 export interface Props {
   meta: TableMeta;
-  state: TableState;
   summary?: TableSummaryRow;
   rows?: RowsData;
   slice?: [number, number];
 }
 
-function findColumn(key: string, headers: HeadersData): HeaderData | undefined {
+function findColumn(key: string, headers: ColumnsMeta): ColumnMeta | undefined {
   for (const header of headers) {
     if (header.key === key) {
       return header;
@@ -65,7 +62,7 @@ function findColumn(key: string, headers: HeadersData): HeaderData | undefined {
   return undefined;
 }
 
-export function Table({ meta, state, summary, rows, slice }: Props) {
+export function Table({ meta, summary, rows, slice }: Props) {
   const [customSortOrder, setCustomSortOrder] = React.useState(
     undefined as undefined | SortColumn
   );
@@ -73,11 +70,11 @@ export function Table({ meta, state, summary, rows, slice }: Props) {
   const sortOrder: SortColumn[] = [];
 
   for (const column of meta.sortColumns) {
-    const header = findColumn(column, meta.headers);
+    const header = findColumn(column, meta.columns);
     if (header !== undefined) {
       sortOrder.push({
         column,
-        direction: header.sort,
+        direction: header.sortDirection,
       });
     }
   }
@@ -86,7 +83,7 @@ export function Table({ meta, state, summary, rows, slice }: Props) {
     sortOrder.unshift(customSortOrder);
   }
 
-  if (rows) {
+  if (rows && sortOrder.length > 0) {
     rows.sort(sortFunc.bind(undefined, sortOrder));
   }
 
@@ -94,7 +91,7 @@ export function Table({ meta, state, summary, rows, slice }: Props) {
 
   return (
     <MUITable>
-      {state.showHeaders && (
+      {meta.columns.length > 0 && (
         <TableHead
           sx={{
             position: "sticky",
@@ -105,7 +102,7 @@ export function Table({ meta, state, summary, rows, slice }: Props) {
           }}
         >
           <HeaderRow
-            meta={meta}
+            tableMeta={meta}
             summary={summary}
             sortOrder={sortOrder}
             setCustomSortOrder={setCustomSortOrder}

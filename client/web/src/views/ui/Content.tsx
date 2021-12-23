@@ -3,11 +3,9 @@ import Box from "@mui/material/Box";
 import { useOutletContext, Outlet } from "react-router-dom";
 import { Component as Card } from "../components/Card";
 
-interface Props {}
-
 type ContextType = { setAssetCard: any };
 
-export default function Content({}: Props) {
+export default function Content() {
   const [assetCard, setAssetCard] = React.useState(
     undefined as string | undefined
   );
@@ -29,7 +27,7 @@ export default function Content({}: Props) {
       <Outlet context={{ setAssetCard }} />
       <Card
         meta={{ id: "foo", assetCard, handleCloseCard }}
-        data={{ name: { name: "Foo" } }}
+        data={{ name: "foo" }}
       />
     </Box>
   );

@@ -1,13 +1,8 @@
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import {
-  TableMeta,
-  TableSummaryRow,
-  CellAlign,
-  CellValue,
-  Formatter,
-  formatValue,
-} from "./Data";
+import { CellAlign, Formatter, formatValue } from "./data/Column";
+import { TableMeta, TableSummaryRow } from "./data/Table";
+import { CellValue } from "./data/Row";
 
 interface SubHeaderCellProps {
   id: string;
@@ -48,17 +43,17 @@ function SubHeaderCell({
 
 export interface Props {
   summary?: TableSummaryRow;
-  meta: TableMeta;
+  tableMeta: TableMeta;
 }
 
 SubHeaderRow.defaultProps = {
   summary: undefined,
 };
 
-export function SubHeaderRow({ summary, meta }: Props) {
+export function SubHeaderRow({ summary, tableMeta }: Props) {
   return (
     <TableRow>
-      {meta.nested && (
+      {tableMeta.nested && (
         <TableCell
           sx={{
             borderBottom: 0,
@@ -66,19 +61,19 @@ export function SubHeaderRow({ summary, meta }: Props) {
           }}
         />
       )}
-      {meta.headers
-        .filter((header) => header.visible)
-        .map((header: any) => {
-          const id = `${meta.name}-header-${header.key}`;
-          const value = summary ? summary[header.key] : undefined;
+      {tableMeta.columns
+        .filter((column) => column.visible)
+        .map((column: any) => {
+          const id = `${tableMeta.name}-header-${column.key}`;
+          const value = summary ? summary[column.key] : undefined;
           return (
             <SubHeaderCell
               key={id}
               id={id}
-              width={header.width}
+              width={column.width}
               value={value}
-              formatter={header.formatter}
-              align={header.align}
+              formatter={column.formatter}
+              align={column.align}
             />
           );
         })}

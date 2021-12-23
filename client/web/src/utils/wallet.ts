@@ -2,12 +2,9 @@ import { Portfolio } from "../store/account";
 import { AssetInfo, Wallet, WalletAsset } from "../store/oracle";
 import { createPortfolioTableData } from "./portfolio";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
-import {
-  TableData,
-  RowData,
-  CellAlign,
-  RowType,
-} from "../views/components/table/Data";
+import { TableMeta } from "../views/components/table/data/Table";
+import { CellAlign } from "../views/components/table/data/Column";
+import { RowData, RowType } from "../views/components/table/data/Row";
 
 export function getWalletAsset(
   walletId: string,

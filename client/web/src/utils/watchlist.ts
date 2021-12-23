@@ -1,7 +1,7 @@
 import { AssetInfo, Watchlist } from "../store/oracle";
 import { Portfolio } from "../store/account";
 import { assert } from "./helpers";
-import { RowData, RowType } from "../views/components/table/Data";
+import { RowData, RowType } from "../views/components/table/data/Row";
 
 export interface WatchlistTableRow extends RowData {
   cells: {

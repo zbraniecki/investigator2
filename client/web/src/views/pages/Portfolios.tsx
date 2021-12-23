@@ -1,12 +1,12 @@
 import { useSelector } from "react-redux";
 import { TableContainer } from "../components/table/Contrainer";
 import {
-  TableMeta,
-  RowData,
-  Formatter,
   CellAlign,
   SortDirection,
-} from "../components/table/Data";
+  Formatter,
+} from "../components/table/data/Column";
+import { BaseTableMeta, TableSettings } from "../components/table/data/Table";
+import { RowData } from "../components/table/data/Row";
 import { preparePortfolioTableData } from "../../utils/portfolio";
 import {
   Portfolio,
@@ -15,75 +15,97 @@ import {
   getSession,
 } from "../../store/account";
 import { getAssetInfo, getWallets } from "../../store/oracle";
-// import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 import { TabInfo } from "../components/Tabs";
 
-const tableMeta: TableMeta = {
+const baseTableMeta: BaseTableMeta = {
   name: "portfolios",
-  sortColumns: ["value"],
   nested: true,
-  headers: [
-    {
+  columns: {
+    id: {
+      label: "ID",
+      align: CellAlign.Right,
+      sortDirection: SortDirection.Asc,
+      width: "5%",
+    },
+    name: {
       label: "Name",
-      key: "name",
       align: CellAlign.Left,
-      sort: SortDirection.Asc,
+      sortDirection: SortDirection.Asc,
       width: "15%",
       formatter: Formatter.Symbol,
-      visible: true,
     },
-    {
+    price: {
       label: "Price",
-      key: "price",
       align: CellAlign.Left,
-      sort: SortDirection.Desc,
+      sortDirection: SortDirection.Desc,
       width: "auto",
       formatter: Formatter.Currency,
-      visible: true,
     },
-    {
+    wallet: {
       label: "Wallet",
-      key: "wallet",
       align: CellAlign.Right,
-      sort: SortDirection.Asc,
+      sortDirection: SortDirection.Asc,
       width: "20%",
-      visible: true,
     },
-    {
+    quantity: {
       label: "Quantity",
-      key: "quantity",
       align: CellAlign.Right,
-      sort: SortDirection.Desc,
+      sortDirection: SortDirection.Desc,
       width: "10%",
       formatter: Formatter.Number,
       editable: true,
-      visible: true,
-      /* sensitive: true, */
+      sensitive: true,
     },
-    {
+    yield: {
       label: "Yield",
-      key: "yield",
       align: CellAlign.Right,
-      sort: SortDirection.Desc,
+      sortDirection: SortDirection.Desc,
       width: "10%",
       formatter: Formatter.Percent,
-      visible: true,
-      /* sensitive: true, */
+      sensitive: true,
     },
-    {
+    value: {
       label: "Value",
-      key: "value",
       align: CellAlign.Right,
-      sort: SortDirection.Desc,
+      sortDirection: SortDirection.Desc,
       width: "10%",
       formatter: Formatter.Currency,
-      visible: true,
-      /* sensitive: true, */
+      sensitive: true,
     },
-  ],
+  },
   //   pager: true,
   //   header: true,
   //   outline: true,
+};
+
+const tableSettings: TableSettings = {
+  sortColumns: ["value"],
+  columns: [
+    {
+      key: "name",
+      visible: true,
+    },
+    {
+      key: "price",
+      visible: true,
+    },
+    {
+      key: "wallet",
+      visible: true,
+    },
+    {
+      key: "quantity",
+      visible: true,
+    },
+    {
+      key: "yield",
+      visible: true,
+    },
+    {
+      key: "value",
+      visible: true,
+    },
+  ],
 };
 
 export function Portfolios() {
@@ -112,6 +134,11 @@ export function Portfolios() {
   const getTableData = (id: string): RowData | undefined =>
     preparePortfolioTableData(id, portfolios, assetInfo, wallets);
   return (
-    <TableContainer tabs={tabs} meta={tableMeta} getTableData={getTableData} />
+    <TableContainer
+      tabs={tabs}
+      baseMeta={baseTableMeta}
+      settings={tableSettings}
+      getTableData={getTableData}
+    />
   );
 }

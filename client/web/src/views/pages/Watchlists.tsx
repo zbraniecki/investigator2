@@ -1,12 +1,12 @@
 import { useSelector } from "react-redux";
 import { TableContainer } from "../components/table/Contrainer";
 import {
-  RowData,
-  TableMeta,
-  Formatter,
   CellAlign,
   SortDirection,
-} from "../components/table/Data";
+  Formatter,
+} from "../components/table/data/Column";
+import { BaseTableMeta, TableSettings } from "../components/table/data/Table";
+import { RowData } from "../components/table/data/Row";
 import { prepareWatchlistTableData } from "../../utils/watchlist";
 import {
   getAssetInfo,
@@ -19,101 +19,118 @@ import {
   getUsers,
   getSession,
 } from "../../store/account";
-// import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
 import { TabInfo } from "../components/Tabs";
 
-const tableMeta: TableMeta = {
+const baseTableMeta: BaseTableMeta = {
   name: "watchlists",
-  sortColumns: ["market_cap_rank", "market_cap"],
   nested: false,
-  headers: [
-    {
+  columns: {
+    id: {
       label: "ID",
-      key: "id",
       align: CellAlign.Right,
-      sort: SortDirection.Asc,
-      width: "80px",
-      visible: false,
+      sortDirection: SortDirection.Asc,
+      width: "5%",
     },
-    {
+    market_cap_rank: {
       label: "#",
-      key: "market_cap_rank",
       align: CellAlign.Right,
-      sort: SortDirection.Asc,
-      width: "80px",
-      visible: true,
+      sortDirection: SortDirection.Asc,
+      width: "5%",
     },
-    {
+    market_cap: {
       label: "Market Cap",
-      key: "market_cap",
       align: CellAlign.Right,
-      sort: SortDirection.Asc,
-      width: "80px",
-      visible: false,
+      sortDirection: SortDirection.Asc,
+      width: "5%",
     },
-    {
+    name: {
       label: "Name",
-      key: "name",
       align: CellAlign.Left,
-      sort: SortDirection.Asc,
-      width: "15%",
+      sortDirection: SortDirection.Asc,
       formatter: Formatter.Symbol,
-      visible: true,
+      width: "10%",
     },
-    {
-      label: "Price",
-      key: "price",
+    symbol: {
+      label: "Symbol",
       align: CellAlign.Left,
-      sort: SortDirection.Desc,
-      width: "auto",
+      sortDirection: SortDirection.Asc,
+      formatter: Formatter.Symbol,
+      width: "10%",
+    },
+    price: {
+      label: "Price",
+      align: CellAlign.Right,
+      sortDirection: SortDirection.Desc,
       formatter: Formatter.Currency,
       editable: true,
-      visible: true,
+      width: "auto",
     },
-    {
+    price_change_percentage_1h: {
       label: "1h",
-      key: "price_change_percentage_1h",
       align: CellAlign.Left,
-      sort: SortDirection.Desc,
-      width: "10%",
+      sortDirection: SortDirection.Desc,
+      width: "5%",
       formatter: Formatter.Percent,
-      // colorDiff: true,
-      visible: true,
     },
-    {
+    price_change_percentage_24h: {
       label: "24h",
-      key: "price_change_percentage_24h",
       align: CellAlign.Left,
-      sort: SortDirection.Desc,
-      width: "10%",
+      sortDirection: SortDirection.Desc,
+      width: "5%",
       formatter: Formatter.Percent,
-      // colorDiff: true,
-      visible: true,
     },
-    {
+    price_change_percentage_7d: {
       label: "7d",
-      key: "price_change_percentage_7d",
       align: CellAlign.Left,
-      sort: SortDirection.Desc,
-      width: "10%",
+      sortDirection: SortDirection.Desc,
+      width: "5%",
       formatter: Formatter.Percent,
-      // colorDiff: true,
-      visible: true,
     },
-    {
+    price_change_percentage_30d: {
       label: "30d",
-      key: "price_change_percentage_30d",
       align: CellAlign.Left,
-      sort: SortDirection.Desc,
-      width: "10%",
+      sortDirection: SortDirection.Desc,
+      width: "5%",
       formatter: Formatter.Percent,
-      // colorDiff: true,
-      visible: true,
     },
-  ],
+  },
   // pager: true,
   // header: true,
   // outline: true,
+};
+
+const tableSettings: TableSettings = {
+  sortColumns: ["market_cap_rank", "market_cap"],
+  columns: [
+    {
+      key: "market_cap_rank",
+      visible: true,
+    },
+    {
+      key: "name",
+      visible: true,
+    },
+    {
+      key: "price",
+      visible: true,
+    },
+    {
+      key: "price_change_percentage_1h",
+      visible: true,
+    },
+    {
+      key: "price_change_percentage_24h",
+      visible: true,
+    },
+    {
+      key: "price_change_percentage_7d",
+      visible: true,
+    },
+    {
+      key: "price_change_percentage_30d",
+      visible: true,
+    },
+  ],
 };
 
 export function Watchlists() {
@@ -161,6 +178,11 @@ export function Watchlists() {
   const getTableData = (id: string): RowData | undefined =>
     prepareWatchlistTableData(id, watchlists, assetInfo, portfolios);
   return (
-    <TableContainer tabs={tabs} meta={tableMeta} getTableData={getTableData} />
+    <TableContainer
+      tabs={tabs}
+      baseMeta={baseTableMeta}
+      settings={tableSettings}
+      getTableData={getTableData}
+    />
   );
 }

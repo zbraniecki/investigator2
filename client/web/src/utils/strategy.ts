@@ -9,11 +9,11 @@ import {
   groupTableDataByColumn2,
   computeGroupedTableData,
 } from "./helpers";
-import { SymbolNameCell } from "../views/components/Table";
+// import { SymbolNameCell } from "../views/components/Table";
 
 export interface StrategyTableRow {
   cells: {
-    name?: SymbolNameCell | string;
+    name?: string;
     target?: number;
     current?: number;
     deviation?: number;
@@ -49,10 +49,7 @@ export function createStrategyTableData(
     const deltaUsd = targetValue - currentValue;
     return {
       cells: {
-        name: {
-          name: asset.name,
-          symbol: asset.symbol,
-        },
+        name: asset.name,
         target: target.percent,
         current: currentPercent,
         deviation,
@@ -83,10 +80,7 @@ export function createStrategyTableData(
 
       children.push({
         cells: {
-          name: {
-            name: asset.name,
-            symbol: asset.symbol,
-          },
+          name: asset.name,
           current,
         },
         type: "asset",

@@ -66,10 +66,10 @@ export function Controls({
 
   return (
     <Toolbar>
-      <Tooltip title="Show values">
+      <Tooltip title="Hide sensitive values">
         <div>
           <Switch
-            checked={infoDisplayMode === InfoDisplayMode.ShowAll}
+            checked={infoDisplayMode === InfoDisplayMode.HideValues}
             onChange={handleInfoDisplayModeChange}
             colors={colors}
           />

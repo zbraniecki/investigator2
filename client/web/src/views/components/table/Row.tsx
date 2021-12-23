@@ -6,7 +6,8 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
 import { useDispatch } from "react-redux";
-import { RowData, TableMeta } from "./Data";
+import { TableMeta } from "./data/Table";
+import { RowData } from "./data/Row";
 import { updateCellThunk } from "../../../store/account";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
@@ -42,20 +43,21 @@ export function Row({ id, data, tableMeta }: Props) {
             )}
           </TableCell>
         )}
-        {tableMeta.headers
-          .filter((header) => header.visible)
-          .map((header) => {
-            const key = `${id}-${header.key}`;
-            const value = data.cells[header.key];
-            if (header.editable) {
+        {tableMeta.columns
+          .filter((columns) => columns.visible)
+          .map((column) => {
+            const key = `${id}-${column.key}`;
+            const value = data.cells[column.key];
+            const hideValue = column.sensitive && tableMeta.hideSensitive;
+            if (column.editable && !hideValue) {
               return (
                 <EditableCell
                   key={key}
                   id={key}
                   value={value}
-                  align={header.align}
-                  width={header.width}
-                  formatter={header.formatter}
+                  align={column.align}
+                  width={column.width}
+                  formatter={column.formatter}
                   onCellUpdate={handleCellUpdate}
                 />
               );
@@ -63,13 +65,14 @@ export function Row({ id, data, tableMeta }: Props) {
             return (
               <Cell
                 key={key}
-                column={header.key}
+                column={column.key}
                 rowId={data.cells.id as string}
                 id={key}
                 value={value}
-                align={header.align}
-                width={header.width}
-                formatter={header.formatter}
+                align={column.align}
+                width={column.width}
+                formatter={column.formatter}
+                showValue={!hideValue}
               />
             );
           })}
@@ -78,19 +81,19 @@ export function Row({ id, data, tableMeta }: Props) {
         <TableRow>
           <TableCell
             style={{ padding: 0 }}
-            colSpan={tableMeta.headers.length + 1}
+            colSpan={tableMeta.columns.length + 1}
           >
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Table
                 rows={data.children}
                 meta={{
                   name: `${id}-sub`,
-                  headers: tableMeta.headers,
+                  columns: tableMeta.columns,
                   sortColumns: tableMeta.sortColumns,
                   nested: tableMeta.nested,
-                }}
-                state={{
                   showHeaders: false,
+                  filter: null,
+                  hideSensitive: tableMeta.hideSensitive,
                 }}
               />
             </Collapse>

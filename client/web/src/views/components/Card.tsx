@@ -16,7 +16,6 @@ import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Modal from "@mui/material/Modal";
-import { SymbolNameCell } from "./Table";
 import { getAssetInfo } from "../../store/oracle";
 import { assert } from "../../utils/helpers";
 
@@ -47,7 +46,7 @@ export interface Props {
     handleCloseCard: any;
   };
   data: {
-    name: SymbolNameCell;
+    name: string;
   };
 }
 
