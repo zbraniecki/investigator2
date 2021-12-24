@@ -14,7 +14,7 @@ router.register(
 router.register(r"profile/watchlist", profile_views.WatchlistViewSet, "Watchlist")
 router.register(r"profile/portfolio", profile_views.PortfolioViewSet, "Portfolio")
 router.register(r"profile/account", profile_views.AccountViewSet)
-router.register(r"profile/holding", profile_views.HoldingViewSet)
+router.register(r"profile/holding", profile_views.HoldingViewSet),
 router.register(r"profile/users", profile_views.UserViewSet, "User")
 router.register(r"strategy/list", strategy_views.StrategyViewSet)
 

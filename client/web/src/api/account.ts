@@ -90,13 +90,32 @@ export const fetchUserInfo = async ({ token }: { token: string }) => {
   return resp;
 };
 
-export const updateCell = async ({ value }: { value: number }) => {
-  const p = new Promise((resolve) => {
-    setTimeout(resolve, 3000);
+export const updateCell = async ({
+  token,
+  id,
+  quantity,
+}: {
+  token: string;
+  id: string;
+  quantity: number;
+}) => {
+  const params = {
+    quantity,
+  };
+
+  const data = await fetch(`${BASE_URL}profile/holding/${id}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(params),
   });
-  await p;
+  const resp = await data.json();
+  // error case?
   return {
     error: null,
-    value,
+    pk: resp.pk,
+    quantity: resp.quantity,
   };
 };

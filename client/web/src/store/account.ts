@@ -41,6 +41,7 @@ export const updateCellThunk = createAsyncThunk(
 
 export interface Holding {
   id: string;
+  asset_id: string;
   symbol: string;
   quantity: number;
   account: string;
@@ -161,18 +162,16 @@ export const accountSlice = createSlice({
         console.log(`action failed`);
         return;
       }
-      const pid = "5842aa4b-a7c7-4300-866d-16a3812ef78a";
-      const assetId = "bitcoin";
-      const accountId = "hodlnaut-wallet";
-      console.log("STATUS UPDATED");
-      const portfolio = state.portfolios[pid];
-      for (const holding of portfolio.holdings) {
-        if (holding.id === assetId && holding.account === accountId) {
-          holding.quantity = action.payload.value;
-          console.log("updating value");
-          break;
+      const { pk, quantity } = action.payload;
+      for (const portfolio of Object.values(state.portfolios)) {
+        for (const holding of portfolio.holdings) {
+          if (holding.id === pk) {
+            console.log("Updating quantity");
+            holding.quantity = quantity;
+          }
         }
       }
+      console.log("STATUS UPDATED");
     });
   },
 });

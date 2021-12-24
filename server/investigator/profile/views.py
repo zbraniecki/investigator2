@@ -18,7 +18,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = PortfolioSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -32,7 +32,7 @@ class HoldingViewSet(viewsets.ModelViewSet):
 
     queryset = Holding.objects.all().order_by("-quantity")
     serializer_class = HoldingSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 class WatchlistViewSet(viewsets.ModelViewSet):

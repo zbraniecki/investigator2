@@ -29,6 +29,7 @@ class AssetViewSet(viewsets.ModelViewSet):
         queryset = Asset.objects.all().order_by("-symbol")
         return queryset
 
+
 class ServiceViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows services to be viewed or edited.

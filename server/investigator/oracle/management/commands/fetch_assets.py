@@ -113,6 +113,7 @@ ASSET_KEYS = {
     ],
 }
 
+
 def fetch_batch(source, batch_idx, crypto, usd, enable, only_update):
     # with open(f"coins_{pidx}.json", "w") as f:
     #     json.dump(source, f)
@@ -211,9 +212,7 @@ def fetch_crypto_assets(active=False, dry=False):
             slice = ids[0:40]
             repl = ",".join(slice)
             print(ids)
-            source = requests.get(
-                COIN_SELECTED_LIST_URL.replace("%IDS%", repl)
-            ).json()
+            source = requests.get(COIN_SELECTED_LIST_URL.replace("%IDS%", repl)).json()
             fetch_batch(source, 0, crypto, usd, True, False)
             for entry in source:
                 id = entry["id"]
@@ -221,6 +220,7 @@ def fetch_crypto_assets(active=False, dry=False):
 
             if len(ids) == 0:
                 break
+
 
 def fetch_stock_assets(input_data, active, dry):
     owner = User.objects.get(username="zbraniecki")
@@ -255,15 +255,15 @@ def fetch_stock_assets(input_data, active, dry):
         tickers = yf.Tickers(symbols)
 
         input_data = yf.download(
-                tickers = symbols,
-                period = "5d",
-                interval = "1d",
-                group_by = 'ticker',
-                auto_adjust = False,
-                prepost = False,
-                threads = True,
-                proxy = None
-            )
+            tickers=symbols,
+            period="5d",
+            interval="1d",
+            group_by="ticker",
+            auto_adjust=False,
+            prepost=False,
+            threads=True,
+            proxy=None,
+        )
 
         data = {}
 
@@ -293,7 +293,7 @@ def fetch_stock_assets(input_data, active, dry):
                 holding = Holding.objects.update_or_create(
                     asset=usd,
                     account=account,
-                    defaults = {
+                    defaults={
                         "quantity": hdata["quantity"],
                     },
                 )
@@ -301,7 +301,7 @@ def fetch_stock_assets(input_data, active, dry):
 
             d = data[symbol]
             ticker = tickers.tickers[symbol.upper()].info
-            defaults={
+            defaults = {
                 "base": usd,
                 "symbol": symbol,
                 "name": ticker["shortName"],
@@ -326,13 +326,12 @@ def fetch_stock_assets(input_data, active, dry):
             holding = Holding.objects.update_or_create(
                 asset=asset,
                 account=account,
-                defaults = {
+                defaults={
                     "quantity": hdata["quantity"],
                 },
             )
 
     return None
-
 
 
 class Command(BaseCommand):

@@ -90,8 +90,10 @@ class PortfolioUIInline(admin.TabularInline):
 class WatchlistUIInline(admin.TabularInline):
     model = WatchlistUI
 
+
 class StrategyUIInline(admin.TabularInline):
     model = StrategyUI
+
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):

@@ -21,7 +21,7 @@ class HoldingSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Holding
-        fields = ["symbol", "quantity", "account"]
+        fields = ["pk", "symbol", "quantity", "account"]
 
     def get_symbol(self, obj):
         return obj.asset.symbol.lower()
@@ -48,7 +48,8 @@ class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
         for holding in obj.holdings.all():
             result.append(
                 {
-                    "id": holding.asset.id,
+                    "id": holding.id,
+                    "asset_id": holding.asset.id,
                     "quantity": holding.quantity,
                     "account": holding.account.service.id,
                 }
@@ -57,7 +58,8 @@ class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
             for holding in account.holdings.all():
                 result.append(
                     {
-                        "id": holding.asset.id,
+                        "id": holding.id,
+                        "asset_id": holding.asset.id,
                         "quantity": holding.quantity,
                         "account": holding.account.service.id,
                     }
@@ -70,9 +72,12 @@ class PortfolioSerializer(serializers.HyperlinkedModelSerializer):
             for holding in holdings:
                 result.append(
                     {
-                        "id": holding.asset.id,
+                        "id": holding.id,
+                        "asset_id": holding.asset.id,
                         "quantity": holding.quantity,
-                        "account": holding.account.service.id if holding.account else None,
+                        "account": holding.account.service.id
+                        if holding.account
+                        else None,
                     }
                 )
         return result
@@ -103,10 +108,7 @@ class WatchlistSerializer(serializers.HyperlinkedModelSerializer):
             return get_dynamic_assets(obj.dynamic)
         if obj.type == WatchlistType.TAG:
             tag = obj.tag
-            assets = Asset.objects.filter(
-                tags__in=[tag],
-                holding__account__owner=user
-            )
+            assets = Asset.objects.filter(tags__in=[tag], holding__account__owner=user)
             return [asset.id for asset in assets]
         else:
             return []

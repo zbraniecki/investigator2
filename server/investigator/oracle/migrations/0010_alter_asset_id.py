@@ -7,13 +7,19 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('oracle', '0009_auto_20211130_0719'),
+        ("oracle", "0009_auto_20211130_0719"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='asset',
-            name='id',
-            field=autoslug.fields.AutoSlugField(editable=False, populate_from='api_id', primary_key=True, serialize=False, unique=True),
+            model_name="asset",
+            name="id",
+            field=autoslug.fields.AutoSlugField(
+                editable=False,
+                populate_from="api_id",
+                primary_key=True,
+                serialize=False,
+                unique=True,
+            ),
         ),
     ]

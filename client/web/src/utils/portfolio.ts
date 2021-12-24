@@ -15,6 +15,7 @@ import {
 export interface PortfolioTableRow extends RowData {
   cells: {
     id?: string;
+    asset_id?: string;
     name?: string;
     symbol?: string;
     price?: number;
@@ -29,6 +30,7 @@ export interface PortfolioTableRow extends RowData {
 export interface StyledPortfolioTableRow extends StyledRowData {
   cells: {
     id?: CellData<string>;
+    asset_id?: CellData<string>;
     name?: CellData<string>;
     symbol?: CellData<string>;
     price?: CellData<number>;
@@ -78,13 +80,14 @@ export function buildPortfolioTableData(
   assetInfo: Record<string, AssetInfo>
 ): PortfolioTableRow[] {
   const rows: PortfolioTableRow[] = portfolio.holdings.map(
-    ({ id, quantity }) => {
-      const asset = assetInfo[id];
+    ({ id, asset_id, quantity }) => {
+      const asset = assetInfo[asset_id];
       assert(asset);
 
       return {
         cells: {
           id,
+          asset_id,
           name: asset.name,
           symbol: asset.symbol,
           price: asset.info.value,
@@ -119,9 +122,12 @@ export function createPortfolioTableData(
   topLevel: boolean
 ): PortfolioTableRow {
   const rows: PortfolioTableRow[] = portfolio.holdings.map(
-    ({ id, quantity, account }) => {
-      const asset = assetInfo[id];
-      assert(asset);
+    ({ id, asset_id, quantity, account }) => {
+      const asset = assetInfo[asset_id];
+      if (!asset) {
+        console.log(asset_id);
+      }
+      // assert(asset);
       const wallet = wallets[account];
       let walletAsset;
       if (wallet) {
@@ -131,6 +137,7 @@ export function createPortfolioTableData(
       return {
         cells: {
           id,
+          asset_id,
           name: asset.name,
           symbol: asset.symbol,
           price: asset.info.value,
@@ -189,7 +196,7 @@ export function preparePortfolioTableData(
   if (data.children !== undefined) {
     data.children = groupTableDataByColumn(
       data.children,
-      "id",
+      "asset_id",
       [
         { key: "name", strategy: GroupingStrategy.IfSame },
         { key: "price", strategy: GroupingStrategy.IfSame },
@@ -224,6 +231,7 @@ export function computePortfolioTableDataStyle(
   const result: StyledPortfolioTableRow = {
     cells: {
       id: newCellData(data.cells.id),
+      asset_id: newCellData(data.cells.asset_id),
       name: newCellData(data.cells.name),
       symbol: newCellData(data.cells.symbol),
       price: newCellData(data.cells.price),

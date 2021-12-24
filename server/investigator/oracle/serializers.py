@@ -40,7 +40,7 @@ class AssetInfoSerializer(serializers.ModelSerializer):
 
 class AssetSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField("get_tags")
-    info = AssetInfoSerializer(source='*')
+    info = AssetInfoSerializer(source="*")
 
     class Meta:
         model = Asset

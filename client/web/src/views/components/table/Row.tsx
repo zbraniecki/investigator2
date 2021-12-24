@@ -5,10 +5,10 @@ import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { TableMeta } from "./data/Table";
 import { StyledRowData } from "./data/Row";
-import { updateCellThunk } from "../../../store/account";
+import { getSession, updateCellThunk } from "../../../store/account";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 
@@ -19,16 +19,17 @@ export interface Props {
 }
 export function Row({ id, data, tableMeta }: Props) {
   const [open, setOpen] = React.useState(false);
+  const session = useSelector(getSession);
 
   const dispatch = useDispatch();
 
-  const handleCellUpdate = async (cid: string, value: number) => {
+  const handleCellUpdate = async (cid: string, quantity: number) => {
     console.log("handling cell update");
     // XXX: We want to get holding ID and carry it into rows.
-    const rid = data.cells.id;
-    console.log(cid);
-    console.log(value);
-    return dispatch(updateCellThunk({ value }));
+    const { value } = data.cells.id;
+    return dispatch(
+      updateCellThunk({ token: session.token, id: value as string, quantity })
+    );
   };
 
   return (
