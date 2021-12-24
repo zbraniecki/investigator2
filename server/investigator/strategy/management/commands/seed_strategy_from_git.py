@@ -5,7 +5,7 @@ from investigator.oracle.models import (
     Asset,
 )
 
-from investigator.profile.models import (
+from investigator.user.models import (
     User,
     Account,
     Holding,

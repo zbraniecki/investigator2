@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from investigator.strategy.models import Portfolio
-from investigator.profile.models import (
+from investigator.user.models import (
     User,
     Holding,
 )

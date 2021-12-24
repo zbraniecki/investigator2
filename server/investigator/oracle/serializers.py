@@ -1,5 +1,5 @@
 from .models import Category, Asset, AssetInfo, Service, Passive
-from investigator.profile.models import Watchlist, WatchlistType, WatchlistUI
+from investigator.user.models import Watchlist, WatchlistType, WatchlistUI
 from rest_framework import serializers
 from django.db.models import Q
 from datetime import datetime

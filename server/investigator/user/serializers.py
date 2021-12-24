@@ -130,32 +130,28 @@ class AccountSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    ui = serializers.SerializerMethodField("get_ui")
-    current = serializers.SerializerMethodField("get_current")
+    visible_lists = serializers.SerializerMethodField("get_visible_lists")
 
     class Meta:
         model = get_user_model()
-        fields = ("id", "username", "email", "ui", "current")
+        fields = ("pk", "username", "email", "base_asset", "visible_lists")
+        read_only_fields = ["pk", "username", "email"]
 
-    def get_ui(self, obj):
+    def get_visible_lists(self, obj):
         portfolios = PortfolioUI.objects.filter(
-            user__id=obj.id, visibility=True, order__isnull=False
-        ).order_by("order")
+            user__id=obj.id, visible_order__isnull=False
+        ).order_by("visible_order")
         watchlists = WatchlistUI.objects.filter(
-            user__id=obj.id, visibility=True, order__isnull=False
-        ).order_by("order")
+            user__id=obj.id, visible_order__isnull=False
+        ).order_by("visible_order")
         strategies = StrategyUI.objects.filter(
-            user__id=obj.id, visibility=True, order__isnull=False
-        ).order_by("order")
+            user__id=obj.id, visible_order__isnull=False
+        ).order_by("visible_order")
         return {
             "portfolios": [p.portfolio.id for p in portfolios],
             "watchlists": [w.watchlist.id for w in watchlists],
             "strategies": [s.strategy.id for s in strategies],
         }
-
-    def get_current(self, obj):
-        user = self.context["request"].user
-        return obj.id == user.id
 
 
 class MyCustomTokenSerializer(serializers.ModelSerializer):

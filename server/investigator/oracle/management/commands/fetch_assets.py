@@ -1,4 +1,4 @@
-from investigator.profile.models import User, Account, Holding
+from investigator.user.models import User, Account, Holding
 from investigator.oracle.models import Asset, Category, Tag, Provider, Service
 from django.core.management.base import BaseCommand
 from django.utils.dateparse import parse_datetime

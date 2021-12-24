@@ -22,7 +22,7 @@ export function App() {
 
   useEffect(() => {
     console.log("in effect");
-    if (session.token && session.username === undefined) {
+    if (session.token) {
       console.log("fetching user info");
       const p = dispatch(
         fetchUserInfoThunk({ token: session.token })
@@ -35,7 +35,7 @@ export function App() {
         console.log("Fetched user stuff");
       });
     }
-  }, [session.token, session.username, session.authenticateState]);
+  }, [session.token, session.user_pk, session.authenticateState]);
 
   useEffect(() => {
     if (Object.keys(assetInfo).length === 0) {

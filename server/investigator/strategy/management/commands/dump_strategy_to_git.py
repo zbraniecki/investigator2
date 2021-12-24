@@ -4,7 +4,7 @@ from investigator.strategy.models import (
     StrategyChange,
     StrategyTarget,
 )
-from investigator.profile.models import (
+from investigator.user.models import (
     User,
 )
 from django.core.management.base import BaseCommand

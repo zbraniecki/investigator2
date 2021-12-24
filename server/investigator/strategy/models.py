@@ -1,5 +1,5 @@
 from django.db import models
-from investigator.profile.models import User, Portfolio
+from investigator.user.models import User, Portfolio
 from investigator.oracle.models import Asset
 import uuid
 
@@ -48,5 +48,4 @@ class StrategyChange(models.Model):
 class StrategyUI(models.Model):
     strategy = models.ForeignKey(Strategy, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    visibility = models.BooleanField()
-    order = models.IntegerField()
+    visible_order = models.IntegerField(blank=True, null=True)

@@ -6,7 +6,7 @@ export const fetchPortfolios = async ({ token }: { token: string }) => {
     setTimeout(resolve, 500);
   });
   await p;
-  const data = await fetch(`${BASE_URL}profile/portfolio/`, {
+  const data = await fetch(`${BASE_URL}user/portfolio/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -17,7 +17,7 @@ export const fetchPortfolios = async ({ token }: { token: string }) => {
 };
 
 export const fetchWatchlists = async ({ token }: { token: string }) => {
-  const data = await fetch(`${BASE_URL}profile/watchlist/`, {
+  const data = await fetch(`${BASE_URL}user/watchlist/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -52,6 +52,7 @@ export const authenticate = async ({
   if (resp.key) {
     handleClose();
     return {
+      pk: resp.user.pk,
       token: resp.key,
       username: resp.user.username,
     };
@@ -79,7 +80,7 @@ export const fetchUserInfo = async ({ token }: { token: string }) => {
   });
   await p;
 
-  const data = await fetch(`${BASE_URL}profile/users/`, {
+  const data = await fetch(`${BASE_URL}user/users/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -103,7 +104,7 @@ export const updateCell = async ({
     quantity,
   };
 
-  const data = await fetch(`${BASE_URL}profile/holding/${id}/`, {
+  const data = await fetch(`${BASE_URL}user/holding/${id}/`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

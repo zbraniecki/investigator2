@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Switch from "@mui/material/Switch";
 import { PaletteMode } from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -17,7 +17,11 @@ import Typography from "@mui/material/Typography";
 import { LightMode } from "../../../components/settings";
 import { AppBarColors } from "../AppBar";
 import { LoginModal } from "../Login";
-import { AuthenticateState, logoutThunk } from "../../../store/account";
+import {
+  AuthenticateState,
+  getUsers,
+  logoutThunk,
+} from "../../../store/account";
 
 interface Props {
   session: any;
@@ -35,6 +39,7 @@ export function AccountMenu({
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loginModalOpen, setLoginModalOpen] = React.useState(false);
+  const users = useSelector(getUsers);
   const open = Boolean(anchorEl);
 
   const handleClick = (event: any) => {
@@ -69,14 +74,13 @@ export function AccountMenu({
     return false;
   };
 
+  const currentUser = users[session.user_pk];
+
   let accountIcon;
-  if (
-    session.authenticateState === AuthenticateState.Session &&
-    session.username !== undefined
-  ) {
+  if (currentUser) {
     accountIcon = (
       <Typography sx={{ color: colors.accent }}>
-        {session.username[0].toUpperCase()}
+        {currentUser.username[0].toUpperCase()}
       </Typography>
     );
   } else {
@@ -127,15 +131,15 @@ export function AccountMenu({
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        {session.username && (
+        {currentUser && (
           <MenuItem sx={{ cursor: "default" }} onClick={handleAccount}>
             <ListItemIcon>
               <Person fontSize="small" />
             </ListItemIcon>
-            {session.username}
+            {currentUser.username}
           </MenuItem>
         )}
-        {session.username && <Divider />}
+        {currentUser && <Divider />}
         <MenuItem onClick={handleLightModeChange}>
           <FormControlLabel
             control={<Switch checked={lightModeName === "dark"} size="small" />}
@@ -143,7 +147,7 @@ export function AccountMenu({
           />
         </MenuItem>
         <Divider />
-        {session.authenticateState === AuthenticateState.Session ? (
+        {currentUser ? (
           <MenuItem onClick={handleLogout}>
             <ListItemIcon>
               <Logout fontSize="small" />

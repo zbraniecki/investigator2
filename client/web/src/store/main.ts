@@ -36,8 +36,10 @@ function saveToLocalStorage(state: any) {
   localStorage.setItem("rows-per-page-option", state.ui.rowsPerPageOption);
   if (state.account.session.token) {
     localStorage.setItem("token", state.account.session.token);
+    localStorage.setItem("user_pk", state.account.session.user_pk);
   } else {
     localStorage.removeItem("token");
+    localStorage.removeItem("user_pk");
   }
 }
 

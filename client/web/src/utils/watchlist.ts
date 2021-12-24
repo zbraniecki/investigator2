@@ -90,7 +90,7 @@ function getAssetsFromPortfolio(
 ): Set<string> {
   const symbols: Set<string> = new Set();
   for (const holding of portfolio.holdings) {
-    symbols.add(holding.id);
+    symbols.add(holding.asset_id);
   }
   for (const pid of portfolio.portfolios) {
     const p = portfolios[pid];

@@ -10,7 +10,7 @@ from investigator.oracle.models import (
     PassiveChangeType,
 )
 
-from investigator.profile.models import (
+from investigator.user.models import (
     User,
     Account,
     Holding,

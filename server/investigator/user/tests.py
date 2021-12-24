@@ -1,5 +1,5 @@
 from django.test import TestCase
-from investigator.profile.management.commands.helpers import find_matches
+from investigator.user.management.commands.helpers import find_matches
 
 
 class CommandHelpersTestCase(TestCase):

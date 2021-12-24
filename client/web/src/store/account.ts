@@ -9,6 +9,7 @@ import {
   fetchUserInfo,
   updateCell,
 } from "../api/account";
+import { createHolding } from "../api/holding";
 import { Watchlist } from "./oracle";
 import { getFromLocalStorage } from "./main";
 
@@ -39,12 +40,16 @@ export const updateCellThunk = createAsyncThunk(
   updateCell
 );
 
+export const createHoldingThunk = createAsyncThunk(
+  "account/createHolding",
+  createHolding
+);
+
 export interface Holding {
-  id: string;
+  pk: string;
   asset_id: string;
-  symbol: string;
   quantity: number;
-  account: string;
+  account?: string;
 }
 
 export interface Portfolio {
@@ -77,7 +82,7 @@ interface AccountState {
   session: {
     authenticateState: AuthenticateState;
     token?: string;
-    username?: string;
+    user_pk?: string;
   };
   portfolios: Record<string, Portfolio>;
   watchlists?: Record<string, Watchlist>;
@@ -88,6 +93,7 @@ const initialState = {
   session: {
     authenticateState: AuthenticateState.None,
     token: getFromLocalStorage("token", "string", undefined),
+    user_pk: getFromLocalStorage("user_pk", "string", undefined),
   },
   portfolios: {},
   users: {},
@@ -95,7 +101,7 @@ const initialState = {
 
 function cleanSlice(state: any) {
   state.session.authenticateState = AuthenticateState.None;
-  state.session.username = undefined;
+  state.session.user_pk = undefined;
   state.session.token = undefined;
   state.portfolios = {};
   state.watchlists = undefined;
@@ -137,6 +143,7 @@ export const accountSlice = createSlice({
       } else {
         state.session.authenticateState = AuthenticateState.Session;
         state.session.token = action.payload.token;
+        state.session.user_pk = action.payload.pk;
       }
     });
     builder.addCase(logoutThunk.fulfilled, (state) => {
@@ -150,11 +157,7 @@ export const accountSlice = createSlice({
 
       state.users = {};
       for (const item of action.payload) {
-        state.users[item.username] = item;
-        if (state.session.username === undefined && item.current) {
-          state.session.username = item.username;
-          state.session.authenticateState = AuthenticateState.Session;
-        }
+        state.users[item.pk] = item;
       }
     });
     builder.addCase(updateCellThunk.fulfilled, (state, action) => {
@@ -165,13 +168,17 @@ export const accountSlice = createSlice({
       const { pk, quantity } = action.payload;
       for (const portfolio of Object.values(state.portfolios)) {
         for (const holding of portfolio.holdings) {
-          if (holding.id === pk) {
+          if (holding.pk === pk) {
             console.log("Updating quantity");
             holding.quantity = quantity;
           }
         }
       }
       console.log("STATUS UPDATED");
+    });
+    builder.addCase(createHoldingThunk.fulfilled, (state, action) => {
+      console.log("Created new holding");
+      console.log(action);
     });
   },
 });

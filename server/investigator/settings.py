@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     # "allauth.socialaccount",
     "corsheaders",
     "investigator.oracle",
-    "investigator.profile",
+    "investigator.user",
     "investigator.strategy",
 ]
 
@@ -137,7 +137,7 @@ STATIC_URL = "/static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = "profile.User"
+AUTH_USER_MODEL = "user.User"
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
@@ -165,5 +165,5 @@ REST_FRAMEWORK = {
 }
 
 REST_AUTH_SERIALIZERS = {
-    "TOKEN_SERIALIZER": "investigator.profile.serializers.MyCustomTokenSerializer",
+    "TOKEN_SERIALIZER": "investigator.user.serializers.MyCustomTokenSerializer",
 }

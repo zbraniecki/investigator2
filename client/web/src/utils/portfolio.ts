@@ -71,6 +71,9 @@ function computeHeaderData(
     cells.yield = totalYield;
   }
 
+  if (cells.value === 0) {
+    cells.value = undefined;
+  }
   return cells;
 }
 
@@ -80,13 +83,13 @@ export function buildPortfolioTableData(
   assetInfo: Record<string, AssetInfo>
 ): PortfolioTableRow[] {
   const rows: PortfolioTableRow[] = portfolio.holdings.map(
-    ({ id, asset_id, quantity }) => {
+    ({ pk, asset_id, quantity }) => {
       const asset = assetInfo[asset_id];
       assert(asset);
 
       return {
         cells: {
-          id,
+          id: pk,
           asset_id,
           name: asset.name,
           symbol: asset.symbol,
@@ -122,12 +125,10 @@ export function createPortfolioTableData(
   topLevel: boolean
 ): PortfolioTableRow {
   const rows: PortfolioTableRow[] = portfolio.holdings.map(
-    ({ id, asset_id, quantity, account }) => {
+    ({ pk, asset_id, quantity, account }) => {
       const asset = assetInfo[asset_id];
-      if (!asset) {
-        console.log(asset_id);
-      }
-      // assert(asset);
+      assert(asset);
+      assert(account);
       const wallet = wallets[account];
       let walletAsset;
       if (wallet) {
@@ -136,7 +137,7 @@ export function createPortfolioTableData(
 
       return {
         cells: {
-          id,
+          id: pk,
           asset_id,
           name: asset.name,
           symbol: asset.symbol,

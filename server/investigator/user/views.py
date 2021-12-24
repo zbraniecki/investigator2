@@ -32,7 +32,11 @@ class HoldingViewSet(viewsets.ModelViewSet):
 
     queryset = Holding.objects.all().order_by("-quantity")
     serializer_class = HoldingSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Holding.objects.filter(owner=user).order_by("-name")
 
 
 class WatchlistViewSet(viewsets.ModelViewSet):
@@ -63,7 +67,9 @@ class UserViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
 
+    # queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
+    http_method_names = ["get", "patch"]
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):

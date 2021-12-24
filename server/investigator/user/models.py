@@ -7,7 +7,9 @@ import uuid
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    pass
+    base_asset = models.ForeignKey(
+        Asset, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
 
 class Account(models.Model):
@@ -25,6 +27,7 @@ class Account(models.Model):
 
 class Holding(AssetInfo, PassiveABC):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     quantity = models.FloatField()
     account = models.ForeignKey(
@@ -114,12 +117,10 @@ class Watchlist(models.Model):
 class PortfolioUI(models.Model):
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    visibility = models.BooleanField()
-    order = models.IntegerField()
+    visible_order = models.IntegerField(blank=True, null=True)
 
 
 class WatchlistUI(models.Model):
     watchlist = models.ForeignKey(Watchlist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    visibility = models.BooleanField()
-    order = models.IntegerField()
+    visible_order = models.IntegerField(blank=True, null=True)

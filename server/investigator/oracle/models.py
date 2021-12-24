@@ -10,7 +10,7 @@ def percent(input):
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(
-        "profile.User", on_delete=models.CASCADE, blank=True, null=True
+        "user.User", on_delete=models.CASCADE, blank=True, null=True
     )
     name = models.CharField(max_length=100)
     slug = AutoSlugField(populate_from="name")
@@ -30,7 +30,7 @@ class Category(models.Model):
 class Tag(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(
-        "profile.User", on_delete=models.CASCADE, blank=True, null=True
+        "user.User", on_delete=models.CASCADE, blank=True, null=True
     )
     name = models.CharField(max_length=100)
     slug = AutoSlugField(populate_from="name")
@@ -71,6 +71,36 @@ class AssetInfo(models.Model):
     value = models.FloatField(blank=True, null=True)
     high_24h = models.FloatField(blank=True, null=True)
     low_24h = models.FloatField(blank=True, null=True)
+    last_updated = models.DateTimeField(blank=True, null=True)
+    image = models.CharField(max_length=200, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+def get_asset_slug(instance):
+    id = instance.api_id if instance.api_id is not None else instance.symbol
+    return f"{instance.asset_class.name}_{id}"
+
+
+class Asset(AssetInfo):
+    objects = ActiveAssetManager()
+    inactive_objects = InactiveAssetManager()
+    all_objects = AllAssetManager()
+
+    id = AutoSlugField(
+        primary_key=True,
+        populate_from=get_asset_slug,
+        unique=True,
+        manager=all_objects,
+    )
+
+    symbol = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    asset_class = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    tags = models.ManyToManyField(Tag, related_name="+", blank=True)
+    api_id = models.CharField(max_length=100, blank=True, null=True)
+    active = models.BooleanField(default=False)
     market_cap_rank = models.IntegerField(blank=True, null=True)
     market_cap = models.FloatField(blank=True, null=True)
     market_cap_change_percentage_24h = models.FloatField(blank=True, null=True)
@@ -81,28 +111,7 @@ class AssetInfo(models.Model):
     circulating_supply = models.FloatField(blank=True, null=True)
     total_supply = models.FloatField(blank=True, null=True)
     max_supply = models.FloatField(blank=True, null=True)
-    last_updated = models.DateTimeField(blank=True, null=True)
-    image = models.CharField(max_length=200, blank=True, null=True)
     inflation = models.FloatField(blank=True, null=True)
-
-    class Meta:
-        abstract = True
-
-
-class Asset(AssetInfo):
-    objects = ActiveAssetManager()
-    inactive_objects = InactiveAssetManager()
-    all_objects = AllAssetManager()
-
-    id = AutoSlugField(
-        primary_key=True, populate_from="api_id", unique=True, manager=all_objects
-    )
-
-    symbol = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
-    tags = models.ManyToManyField(Tag, blank=True)
-    api_id = models.CharField(max_length=100, blank=True, null=True)
-    active = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} ({self.symbol})"
@@ -165,13 +174,6 @@ class PassiveType(models.TextChoices):
 
 
 class PassiveABC(models.Model):
-    name = models.CharField(max_length=100, blank=True, null=True)
-    type = models.CharField(
-        max_length=3,
-        choices=PassiveType.choices,
-        blank=True,
-        null=True,
-    )
     min = models.FloatField(blank=True, null=True)
     max = models.FloatField(blank=True, null=True)
     apy_min = models.FloatField(blank=True, null=True)
@@ -202,6 +204,13 @@ class PassiveABC(models.Model):
 
 
 class Passive(PassiveABC):
+    name = models.CharField(max_length=100, blank=True, null=True)
+    type = models.CharField(
+        max_length=3,
+        choices=PassiveType.choices,
+        blank=True,
+        null=True,
+    )
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
 
