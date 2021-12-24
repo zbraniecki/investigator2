@@ -12,6 +12,7 @@ import Person from "@mui/icons-material/Person";
 import Logout from "@mui/icons-material/Logout";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
+import SettingsIcon from "@mui/icons-material/Settings";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import { LightMode } from "../../../components/settings";
@@ -28,6 +29,7 @@ interface Props {
   colors: AppBarColors;
   lightModeName: PaletteMode;
   setLightMode: any;
+  setSettingsOpen: any;
 }
 
 export function AccountMenu({
@@ -35,6 +37,7 @@ export function AccountMenu({
   colors,
   lightModeName,
   setLightMode,
+  setSettingsOpen,
 }: Props) {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -72,6 +75,10 @@ export function AccountMenu({
     event.preventDefault();
     event.stopPropagation();
     return false;
+  };
+
+  const handleSettings = (event: any) => {
+    setSettingsOpen(true);
   };
 
   const currentUser = users[session.user_pk];
@@ -140,6 +147,14 @@ export function AccountMenu({
           </MenuItem>
         )}
         {currentUser && <Divider />}
+        {currentUser && (
+          <MenuItem onClick={handleSettings}>
+            <ListItemIcon>
+              <SettingsIcon fontSize="small" />
+            </ListItemIcon>
+            Settings
+          </MenuItem>
+        )}
         <MenuItem onClick={handleLightModeChange}>
           <FormControlLabel
             control={<Switch checked={lightModeName === "dark"} size="small" />}

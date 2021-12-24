@@ -18,6 +18,7 @@ interface Props {
   infoDisplayMode: InfoDisplayMode;
   lightModeName: PaletteMode;
   setLightMode: any;
+  setSettingsOpen: any;
   colors: AppBarColors;
 }
 
@@ -25,6 +26,7 @@ export function Controls({
   infoDisplayMode,
   lightModeName,
   setLightMode,
+  setSettingsOpen,
   colors,
 }: Props) {
   const dispatch = useDispatch();
@@ -97,6 +99,7 @@ export function Controls({
         colors={colors}
         lightModeName={lightModeName}
         setLightMode={setLightMode}
+        setSettingsOpen={setSettingsOpen}
       />
     </Toolbar>
   );

@@ -9,6 +9,7 @@ interface Props {
   setLightMode: any;
   lightModeName: PaletteMode;
   infoDisplayMode: InfoDisplayMode;
+  setSettingsOpen: any;
 }
 
 export interface AppBarColors {
@@ -23,6 +24,7 @@ export function InvestigatorAppBar({
   setLightMode,
   lightModeName,
   infoDisplayMode,
+  setSettingsOpen,
 }: Props) {
   let colors: AppBarColors = {
     primary: "primary.50",
@@ -59,6 +61,7 @@ export function InvestigatorAppBar({
         infoDisplayMode={infoDisplayMode}
         lightModeName={lightModeName}
         setLightMode={setLightMode}
+        setSettingsOpen={setSettingsOpen}
         colors={colors}
       />
     </AppBar>

@@ -15,8 +15,11 @@ import InvestigatorDrawer from "./Drawer";
 import { getMenuItems } from "./Menu";
 import Content from "./Content";
 import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
+import { SettingsDialog } from "./Settings";
 
 export function Chrome() {
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
+
   const storedLightMode: LightMode = useSelector(getLightMode);
   const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
 
@@ -62,6 +65,8 @@ export function Chrome() {
     },
   ]);
 
+  const onSettingsOk = () => {};
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -69,11 +74,17 @@ export function Chrome() {
         setLightMode={setLightMode}
         lightModeName={lightModeName}
         infoDisplayMode={infoDisplayMode}
+        setSettingsOpen={setSettingsOpen}
       />
       <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
         <InvestigatorDrawer menuItems={menuItems} />
         {routes}
       </Box>
+      <SettingsDialog
+        onOk={onSettingsOk}
+        open={settingsOpen}
+        setOpen={setSettingsOpen}
+      />
     </ThemeProvider>
   );
 }
