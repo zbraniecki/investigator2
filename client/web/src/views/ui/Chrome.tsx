@@ -16,7 +16,7 @@ import { getMenuItems } from "./Menu";
 import Content from "./Content";
 import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
 import { SettingsDialog } from "./Settings";
-import { TutorialDialog } from "./Tutorial";
+import { TutorialDialog } from "./tutorial/Tutorial";
 
 export function Chrome() {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
