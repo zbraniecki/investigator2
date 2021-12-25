@@ -16,9 +16,11 @@ import { getMenuItems } from "./Menu";
 import Content from "./Content";
 import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
 import { SettingsDialog } from "./Settings";
+import { TutorialDialog } from "./Tutorial";
 
 export function Chrome() {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [tutorialOpen, setTutorialOpen] = React.useState(true);
 
   const storedLightMode: LightMode = useSelector(getLightMode);
   const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
@@ -85,6 +87,7 @@ export function Chrome() {
         open={settingsOpen}
         setOpen={setSettingsOpen}
       />
+      <TutorialDialog open={tutorialOpen} setOpen={setTutorialOpen} />
     </ThemeProvider>
   );
 }

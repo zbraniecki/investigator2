@@ -27,8 +27,7 @@ export function SettingsDialog({ open, setOpen, onOk }: Props) {
   };
 
   const handleBaseAssetChange = (event: any) => {
-    const {value} = event.target;
-    console.log(value);
+    const { value } = event.target;
     setBaseAsset(value);
   };
 
