@@ -1,17 +1,30 @@
+import React from "react";
 /* import { useSelector } from "react-redux"; */
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Drawer from "@mui/material/Drawer";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
+import ListIcon from "@mui/icons-material/List";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
+import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import { useMatch, NavLink } from "react-router-dom";
+import { bindActionCreators } from "@reduxjs/toolkit";
 import { MenuItem } from "./Menu";
 /* import { getSession } from "../../store/account"; */
 
 interface Props {
   menuItems: Array<MenuItem>;
+  setHoldingOpen: any;
 }
 
-export default function InvestigatorDrawer({ menuItems }: Props) {
+export default function InvestigatorDrawer({
+  menuItems,
+  setHoldingOpen,
+}: Props) {
   /* const session = useSelector(getSession); */
   const index = Boolean(useMatch(`/`));
 
@@ -24,6 +37,21 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
     }
     return false;
   }
+
+  const handleHoldingOpen = (event: any) => {
+    setHoldingOpen(true);
+  };
+
+  const actions = [
+    {
+      icon: <MonetizationOnIcon />,
+      name: "Holding",
+      action: handleHoldingOpen,
+    },
+    { icon: <ListIcon />, name: "Portfolio" },
+    { icon: <ShowChartIcon />, name: "Watchlist" },
+    { icon: <PieChartOutlineIcon />, name: "Strategy" },
+  ];
 
   return (
     <Drawer
@@ -52,6 +80,23 @@ export default function InvestigatorDrawer({ menuItems }: Props) {
           </ListItemButton>
         ))}
       </List>
+      <SpeedDial
+        id="main-speed-dial"
+        ariaLabel="SpeedDial basic example"
+        sx={{ position: "absolute", bottom: 28, left: 0, zIndex: 100 }}
+        FabProps={{ size: "small", style: { backgroundColor: "#444444" } }}
+        icon={<SpeedDialIcon />}
+      >
+        {actions.map((action) => (
+          <SpeedDialAction
+            key={action.name}
+            icon={action.icon}
+            onMouseDown={(event) => event.preventDefault()}
+            tooltipTitle={action.name}
+            onClick={action.action}
+          />
+        ))}
+      </SpeedDial>
     </Drawer>
   );
 }

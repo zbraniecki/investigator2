@@ -22,7 +22,7 @@ import { HoldingDialog } from "./edit/Holding";
 export function Chrome() {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [tutorialOpen, setTutorialOpen] = React.useState(false);
-  const [holdingOpen, setHoldingOpen] = React.useState(true);
+  const [holdingOpen, setHoldingOpen] = React.useState(false);
 
   const storedLightMode: LightMode = useSelector(getLightMode);
   const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
@@ -81,7 +81,10 @@ export function Chrome() {
         setSettingsOpen={setSettingsOpen}
       />
       <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
-        <InvestigatorDrawer menuItems={menuItems} />
+        <InvestigatorDrawer
+          menuItems={menuItems}
+          setHoldingOpen={setHoldingOpen}
+        />
         {routes}
       </Box>
       <SettingsDialog

@@ -4,13 +4,6 @@ import MUITableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import TablePagination from "@mui/material/TablePagination";
 import { useParams } from "react-router-dom";
-import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import SpeedDialAction from "@mui/material/SpeedDialAction";
-import ListIcon from "@mui/icons-material/List";
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import ShowChartIcon from "@mui/icons-material/ShowChart";
-import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import { Table } from "./Table";
 import { BaseTableMeta, TableSettings, buildTableMeta } from "./data/Table";
 import { StyledRowsData } from "./data/Row";
@@ -23,13 +16,6 @@ import {
 } from "../../../store/ui";
 import { TableMenu } from "./Menu";
 import { InfoDisplayMode } from "../../../components/settings";
-
-const actions = [
-  { icon: <MonetizationOnIcon />, name: "Holding" },
-  { icon: <ListIcon />, name: "Portfolio" },
-  { icon: <ShowChartIcon />, name: "Watchlist" },
-  { icon: <PieChartOutlineIcon />, name: "Strategy" },
-];
 
 export interface Props {
   baseMeta: BaseTableMeta;
@@ -208,20 +194,6 @@ export function TableContainer({
           summary={summary}
         />
       </MUITableContainer>
-      <SpeedDial
-        ariaLabel="SpeedDial basic example"
-        sx={{ position: "absolute", bottom: 28, left: 54, zIndex: 100 }}
-        FabProps={{ size: "small", style: { backgroundColor: "#444444" } }}
-        icon={<SpeedDialIcon />}
-      >
-        {actions.map((action) => (
-          <SpeedDialAction
-            key={action.name}
-            icon={action.icon}
-            tooltipTitle={action.name}
-          />
-        ))}
-      </SpeedDial>
       {showPager && visibleRowsCount > 0 && (
         <TablePagination
           rowsPerPageOptions={[5, 10, 30, 50, { label: "All", value: -1 }]}

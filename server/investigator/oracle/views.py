@@ -1,14 +1,17 @@
 from django.shortcuts import render
 
-from .models import Category, Asset, AssetInfo, Service
+from .models import Category, Tag, Asset, AssetInfo, Service
 from investigator.user.models import Watchlist
 from rest_framework import viewsets
+from rest_framework.response import Response
 from rest_framework import permissions
 from .serializers import (
     AssetSerializer,
     AssetInfoSerializer,
     ServiceSerializer,
     PublicWatchlistSerializer,
+    CategorySerializer,
+    TagSerializer,
 )
 from investigator.oracle.management.commands.fetch_assets import fetch_crypto_assets
 
@@ -49,3 +52,37 @@ class PublicWatchlistsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Watchlist.objects.filter(owner__isnull=True).order_by("-name")
         return queryset
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    serializer_class = CategorySerializer
+
+    def get_queryset(self):
+        queryset = Category.objects.filter(owner__isnull=True).order_by("-name")
+        return queryset
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    serializer_class = TagSerializer
+
+    def get_queryset(self):
+        queryset = Tag.objects.filter(owner__isnull=True).order_by("-name")
+        return queryset
+
+
+class TaxonomyViewSet(viewsets.ViewSet):
+    def list(self, request, format=None):
+        categories = {
+            category.pk.__str__(): CategorySerializer(category).data
+            for category in Category.objects.filter(owner__isnull=True)
+        }
+        tags = {
+            tag.pk.__str__(): TagSerializer(tag).data
+            for tag in Tag.objects.filter(owner__isnull=True)
+        }
+        return Response(
+            {
+                "categories": categories,
+                "tags": tags,
+            }
+        )

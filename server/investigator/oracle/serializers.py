@@ -1,4 +1,4 @@
-from .models import Category, Asset, AssetInfo, Service, Passive
+from .models import Category, Asset, AssetInfo, Service, Passive, Category, Tag
 from investigator.user.models import Watchlist, WatchlistType, WatchlistUI
 from rest_framework import serializers
 from django.db.models import Q
@@ -44,7 +44,7 @@ class AssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ["id", "symbol", "name", "tags", "info"]
+        fields = ["pk", "asset_class", "symbol", "name", "tags", "info"]
 
     def get_tags(self, obj):
         return [tag.__str__() for tag in obj.tags.all()]
@@ -56,7 +56,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Service
-        fields = ["id", "name", "assets", "type"]
+        fields = ["pk", "name", "assets", "type"]
 
     def get_name(self, obj):
         return obj.provider.__str__()
@@ -70,7 +70,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
         for passive in passives:
             result.append(
                 {
-                    "id": passive.asset.id,
+                    "pk": passive.asset.id,
                     "apy": passive.apy_min,
                     "yield_type": passive.type,
                 }
@@ -87,7 +87,7 @@ class PublicWatchlistSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Watchlist
         fields = [
-            "id",
+            "pk",
             "name",
             "type",
             "assets",
@@ -109,3 +109,15 @@ class PublicWatchlistSerializer(serializers.HyperlinkedModelSerializer):
             return get_dynamic_assets(obj.dynamic)
         else:
             return []
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ["pk", "name", "slug", "category"]
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["pk", "name", "slug", "parent"]

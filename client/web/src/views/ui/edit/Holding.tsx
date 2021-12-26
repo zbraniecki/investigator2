@@ -11,11 +11,8 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
-import {
-  getSession,
-  getUsers,
-  updateUserInfoThunk,
-} from "../../../store/account";
+import { getSession, getUsers } from "../../../store/account";
+import { getAssetInfo } from "../../../store/oracle";
 
 interface Props {
   open: boolean;
@@ -28,7 +25,8 @@ export function HoldingDialog({ open, setOpen }: Props) {
 
   const session = useSelector(getSession);
   const users = useSelector(getUsers);
-  const dispatch = useDispatch();
+  const assetInfo = useSelector(getAssetInfo);
+  console.log(assetInfo);
 
   const currentUser = users[session.user_pk];
 
