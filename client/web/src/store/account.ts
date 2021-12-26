@@ -8,6 +8,7 @@ import {
   logout,
   fetchUserInfo,
   updateCell,
+  updateUserInfo,
 } from "../api/account";
 import { createHolding } from "../api/holding";
 import { Watchlist } from "./oracle";
@@ -45,6 +46,11 @@ export const createHoldingThunk = createAsyncThunk(
   createHolding
 );
 
+export const updateUserInfoThunk = createAsyncThunk(
+  "account/updateUserInfo",
+  updateUserInfo
+);
+
 export interface Holding {
   pk: string;
   asset_id: string;
@@ -61,7 +67,7 @@ export interface Portfolio {
 }
 
 export interface User {
-  id: string;
+  pk: string;
   username: string;
   email: string;
   ui: {
@@ -179,6 +185,9 @@ export const accountSlice = createSlice({
     builder.addCase(createHoldingThunk.fulfilled, (state, action) => {
       console.log("Created new holding");
       console.log(action);
+    });
+    builder.addCase(updateUserInfoThunk.fulfilled, (state, action) => {
+      state.users[action.payload.pk] = action.payload;
     });
   },
 });

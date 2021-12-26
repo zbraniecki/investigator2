@@ -1,4 +1,4 @@
-import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Button from "@mui/material/Button";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -8,6 +8,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import { getSession, getUsers, updateUserInfoThunk } from "../../store/account";
 
 interface Props {
   open: boolean;
@@ -16,7 +17,12 @@ interface Props {
 }
 
 export function SettingsDialog({ open, setOpen, onOk }: Props) {
-  const [baseAsset, setBaseAsset] = React.useState("fiat_usd");
+  const session = useSelector(getSession);
+  const users = useSelector(getUsers);
+  const dispatch = useDispatch();
+
+  const currentUser = users[session.user_pk];
+  const baseAsset = currentUser?.base_asset;
 
   const handleCancel = () => {
     setOpen(false);
@@ -28,7 +34,13 @@ export function SettingsDialog({ open, setOpen, onOk }: Props) {
 
   const handleBaseAssetChange = (event: any) => {
     const { value } = event.target;
-    setBaseAsset(value);
+    dispatch(
+      updateUserInfoThunk({
+        token: session.token,
+        pk: session.user_pk,
+        baseAsset: value,
+      })
+    );
   };
 
   return (

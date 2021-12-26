@@ -17,10 +17,12 @@ import Content from "./Content";
 import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
 import { SettingsDialog } from "./Settings";
 import { TutorialDialog } from "./tutorial/Tutorial";
+import { HoldingDialog } from "./edit/Holding";
 
 export function Chrome() {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
-  const [tutorialOpen, setTutorialOpen] = React.useState(true);
+  const [tutorialOpen, setTutorialOpen] = React.useState(false);
+  const [holdingOpen, setHoldingOpen] = React.useState(true);
 
   const storedLightMode: LightMode = useSelector(getLightMode);
   const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
@@ -88,6 +90,7 @@ export function Chrome() {
         setOpen={setSettingsOpen}
       />
       <TutorialDialog open={tutorialOpen} setOpen={setTutorialOpen} />
+      <HoldingDialog open={holdingOpen} setOpen={setHoldingOpen} />
     </ThemeProvider>
   );
 }

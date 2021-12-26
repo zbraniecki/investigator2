@@ -1,5 +1,6 @@
 import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
+import { User } from "../store/account";
 
 export const fetchPortfolios = async ({ token }: { token: string }) => {
   const p = new Promise((resolve) => {
@@ -119,4 +120,30 @@ export const updateCell = async ({
     pk: resp.pk,
     quantity: resp.quantity,
   };
+};
+
+export const updateUserInfo = async ({
+  token,
+  pk,
+  baseAsset,
+}: {
+  token: string;
+  pk: string;
+  baseAsset: string;
+}): Promise<User> => {
+  const params = {
+    base_asset: baseAsset,
+  };
+
+  const data = await fetch(`${BASE_URL}user/users/${pk}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(params),
+  });
+  const resp = await data.json();
+
+  return resp;
 };

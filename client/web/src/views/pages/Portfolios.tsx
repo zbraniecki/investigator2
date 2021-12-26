@@ -121,8 +121,8 @@ export function Portfolios() {
   let tabs: TabInfo[] = [];
 
   if (Object.keys(portfolios).length > 0) {
-    const currentUser = session.username ? users[session.username] : undefined;
-    const plists: string[] = currentUser?.ui.portfolios || [];
+    const currentUser = session.user_pk ? users[session.user_pk] : undefined;
+    const plists: string[] = currentUser?.visible_lists.portfolios || [];
 
     tabs = plists
       .filter((pid) => pid in portfolios)
