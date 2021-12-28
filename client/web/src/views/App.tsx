@@ -11,6 +11,7 @@ import {
   fetchWalletsThunk,
   fetchWatchlistsThunk as fetchPublicWatchlistsThunk,
   getAssetInfo,
+  fetchTaxonomiesThunk,
 } from "../store/oracle";
 import { fetchStrategiesThunk } from "../store/strategy";
 import { Chrome } from "./ui/Chrome";
@@ -43,6 +44,7 @@ export function App() {
       const p = Promise.all([
         dispatch(fetchAssetInfoThunk({})),
         dispatch(fetchPublicWatchlistsThunk()),
+        dispatch(fetchTaxonomiesThunk()),
         dispatch(fetchWalletsThunk()),
       ]);
       p.then(() => {

@@ -30,3 +30,8 @@ export const fetchWatchlists = async () => {
   const resp = await fetch(`${BASE_URL}oracle/watchlists/`);
   return resp.json();
 };
+
+export const fetchTaxonomies = async () => {
+  const resp = await fetch(`${BASE_URL}oracle/taxonomy/`);
+  return resp.json();
+};

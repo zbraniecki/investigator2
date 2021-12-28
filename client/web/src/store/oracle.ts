@@ -1,7 +1,12 @@
 /* eslint camelcase: "off" */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchAssetInfo, fetchWallets, fetchWatchlists } from "../api/oracle";
+import {
+  fetchAssetInfo,
+  fetchWallets,
+  fetchWatchlists,
+  fetchTaxonomies,
+} from "../api/oracle";
 
 export const fetchAssetInfoThunk = createAsyncThunk(
   "oracle/fetchAssetInfo",
@@ -18,6 +23,11 @@ export const fetchWatchlistsThunk = createAsyncThunk(
   fetchWatchlists
 );
 
+export const fetchTaxonomiesThunk = createAsyncThunk(
+  "oracle/fetchTaxonomies",
+  fetchTaxonomies
+);
+
 export interface Watchlist {
   id: string;
   name: string;
@@ -27,9 +37,10 @@ export interface Watchlist {
 }
 
 export interface AssetInfo {
-  id: string;
+  pk: string;
   symbol: string;
   name: string;
+  asset_class: string;
   info: {
     pair: [string, string];
     value: number;
@@ -63,17 +74,39 @@ export interface Wallet {
   type: "WALT" | "CHAC" | "SAAC" | "INAC" | "REAC" | "CRAC" | "LOAN";
 }
 
+export interface Category {
+  pk: string;
+  name: string;
+  slug: string;
+  parent?: string;
+}
+
+export interface Tag {
+  pk: string;
+  name: string;
+  slug: string;
+  category?: string;
+}
+
 interface OracleState {
   assetUpdated?: string;
   assets: Record<string, AssetInfo>;
   wallets: Record<string, Wallet>;
   watchlists: Record<string, Watchlist>;
+  taxonomies: {
+    categories: Record<string, Category>;
+    tags: Record<string, Tag>;
+  };
 }
 
 const initialState = {
   assets: {},
   wallets: {},
   watchlists: {},
+  taxonomies: {
+    categories: {},
+    tags: {},
+  },
 } as OracleState;
 
 export const oracleSlice = createSlice({
@@ -96,18 +129,21 @@ export const oracleSlice = createSlice({
       }
       state.assets = {};
       for (const item of action.payload) {
-        state.assets[item.id] = item;
+        state.assets[item.pk] = item;
       }
     });
     builder.addCase(fetchWalletsThunk.fulfilled, (state, action) => {
       for (const item of action.payload) {
-        state.wallets[item.id] = item;
+        state.wallets[item.pk] = item;
       }
     });
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
       for (const item of action.payload) {
-        state.watchlists[item.id] = item;
+        state.watchlists[item.pk] = item;
       }
+    });
+    builder.addCase(fetchTaxonomiesThunk.fulfilled, (state, action) => {
+      state.taxonomies = action.payload;
     });
   },
 });
@@ -117,5 +153,6 @@ export const getAssetUpdated = (state: any): Date =>
   new Date(state.oracle.assetUpdated);
 export const getWallets = (state: any) => state.oracle.wallets;
 export const getWatchlists = (state: any) => state.oracle.watchlists;
+export const getTaxonomies = (state: any) => state.oracle.taxonomies;
 
 export default oracleSlice.reducer;

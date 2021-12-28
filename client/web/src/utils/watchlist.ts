@@ -122,7 +122,7 @@ export function createWatchlistTableData(
 
     return {
       cells: {
-        id: asset.id,
+        id: asset.pk,
         market_cap_rank: asset.info.market_cap_rank,
         market_cap: asset.info.market_cap,
         name: asset.name,

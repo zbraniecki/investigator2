@@ -39,7 +39,7 @@ export function createStrategyTableData(
     const asset = assetInfo[target.asset];
     assert(asset);
 
-    const computedData = computedTableData[asset.id];
+    const computedData = computedTableData[asset.pk];
 
     const currentValue = computedData?.value || 0;
     const targetValue = totalPortfolioValue * target.percent;
@@ -73,7 +73,7 @@ export function createStrategyTableData(
       const asset = assetInfo[assetId];
       assert(asset);
 
-      const computedData = computedTableData[asset.id];
+      const computedData = computedTableData[asset.pk];
       assert(computedData);
 
       const current = computedData.value / totalPortfolioValue;

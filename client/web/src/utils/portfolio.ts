@@ -132,7 +132,7 @@ export function createPortfolioTableData(
       const wallet = wallets[account];
       let walletAsset;
       if (wallet) {
-        walletAsset = getWalletAsset(wallet.id, asset.id, wallets);
+        walletAsset = getWalletAsset(wallet.id, asset.pk, wallets);
       }
 
       return {
