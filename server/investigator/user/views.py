@@ -30,13 +30,13 @@ class HoldingViewSet(viewsets.ModelViewSet):
     API endpoint that allows holdings to be viewed or edited.
     """
 
-    queryset = Holding.objects.all().order_by("-quantity")
+    # queryset = Holding.objects.all().order_by("-quantity")
     serializer_class = HoldingSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        return Holding.objects.filter(owner=user).order_by("-name")
+        return Holding.objects.filter(owner=user).order_by("-quantity")
 
 
 class WatchlistViewSet(viewsets.ModelViewSet):

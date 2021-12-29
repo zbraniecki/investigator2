@@ -35,3 +35,33 @@ export const createHolding = async ({
 
   return resp;
 };
+
+export const updateHolding = async ({
+  token,
+  pk,
+  quantity,
+}: {
+  token: string;
+  pk: string;
+  quantity: number;
+}) => {
+  const params = {
+    quantity,
+  };
+
+  const data = await fetch(`${BASE_URL}user/holdings/${pk}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(params),
+  });
+  const resp = await data.json();
+  // error case?
+  return {
+    error: null,
+    pk: resp.pk,
+    quantity: resp.quantity,
+  };
+};

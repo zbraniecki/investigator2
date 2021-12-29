@@ -8,10 +8,9 @@ import {
   authenticate,
   logout,
   fetchUserInfo,
-  updateCell,
   updateUserInfo,
 } from "../api/user";
-import { createHolding } from "../api/holding";
+import { createHolding, updateHolding } from "../api/holding";
 import { Watchlist } from "./oracle";
 import { getFromLocalStorage } from "./main";
 
@@ -42,9 +41,9 @@ export const fetchUserInfoThunk = createAsyncThunk(
 
 export const logoutThunk = createAsyncThunk("user/logout", logout);
 
-export const updateCellThunk = createAsyncThunk(
-  "user/portfolio/update/cell",
-  updateCell
+export const updateHoldingThunk = createAsyncThunk(
+  "user/updateHolding",
+  updateHolding
 );
 
 export const createHoldingThunk = createAsyncThunk(
@@ -192,25 +191,21 @@ export const userSlice = createSlice({
         state.users[item.pk] = item;
       }
     });
-    builder.addCase(updateCellThunk.fulfilled, (state, action) => {
+    builder.addCase(updateHoldingThunk.fulfilled, (state, action) => {
       if (action.payload.error !== null) {
         console.log(`action failed`);
         return;
       }
       const { pk, quantity } = action.payload;
-      for (const portfolio of Object.values(state.portfolios)) {
-        for (const holding of portfolio.holdings) {
+      for (const account of Object.values(state.accounts)) {
+        for (const holding of account.holdings) {
           if (holding.pk === pk) {
-            console.log("Updating quantity");
             holding.quantity = quantity;
           }
         }
       }
-      console.log("STATUS UPDATED");
     });
     builder.addCase(createHoldingThunk.fulfilled, (state, action) => {
-      console.log("Created new holding");
-      console.log(action);
       const account = action.payload.account as string;
       state.accounts[account].holdings.push({
         pk: action.payload.pk,

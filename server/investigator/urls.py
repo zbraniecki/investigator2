@@ -15,7 +15,7 @@ router.register(r"oracle/categories", oracle_views.CategoryViewSet, "category")
 router.register(r"oracle/tags", oracle_views.TagViewSet, "tag")
 router.register(r"oracle/taxonomy", oracle_views.TaxonomyViewSet, "taxonomy")
 
-router.register(r"user/holdings", user_views.HoldingViewSet),
+router.register(r"user/holdings", user_views.HoldingViewSet, "holding"),
 
 router.register(r"user/watchlist", user_views.WatchlistViewSet, "watchlist")
 router.register(r"user/portfolios", user_views.PortfolioViewSet, "portfolio")

@@ -134,7 +134,7 @@ export function EditableCell({
       setUpdateInProgress(true);
       onCellUpdate(column, result).then(
         ({ payload }: { payload: { error: string | null } }) => {
-          if (payload.error !== null) {
+          if (payload?.error) {
           }
           setTempValue(null);
           setUpdateInProgress(false);
@@ -197,12 +197,14 @@ export function EditableCell({
       {editing ? (
         <InputBase
           autoFocus
-          fullWidth
           placeholder={visibleValue.toString()}
           onBlur={handleBlur}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          sx={{ color: "primary.500", "& input": { padding: 0 } }}
+          sx={{
+            color: "primary.500",
+            "& input": { padding: 0, textAlign: align },
+          }}
           value={visibleValue}
         />
       ) : (

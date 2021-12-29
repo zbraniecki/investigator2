@@ -103,36 +103,6 @@ export const fetchUserInfo = async ({ token }: { token: string }) => {
   return resp;
 };
 
-export const updateCell = async ({
-  token,
-  id,
-  quantity,
-}: {
-  token: string;
-  id: string;
-  quantity: number;
-}) => {
-  const params = {
-    quantity,
-  };
-
-  const data = await fetch(`${BASE_URL}user/holding/${id}/`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`,
-    },
-    body: JSON.stringify(params),
-  });
-  const resp = await data.json();
-  // error case?
-  return {
-    error: null,
-    pk: resp.pk,
-    quantity: resp.quantity,
-  };
-};
-
 export const updateUserInfo = async ({
   token,
   pk,

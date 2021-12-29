@@ -8,7 +8,7 @@ import Collapse from "@mui/material/Collapse";
 import { useSelector, useDispatch } from "react-redux";
 import { TableMeta } from "./data/Table";
 import { StyledRowData } from "./data/Row";
-import { getSession, updateCellThunk } from "../../../store/user";
+import { getSession, updateHoldingThunk } from "../../../store/user";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 
@@ -27,7 +27,11 @@ export function Row({ id, data, tableMeta }: Props) {
     console.log("handling cell update");
     const { value } = data.cells.id;
     return dispatch(
-      updateCellThunk({ token: session.token, id: value as string, quantity })
+      updateHoldingThunk({
+        token: session.token,
+        pk: value as string,
+        quantity,
+      })
     );
   };
 
