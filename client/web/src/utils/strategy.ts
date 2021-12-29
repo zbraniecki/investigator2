@@ -1,6 +1,6 @@
 /* eslint camelcase: "off" */
 
-import { Portfolio } from "../store/account";
+import { Portfolio } from "../store/user";
 import { AssetInfo } from "../store/oracle";
 import { Strategy } from "../store/strategy";
 import { buildPortfolioTableData } from "./portfolio";

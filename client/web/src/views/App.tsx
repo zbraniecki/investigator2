@@ -3,12 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchPortfoliosThunk,
   fetchWatchlistsThunk as fetchUserWatchlistsThunk,
+  fetchAccountsThunk,
   fetchUserInfoThunk,
   getSession,
-} from "../store/account";
+} from "../store/user";
 import {
   fetchAssetInfoThunk,
-  fetchWalletsThunk,
+  fetchServicesThunk,
   fetchWatchlistsThunk as fetchPublicWatchlistsThunk,
   getAssetInfo,
   fetchTaxonomiesThunk,
@@ -33,6 +34,7 @@ export function App() {
         dispatch(fetchPortfoliosThunk({ token: session.token }));
         dispatch(fetchStrategiesThunk({ token: session.token }));
         dispatch(fetchUserWatchlistsThunk({ token: session.token }));
+        dispatch(fetchAccountsThunk({ token: session.token }));
         console.log("Fetched user stuff");
       });
     }
@@ -45,7 +47,7 @@ export function App() {
         dispatch(fetchAssetInfoThunk({})),
         dispatch(fetchPublicWatchlistsThunk()),
         dispatch(fetchTaxonomiesThunk()),
-        dispatch(fetchWalletsThunk()),
+        dispatch(fetchServicesThunk()),
       ]);
       p.then(() => {
         console.log("fetched public stuff");

@@ -1,5 +1,5 @@
 import { AssetInfo, Watchlist } from "../store/oracle";
-import { Portfolio } from "../store/account";
+import { Portfolio } from "../store/user";
 import { assert } from "./helpers";
 import {
   RowData,
@@ -90,7 +90,7 @@ function getAssetsFromPortfolio(
 ): Set<string> {
   const symbols: Set<string> = new Set();
   for (const holding of portfolio.holdings) {
-    symbols.add(holding.asset_id);
+    symbols.add(holding.asset);
   }
   for (const pid of portfolio.portfolios) {
     const p = portfolios[pid];

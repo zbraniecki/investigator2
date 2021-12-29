@@ -1,8 +1,8 @@
 /* eslint camelcase: "off" */
 
-import { Portfolio } from "../store/account";
-import { AssetInfo, Wallet } from "../store/oracle";
-import { getWalletAsset } from "./wallet";
+import { Portfolio, Account } from "../store/user";
+import { AssetInfo, Service } from "../store/oracle";
+import { getServiceAsset } from "./service";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
 import {
   RowData,
@@ -15,7 +15,7 @@ import {
 export interface PortfolioTableRow extends RowData {
   cells: {
     id?: string;
-    asset_id?: string;
+    asset?: string;
     name?: string;
     symbol?: string;
     price?: number;
@@ -30,7 +30,7 @@ export interface PortfolioTableRow extends RowData {
 export interface StyledPortfolioTableRow extends StyledRowData {
   cells: {
     id?: CellData<string>;
-    asset_id?: CellData<string>;
+    asset?: CellData<string>;
     name?: CellData<string>;
     symbol?: CellData<string>;
     price?: CellData<number>;
@@ -83,14 +83,14 @@ export function buildPortfolioTableData(
   assetInfo: Record<string, AssetInfo>
 ): PortfolioTableRow[] {
   const rows: PortfolioTableRow[] = portfolio.holdings.map(
-    ({ pk, asset_id, quantity }) => {
-      const asset = assetInfo[asset_id];
+    ({ pk, asset: assetPk, quantity }) => {
+      const asset = assetInfo[assetPk];
       assert(asset);
 
       return {
         cells: {
           id: pk,
-          asset_id,
+          asset: asset.pk,
           name: asset.name,
           symbol: asset.symbol,
           price: asset.info.value,
@@ -106,7 +106,7 @@ export function buildPortfolioTableData(
     assert(subPortfolio);
     return {
       cells: {
-        id: subPortfolio.id,
+        id: subPortfolio.pk,
         name: subPortfolio.name,
       },
       children: buildPortfolioTableData(subPortfolio, portfolios, assetInfo),
@@ -121,31 +121,31 @@ export function createPortfolioTableData(
   portfolio: Portfolio,
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>,
-  wallets: Record<string, Wallet>,
+  services: Record<string, Service>,
+  accounts: Record<string, Account>,
   topLevel: boolean
 ): PortfolioTableRow {
   const rows: PortfolioTableRow[] = portfolio.holdings.map(
-    ({ pk, asset_id, quantity, account }) => {
-      const asset = assetInfo[asset_id];
+    ({ pk, asset: assetId, quantity, account: accountId }) => {
+      const asset = assetInfo[assetId];
       assert(asset);
-      assert(account);
-      const wallet = wallets[account];
-      let walletAsset;
-      if (wallet) {
-        walletAsset = getWalletAsset(wallet.id, asset.pk, wallets);
+      const account = accountId ? accounts[accountId] : undefined;
+      let serviceAsset;
+      if (account) {
+        serviceAsset = getServiceAsset(account.pk, asset.pk, services);
       }
 
       return {
         cells: {
           id: pk,
-          asset_id,
+          asset: asset.pk,
           name: asset.name,
           symbol: asset.symbol,
           price: asset.info.value,
           quantity,
           value: asset.info.value * quantity,
-          wallet: wallet?.name,
-          yield: walletAsset?.apy,
+          wallet: account?.name,
+          yield: serviceAsset?.apy,
         },
         type: RowType.Asset,
       };
@@ -158,11 +158,41 @@ export function createPortfolioTableData(
       subPortfolio,
       portfolios,
       assetInfo,
-      wallets,
+      services,
+      accounts,
       false
     );
   });
   rows.push(...res2);
+  if (portfolio.tags.length > 0) {
+    Object.values(accounts).forEach((account) => {
+      account.holdings.forEach((holding) => {
+        const asset = assetInfo[holding.asset];
+        assert(asset);
+        if (portfolio.tags.includes(asset.asset_class)) {
+          let serviceAsset;
+          if (account) {
+            serviceAsset = getServiceAsset(account.pk, asset.pk, services);
+          }
+
+          rows.push({
+            cells: {
+              id: holding.pk,
+              asset: asset.pk,
+              name: asset.name,
+              symbol: asset.symbol,
+              price: asset.info.value,
+              quantity: holding.quantity,
+              value: asset.info.value * holding.quantity,
+              wallet: account?.name,
+              yield: serviceAsset?.apy,
+            },
+            type: RowType.Asset,
+          });
+        }
+      });
+    });
+  }
 
   rows.sort((a, b) => (b.cells.value || 0) - (a.cells.value || 0));
 
@@ -179,7 +209,8 @@ export function preparePortfolioTableData(
   pid: string,
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>,
-  wallets: Record<string, Wallet>
+  services: Record<string, Service>,
+  accounts: Record<string, Account>
 ): PortfolioTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);
@@ -191,7 +222,8 @@ export function preparePortfolioTableData(
     portfolio,
     portfolios,
     assetInfo,
-    wallets,
+    services,
+    accounts,
     true
   );
   if (data.children !== undefined) {
@@ -232,7 +264,7 @@ export function computePortfolioTableDataStyle(
   const result: StyledPortfolioTableRow = {
     cells: {
       id: newCellData(data.cells.id),
-      asset_id: newCellData(data.cells.asset_id),
+      asset: newCellData(data.cells.asset),
       name: newCellData(data.cells.name),
       symbol: newCellData(data.cells.symbol),
       price: newCellData(data.cells.price),

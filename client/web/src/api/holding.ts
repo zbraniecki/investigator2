@@ -1,18 +1,24 @@
 import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
-import { Holding } from "../store/account";
+import { Holding } from "../store/user";
 
 export const createHolding = async ({
   token,
-  assetId,
+  assetPk,
+  accountPk,
+  ownerPk,
   quantity,
 }: {
   token: string;
-  assetId: string;
+  assetPk: string;
+  accountPk?: string;
+  ownerPk: string;
   quantity: number;
 }): Promise<Holding> => {
   const params = {
-    asset: assetId,
+    asset: assetPk,
+    account: accountPk,
+    owner: ownerPk,
     quantity,
   };
 

@@ -1,13 +1,13 @@
 import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
-import { User } from "../store/account";
+import { User } from "../store/user";
 
 export const fetchPortfolios = async ({ token }: { token: string }) => {
   const p = new Promise((resolve) => {
     setTimeout(resolve, 500);
   });
   await p;
-  const data = await fetch(`${BASE_URL}user/portfolio/`, {
+  const data = await fetch(`${BASE_URL}user/portfolios/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -19,6 +19,17 @@ export const fetchPortfolios = async ({ token }: { token: string }) => {
 
 export const fetchWatchlists = async ({ token }: { token: string }) => {
   const data = await fetch(`${BASE_URL}user/watchlist/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+  });
+  return data.json();
+};
+
+export const fetchAccounts = async ({ token }: { token: string }) => {
+  const data = await fetch(`${BASE_URL}user/accounts/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

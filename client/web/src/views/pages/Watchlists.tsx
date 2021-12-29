@@ -21,7 +21,7 @@ import {
   getWatchlists as getUserWatchlists,
   getUsers,
   getSession,
-} from "../../store/account";
+} from "../../store/user";
 import { TabInfo } from "../components/Tabs";
 
 const baseTableMeta: BaseTableMeta = {

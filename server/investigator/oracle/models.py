@@ -176,8 +176,13 @@ class PassiveType(models.TextChoices):
 class PassiveABC(models.Model):
     min = models.FloatField(blank=True, null=True)
     max = models.FloatField(blank=True, null=True)
-    apy_min = models.FloatField(blank=True, null=True)
-    apy_max = models.FloatField(blank=True, null=True)
+    apy_min = models.FloatField(blank=True, null=True)  # asset per 1 asset per 1 year
+    apy_max = models.FloatField(blank=True, null=True)  # asset per 1 asset per 1 year
+    interest_asset = models.ForeignKey(
+        Asset, related_name="+", on_delete=models.CASCADE, blank=True, null=True
+    )
+    locked_period = models.DurationField(blank=True, null=True)
+    payout_frequency = models.DurationField(blank=True, null=True)
 
     class Meta:
         abstract = True

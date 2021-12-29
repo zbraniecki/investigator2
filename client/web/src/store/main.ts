@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import uiReducer from "./ui";
-import accountReducer from "./account";
+import userReducer from "./user";
 import oracleReducer from "./oracle";
 import strategyReducer from "./strategy";
 
@@ -34,9 +34,9 @@ function saveToLocalStorage(state: any) {
   localStorage.setItem("lightMode", state.ui.lightMode);
   localStorage.setItem("info-display-mode", state.ui.infoDisplayMode);
   localStorage.setItem("rows-per-page-option", state.ui.rowsPerPageOption);
-  if (state.account.session.token) {
-    localStorage.setItem("token", state.account.session.token);
-    localStorage.setItem("user_pk", state.account.session.user_pk);
+  if (state.user.session.token) {
+    localStorage.setItem("token", state.user.session.token);
+    localStorage.setItem("user_pk", state.user.session.user_pk);
   } else {
     localStorage.removeItem("token");
     localStorage.removeItem("user_pk");
@@ -46,7 +46,7 @@ function saveToLocalStorage(state: any) {
 const store = configureStore({
   reducer: {
     ui: uiReducer,
-    account: accountReducer,
+    user: userReducer,
     oracle: oracleReducer,
     strategy: strategyReducer,
   },

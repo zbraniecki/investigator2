@@ -18,7 +18,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = PortfolioSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user

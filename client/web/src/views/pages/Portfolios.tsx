@@ -16,8 +16,9 @@ import {
   getPortfolios,
   getUsers,
   getSession,
-} from "../../store/account";
-import { getAssetInfo, getWallets } from "../../store/oracle";
+  getAccounts,
+} from "../../store/user";
+import { getAssetInfo, getServices } from "../../store/oracle";
 import { TabInfo } from "../components/Tabs";
 
 const baseTableMeta: BaseTableMeta = {
@@ -114,9 +115,10 @@ const tableSettings: TableSettings = {
 export function Portfolios() {
   const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
   const assetInfo = useSelector(getAssetInfo);
-  const wallets = useSelector(getWallets);
+  const services = useSelector(getServices);
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
+  const accounts = useSelector(getAccounts);
 
   let tabs: TabInfo[] = [];
 
@@ -129,13 +131,19 @@ export function Portfolios() {
       .map((pid) => {
         const portfolio = portfolios[pid];
         return {
-          id: portfolio.id,
+          id: portfolio.pk,
           label: portfolio.name,
         };
       });
   }
   const getTableData = (id: string): StyledRowData | undefined => {
-    const data = preparePortfolioTableData(id, portfolios, assetInfo, wallets);
+    const data = preparePortfolioTableData(
+      id,
+      portfolios,
+      assetInfo,
+      services,
+      accounts
+    );
     if (data === undefined) {
       return undefined;
     }

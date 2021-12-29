@@ -21,8 +21,8 @@ export const fetchAssetInfo = async ({
   return resp.json();
 };
 
-export const fetchWallets = async () => {
-  const resp = await fetch(`${BASE_URL}oracle/wallets/`);
+export const fetchServices = async () => {
+  const resp = await fetch(`${BASE_URL}oracle/services/`);
   return resp.json();
 };
 

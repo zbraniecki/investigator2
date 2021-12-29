@@ -1,21 +1,21 @@
-import { Portfolio } from "../store/account";
-import { AssetInfo, Wallet, WalletAsset } from "../store/oracle";
+import { Portfolio } from "../store/user";
+import { AssetInfo, Service, ServiceAsset } from "../store/oracle";
 import { createPortfolioTableData } from "./portfolio";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
 import { TableMeta } from "../views/components/table/data/Table";
 import { CellAlign } from "../views/components/table/data/Column";
 import { RowData, RowType } from "../views/components/table/data/Row";
 
-export function getWalletAsset(
-  walletId: string,
+export function getServiceAsset(
+  serviceId: string,
   assetId: string,
-  wallets: Record<string, Wallet>
-): WalletAsset | null {
-  const wallet = wallets[walletId];
-  if (!wallet) {
+  services: Record<string, Service>
+): ServiceAsset | null {
+  const service = services[serviceId];
+  if (!service) {
     return null;
   }
-  for (const asset of wallet.assets) {
+  for (const asset of service.assets) {
     if (asset.id === assetId) {
       return asset;
     }
@@ -41,7 +41,7 @@ export function prepareWalletTableData(
   pid: string,
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>,
-  wallets: Record<string, Wallet>
+  services: Record<string, Service>
 ): WalletTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);
@@ -53,7 +53,8 @@ export function prepareWalletTableData(
     portfolio,
     portfolios,
     assetInfo,
-    wallets,
+    services,
+    {}, // XXX: This is really accounts, not services
     true
   ) as WalletTableRow;
 

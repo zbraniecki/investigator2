@@ -15,7 +15,7 @@ import {
   AuthenticateState,
   setAuthenticateState,
   authenticateThunk,
-} from "../../store/account";
+} from "../../store/user";
 import { assert } from "../../utils/helpers";
 
 interface Props {

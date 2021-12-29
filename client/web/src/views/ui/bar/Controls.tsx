@@ -10,7 +10,7 @@ import { AccountMenu } from "./Menu";
 import { Switch } from "../../components/Switch";
 import { setInfoDisplayMode } from "../../../store/ui";
 import { InfoDisplayMode } from "../../../components/settings";
-import { getSession } from "../../../store/account";
+import { getSession } from "../../../store/user";
 import { fetchAssetInfoThunk, getAssetUpdated } from "../../../store/oracle";
 import { AppBarColors } from "../AppBar";
 

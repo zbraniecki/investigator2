@@ -50,7 +50,7 @@ class AssetSerializer(serializers.ModelSerializer):
         return [tag.__str__() for tag in obj.tags.all()]
 
 
-class ServiceSerializer(serializers.HyperlinkedModelSerializer):
+class ServiceSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField("get_name")
     assets = serializers.SerializerMethodField("get_assets")
 
@@ -59,7 +59,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["pk", "name", "assets", "type"]
 
     def get_name(self, obj):
-        return obj.provider.__str__()
+        return obj.__str__()
 
     def get_assets(self, obj):
         today = datetime.today()
@@ -68,10 +68,23 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
         result = []
 
         for passive in passives:
+            quantity = (
+                (passive.min, passive.max)
+                if passive.max
+                else passive.min
+                if passive.min
+                else None
+            )
+            apy = (
+                (passive.apy_min, passive.apy_max)
+                if passive.apy_max
+                else passive.apy_min
+            )
             result.append(
                 {
-                    "pk": passive.asset.id,
-                    "apy": passive.apy_min,
+                    "asset_pk": passive.asset.pk,
+                    "apy": apy,
+                    "quantity": quantity,
                     "yield_type": passive.type,
                 }
             )
@@ -79,7 +92,7 @@ class ServiceSerializer(serializers.HyperlinkedModelSerializer):
         return result
 
 
-class PublicWatchlistSerializer(serializers.HyperlinkedModelSerializer):
+class PublicWatchlistSerializer(serializers.ModelSerializer):
     portfolio = serializers.SerializerMethodField("get_portfolio")
     assets = serializers.SerializerMethodField("get_assets")
     type = serializers.SerializerMethodField("get_type")

@@ -8,7 +8,7 @@ import Collapse from "@mui/material/Collapse";
 import { useSelector, useDispatch } from "react-redux";
 import { TableMeta } from "./data/Table";
 import { StyledRowData } from "./data/Row";
-import { getSession, updateCellThunk } from "../../../store/account";
+import { getSession, updateCellThunk } from "../../../store/user";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 

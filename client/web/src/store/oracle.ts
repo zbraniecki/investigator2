@@ -3,7 +3,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   fetchAssetInfo,
-  fetchWallets,
+  fetchServices,
   fetchWatchlists,
   fetchTaxonomies,
 } from "../api/oracle";
@@ -13,9 +13,9 @@ export const fetchAssetInfoThunk = createAsyncThunk(
   fetchAssetInfo
 );
 
-export const fetchWalletsThunk = createAsyncThunk(
-  "oracle/fetchWallets",
-  fetchWallets
+export const fetchServicesThunk = createAsyncThunk(
+  "oracle/fetchServices",
+  fetchServices
 );
 
 export const fetchWatchlistsThunk = createAsyncThunk(
@@ -61,16 +61,16 @@ export interface AssetInfo {
   };
 }
 
-export interface WalletAsset {
+export interface ServiceAsset {
   id: string;
   apy: number;
   yield_type: "ST" | "LP" | "INT";
 }
 
-export interface Wallet {
-  id: string;
+export interface Service {
+  pk: string;
   name: string;
-  assets: WalletAsset[];
+  assets: ServiceAsset[];
   type: "WALT" | "CHAC" | "SAAC" | "INAC" | "REAC" | "CRAC" | "LOAN";
 }
 
@@ -91,7 +91,7 @@ export interface Tag {
 interface OracleState {
   assetUpdated?: string;
   assets: Record<string, AssetInfo>;
-  wallets: Record<string, Wallet>;
+  services: Record<string, Service>;
   watchlists: Record<string, Watchlist>;
   taxonomies: {
     categories: Record<string, Category>;
@@ -101,7 +101,7 @@ interface OracleState {
 
 const initialState = {
   assets: {},
-  wallets: {},
+  services: {},
   watchlists: {},
   taxonomies: {
     categories: {},
@@ -132,9 +132,9 @@ export const oracleSlice = createSlice({
         state.assets[item.pk] = item;
       }
     });
-    builder.addCase(fetchWalletsThunk.fulfilled, (state, action) => {
+    builder.addCase(fetchServicesThunk.fulfilled, (state, action) => {
       for (const item of action.payload) {
-        state.wallets[item.pk] = item;
+        state.services[item.pk] = item;
       }
     });
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
@@ -151,7 +151,7 @@ export const oracleSlice = createSlice({
 export const getAssetInfo = (state: any) => state.oracle.assets;
 export const getAssetUpdated = (state: any): Date =>
   new Date(state.oracle.assetUpdated);
-export const getWallets = (state: any) => state.oracle.wallets;
+export const getServices = (state: any) => state.oracle.services;
 export const getWatchlists = (state: any) => state.oracle.watchlists;
 export const getTaxonomies = (state: any) => state.oracle.taxonomies;
 

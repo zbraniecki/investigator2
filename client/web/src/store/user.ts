@@ -4,65 +4,73 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   fetchPortfolios,
   fetchWatchlists,
+  fetchAccounts,
   authenticate,
   logout,
   fetchUserInfo,
   updateCell,
   updateUserInfo,
-} from "../api/account";
+} from "../api/user";
 import { createHolding } from "../api/holding";
 import { Watchlist } from "./oracle";
 import { getFromLocalStorage } from "./main";
 
 export const fetchPortfoliosThunk = createAsyncThunk(
-  "account/fetchPortfolios",
+  "user/fetchPortfolios",
   fetchPortfolios
 );
 
 export const fetchWatchlistsThunk = createAsyncThunk(
-  "account/fetchWatchlists",
+  "user/fetchWatchlists",
   fetchWatchlists
 );
 
+export const fetchAccountsThunk = createAsyncThunk(
+  "user/fetchAccounts",
+  fetchAccounts
+);
+
 export const authenticateThunk = createAsyncThunk(
-  "account/authenticate",
+  "user/authenticate",
   authenticate
 );
 
 export const fetchUserInfoThunk = createAsyncThunk(
-  "account/user",
+  "user/userInfo",
   fetchUserInfo
 );
 
-export const logoutThunk = createAsyncThunk("account/logout", logout);
+export const logoutThunk = createAsyncThunk("user/logout", logout);
 
 export const updateCellThunk = createAsyncThunk(
-  "account/portfolio/update/cell",
+  "user/portfolio/update/cell",
   updateCell
 );
 
 export const createHoldingThunk = createAsyncThunk(
-  "account/createHolding",
+  "user/createHolding",
   createHolding
 );
 
 export const updateUserInfoThunk = createAsyncThunk(
-  "account/updateUserInfo",
+  "user/updateUserInfo",
   updateUserInfo
 );
 
 export interface Holding {
   pk: string;
-  asset_id: string;
+  asset: string;
   quantity: number;
   account?: string;
 }
 
 export interface Portfolio {
-  id: string;
+  pk: string;
   name: string;
   holdings: Holding[];
   portfolios: string[];
+  accounts: string[];
+  tags: string[];
   value?: number;
 }
 
@@ -75,6 +83,14 @@ export interface User {
     watchlists: string[];
     strategies: string[];
   };
+}
+
+export interface Account {
+  pk: string;
+  owner: string;
+  name: string;
+  service: string;
+  holdings: Holding[];
 }
 
 export enum AuthenticateState {
@@ -91,7 +107,8 @@ interface AccountState {
     user_pk?: string;
   };
   portfolios: Record<string, Portfolio>;
-  watchlists?: Record<string, Watchlist>;
+  watchlists: Record<string, Watchlist>;
+  accounts: Record<string, Account>;
   users: Record<string, User>;
 }
 
@@ -102,6 +119,8 @@ const initialState = {
     user_pk: getFromLocalStorage("user_pk", "string", undefined),
   },
   portfolios: {},
+  watchlists: {},
+  accounts: {},
   users: {},
 } as AccountState;
 
@@ -110,12 +129,13 @@ function cleanSlice(state: any) {
   state.session.user_pk = undefined;
   state.session.token = undefined;
   state.portfolios = {};
-  state.watchlists = undefined;
+  state.watchlists = {};
+  state.accounts = {};
   state.users = {};
 }
 
-export const accountSlice = createSlice({
-  name: "account",
+export const userSlice = createSlice({
+  name: "user",
   initialState,
   reducers: {
     setAuthenticateState: (
@@ -133,13 +153,19 @@ export const accountSlice = createSlice({
         if (item.value === null) {
           item.value = undefined;
         }
-        state.portfolios[item.id] = item;
+        state.portfolios[item.pk] = item;
       }
     });
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
       state.watchlists = {};
       for (const item of action.payload) {
         state.watchlists[item.id] = item;
+      }
+    });
+    builder.addCase(fetchAccountsThunk.fulfilled, (state, action) => {
+      state.accounts = {};
+      for (const item of action.payload) {
+        state.accounts[item.pk] = item;
       }
     });
     builder.addCase(authenticateThunk.fulfilled, (state, action) => {
@@ -185,6 +211,13 @@ export const accountSlice = createSlice({
     builder.addCase(createHoldingThunk.fulfilled, (state, action) => {
       console.log("Created new holding");
       console.log(action);
+      const account = action.payload.account as string;
+      state.accounts[account].holdings.push({
+        pk: action.payload.pk,
+        asset: action.payload.asset,
+        quantity: action.payload.quantity,
+        account,
+      });
     });
     builder.addCase(updateUserInfoThunk.fulfilled, (state, action) => {
       state.users[action.payload.pk] = action.payload;
@@ -192,10 +225,11 @@ export const accountSlice = createSlice({
   },
 });
 
-export const getPortfolios = (state: any) => state.account.portfolios;
-export const getWatchlists = (state: any) => state.account.watchlists;
-export const getSession = (state: any) => state.account.session;
-export const getUsers = (state: any) => state.account.users;
-export const { setAuthenticateState } = accountSlice.actions;
+export const getPortfolios = (state: any) => state.user.portfolios;
+export const getWatchlists = (state: any) => state.user.watchlists;
+export const getSession = (state: any) => state.user.session;
+export const getUsers = (state: any) => state.user.users;
+export const getAccounts = (state: any) => state.user.accounts;
+export const { setAuthenticateState } = userSlice.actions;
 
-export default accountSlice.reducer;
+export default userSlice.reducer;
