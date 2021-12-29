@@ -21,7 +21,7 @@ export interface PortfolioTableRow extends RowData {
     price?: number;
     quantity?: number;
     value?: number;
-    wallet?: string;
+    account?: string;
     yield?: number;
   };
   children?: PortfolioTableRow[];
@@ -36,7 +36,7 @@ export interface StyledPortfolioTableRow extends StyledRowData {
     price?: CellData<number>;
     quantity?: CellData<number>;
     value?: CellData<number>;
-    wallet?: CellData<string>;
+    account?: CellData<string>;
     yield?: CellData<number>;
   };
   children?: StyledPortfolioTableRow[];
@@ -144,7 +144,7 @@ export function createPortfolioTableData(
           price: asset.info.value,
           quantity,
           value: asset.info.value * quantity,
-          wallet: account?.name,
+          account: account?.name,
           yield: serviceAsset?.apy,
         },
         type: RowType.Asset,
@@ -184,7 +184,7 @@ export function createPortfolioTableData(
               price: asset.info.value,
               quantity: holding.quantity,
               value: asset.info.value * holding.quantity,
-              wallet: account?.name,
+              account: account?.name,
               yield: serviceAsset?.apy,
             },
             type: RowType.Asset,
@@ -233,7 +233,7 @@ export function preparePortfolioTableData(
       [
         { key: "name", strategy: GroupingStrategy.IfSame },
         { key: "price", strategy: GroupingStrategy.IfSame },
-        { key: "wallet", strategy: GroupingStrategy.IfSame },
+        { key: "account", strategy: GroupingStrategy.IfSame },
         { key: "yield", strategy: GroupingStrategy.IfSame },
         { key: "quantity", strategy: GroupingStrategy.Sum },
       ],
@@ -270,7 +270,7 @@ export function computePortfolioTableDataStyle(
       price: newCellData(data.cells.price),
       quantity: newCellData(data.cells.quantity),
       value: newCellData(data.cells.value),
-      wallet: newCellData(data.cells.wallet),
+      account: newCellData(data.cells.account),
       yield: newCellData(data.cells.yield),
     },
     children: data.children?.map((row) => computePortfolioTableDataStyle(row)),

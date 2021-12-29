@@ -45,8 +45,8 @@ const baseTableMeta: BaseTableMeta = {
       width: "auto",
       formatter: Formatter.Currency,
     },
-    wallet: {
-      label: "Wallet",
+    account: {
+      label: "Account",
       align: CellAlign.Right,
       sortDirection: SortDirection.Asc,
       width: "20%",
@@ -94,7 +94,7 @@ const tableSettings: TableSettings = {
       visible: true,
     },
     {
-      key: "wallet",
+      key: "account",
       visible: true,
     },
     {

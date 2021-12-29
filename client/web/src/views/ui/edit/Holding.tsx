@@ -19,6 +19,7 @@ import {
   getUsers,
   getAccounts,
   createHoldingThunk,
+  Account,
 } from "../../../store/user";
 import {
   getAssetInfo,
@@ -32,12 +33,18 @@ import {
 import { assert } from "../../../utils/helpers";
 
 interface Props {
-  open: boolean;
-  setOpen: any;
+  holdingPk?: string;
+  setCloseDialog: any;
 }
 
-export function HoldingDialog({ open, setOpen }: Props) {
+export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
   const dispatch = useDispatch();
+
+  const session = useSelector(getSession);
+  const users = useSelector(getUsers);
+  const assetInfo = useSelector(getAssetInfo);
+  const taxonomies = useSelector(getTaxonomies);
+  const accounts = useSelector(getAccounts);
 
   const [assetClassPk, setAssetClassPk] = React.useState(
     undefined as string | undefined
@@ -50,12 +57,28 @@ export function HoldingDialog({ open, setOpen }: Props) {
     undefined as number | undefined
   );
 
-  const session = useSelector(getSession);
-  const users = useSelector(getUsers);
-  const assetInfo = useSelector(getAssetInfo);
-  const taxonomies = useSelector(getTaxonomies);
-  const services = useSelector(getServices);
-  const accounts = useSelector(getAccounts);
+  let currentHolding;
+  let currentAccount;
+
+  for (const account of Object.values<Account>(accounts)) {
+    for (const h of account.holdings) {
+      if (h.pk === holdingPk) {
+        currentHolding = h;
+        currentAccount = account;
+        break;
+      }
+    }
+  }
+
+  if (currentAccount && accountPk === undefined) {
+    setAccountPk(currentAccount.pk);
+  }
+  if (currentHolding && assetPk === undefined) {
+    const asset = assetInfo[currentHolding.asset];
+    setAssetClassPk(asset.asset_class);
+    setAssetPk(asset.pk);
+    setQuantity(currentHolding.quantity);
+  }
 
   const assetClassCategory = Object.values(taxonomies.categories).find(
     (category: Category) => category.name == "asset_class"
@@ -83,12 +106,6 @@ export function HoldingDialog({ open, setOpen }: Props) {
     assets = Object.values(assetInfo).filter(
       (asset: AssetInfo) => asset.asset_class === assetClassPk
     ) as AssetInfo[];
-
-    if (assets.length > 0 && assetPk === undefined) {
-      const defaultAsset = assets[0];
-      assert(defaultAsset);
-      setAssetPk(defaultAsset.pk);
-    }
   }
 
   const currentUser = users[session.user_pk];
@@ -97,11 +114,20 @@ export function HoldingDialog({ open, setOpen }: Props) {
   const account = accountPk ? accounts[accountPk] : undefined;
 
   const handleCancel = () => {
-    setOpen(false);
+    setCloseDialog();
   };
 
   const handleOk = () => {
-    assert(quantity !== undefined);
+    if (quantity === undefined) {
+      return false;
+    }
+    if (asset === undefined) {
+      return false;
+    }
+    if (account === undefined) {
+      return false;
+    }
+
     const p = dispatch(
       createHoldingThunk({
         token: session.token,
@@ -113,7 +139,9 @@ export function HoldingDialog({ open, setOpen }: Props) {
     ) as unknown as Promise<any>;
     p.then((resp: any) => {
       if (resp.payload.pk) {
-        setOpen(false);
+        setAssetPk(undefined);
+        setAccountPk(undefined);
+        setCloseDialog();
       }
     });
   };
@@ -129,15 +157,7 @@ export function HoldingDialog({ open, setOpen }: Props) {
 
   const handleAssetChange = (event: any) => {
     const { value } = event.target;
-    console.log(value);
     setAssetPk(value);
-    // dispatch(
-    //   updateUserInfoThunk({
-    //     token: session.token,
-    //     pk: session.user_pk,
-    //     baseAsset: value,
-    //   })
-    // );
   };
 
   const handleServiceChange = (event: any) => {
@@ -148,7 +168,7 @@ export function HoldingDialog({ open, setOpen }: Props) {
     <Dialog
       sx={{ "& .MuiDialog-paper": { width: "80%", height: "80%" } }}
       maxWidth="xs"
-      open={open}
+      open={Boolean(holdingPk)}
     >
       <DialogTitle sx={{ display: "flex", flexDirection: "row" }}>
         <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>
@@ -185,7 +205,7 @@ export function HoldingDialog({ open, setOpen }: Props) {
             <Select
               labelId="holding-asset-label"
               id="holding-asset"
-              value={asset?.pk}
+              value={asset?.pk || ""}
               onChange={handleAssetChange}
               label="Asset"
             >
@@ -204,6 +224,7 @@ export function HoldingDialog({ open, setOpen }: Props) {
             id="outlined-number"
             label="Quantity"
             type="number"
+            value={quantity}
             onChange={handleQuantityChange}
             InputLabelProps={{
               shrink: true,
@@ -212,7 +233,7 @@ export function HoldingDialog({ open, setOpen }: Props) {
         </Box>
         <Box>
           <FormControl variant="standard">
-            <InputLabel id="holding-asset-label">Asset</InputLabel>
+            <InputLabel id="holding-asset-label">Account</InputLabel>
             <Select
               labelId="holding-asset-label"
               id="holding-asset"

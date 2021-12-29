@@ -22,7 +22,9 @@ import { HoldingDialog } from "./edit/Holding";
 export function Chrome() {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [tutorialOpen, setTutorialOpen] = React.useState(false);
-  const [holdingOpen, setHoldingOpen] = React.useState(false);
+  const [holdingOpen, setHoldingOpen] = React.useState(
+    undefined as string | undefined
+  );
 
   const storedLightMode: LightMode = useSelector(getLightMode);
   const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
@@ -64,7 +66,7 @@ export function Chrome() {
   const routes = useRoutes([
     {
       path: "/",
-      element: <Content />,
+      element: <Content setHoldingOpen={setHoldingOpen} />,
       children,
     },
   ]);
@@ -93,7 +95,10 @@ export function Chrome() {
         setOpen={setSettingsOpen}
       />
       <TutorialDialog open={tutorialOpen} setOpen={setTutorialOpen} />
-      <HoldingDialog open={holdingOpen} setOpen={setHoldingOpen} />
+      <HoldingDialog
+        holdingPk={holdingOpen}
+        setCloseDialog={() => setHoldingOpen(undefined)}
+      />
     </ThemeProvider>
   );
 }

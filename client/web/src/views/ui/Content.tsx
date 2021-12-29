@@ -1,19 +1,14 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import { useOutletContext, Outlet } from "react-router-dom";
-import { Component as Card } from "../components/Card";
 
-type ContextType = { setAssetCard: any };
+type ContextType = { setHoldingOpen: any };
 
-export default function Content() {
-  const [assetCard, setAssetCard] = React.useState(
-    undefined as string | undefined
-  );
+export interface Props {
+  setHoldingOpen: any;
+}
 
-  const handleCloseCard = () => {
-    setAssetCard(undefined);
-  };
-
+export default function Content({ setHoldingOpen }: Props) {
   return (
     <Box
       component="main"
@@ -24,11 +19,7 @@ export default function Content() {
         height: "calc(100vh - 130px)",
       }}
     >
-      <Outlet context={{ setAssetCard }} />
-      <Card
-        meta={{ id: "foo", assetCard, handleCloseCard }}
-        data={{ name: "foo" }}
-      />
+      <Outlet context={{ setHoldingOpen }} />
     </Box>
   );
 }

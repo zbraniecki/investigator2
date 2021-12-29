@@ -11,6 +11,7 @@ import { StyledRowData } from "./data/Row";
 import { getSession, updateHoldingThunk } from "../../../store/user";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
+import { getOutletContext } from "../../ui/Content";
 
 export interface Props {
   id: string;
@@ -20,6 +21,7 @@ export interface Props {
 export function Row({ id, data, tableMeta }: Props) {
   const [open, setOpen] = React.useState(false);
   const session = useSelector(getSession);
+  const outletContext = getOutletContext();
 
   const dispatch = useDispatch();
 
@@ -33,6 +35,11 @@ export function Row({ id, data, tableMeta }: Props) {
         quantity,
       })
     );
+  };
+
+  const handleRowInfoOpen = () => {
+    const { value } = data.cells.id;
+    outletContext.setHoldingOpen(value);
   };
 
   return (
@@ -82,6 +89,11 @@ export function Row({ id, data, tableMeta }: Props) {
                 width={column.width}
                 formatter={column.formatter}
                 showValue={!hideValue}
+                onClick={
+                  ["name", "account"].includes(column.key)
+                    ? handleRowInfoOpen
+                    : undefined
+                }
               />
             );
           })}

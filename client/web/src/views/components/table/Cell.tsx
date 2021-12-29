@@ -2,7 +2,6 @@ import React from "react";
 import TableCell from "@mui/material/TableCell";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
-import { getOutletContext } from "../../ui/Content";
 import { CellAlign, Formatter, formatValue } from "./data/Column";
 import { CellData, CellValue } from "./data/Row";
 
@@ -15,6 +14,7 @@ interface CellProps {
   width: string;
   formatter?: Formatter;
   showValue: boolean;
+  onClick?: any;
 }
 
 Cell.defaultProps = {
@@ -31,13 +31,8 @@ export function Cell({
   width,
   formatter,
   showValue,
+  onClick,
 }: CellProps) {
-  const { setAssetCard } = getOutletContext();
-
-  const handleClick = () => {
-    setAssetCard(rowId);
-  };
-
   const displayValue = data?.value
     ? showValue
       ? formatValue(data.value, formatter)
@@ -49,10 +44,8 @@ export function Cell({
     sx.color = data.color;
   }
   return (
-    <TableCell key={id} align={align} sx={{ width }}>
-      <Typography sx={sx} onClick={column === "name" ? handleClick : undefined}>
-        {displayValue}
-      </Typography>
+    <TableCell key={id} onClick={onClick} align={align} sx={{ width }}>
+      <Typography sx={sx}>{displayValue}</Typography>
     </TableCell>
   );
 }
@@ -65,6 +58,7 @@ interface EditableCellProps {
   width: string;
   formatter?: Formatter;
   onCellUpdate: any;
+  onClick?: any;
 }
 
 EditableCell.defaultProps = {
@@ -97,6 +91,7 @@ export function EditableCell({
   width,
   formatter,
   onCellUpdate,
+  onClick,
 }: EditableCellProps) {
   const [tempValue, setTempValue] = React.useState(null as string | null);
   const [editing, setEditing] = React.useState(false);
@@ -191,6 +186,7 @@ export function EditableCell({
       key={id}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDblClick}
+      onClick={onClick}
       align={align}
       sx={{ color: updateInProgress ? "action.disabled" : "inherit", width }}
     >
