@@ -23,7 +23,7 @@ export function Chrome() {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [tutorialOpen, setTutorialOpen] = React.useState(false);
   const [holdingOpen, setHoldingOpen] = React.useState(
-    undefined as string | undefined
+    "aba1a933-f314-448f-a70a-8b78bc8d9157" as string | undefined
   );
 
   const storedLightMode: LightMode = useSelector(getLightMode);

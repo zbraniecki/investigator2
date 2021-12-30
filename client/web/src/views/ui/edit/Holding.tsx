@@ -14,12 +14,23 @@ import TextField from "@mui/material/TextField";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import { orange } from "@mui/material/colors";
+import BottomNavigation from "@mui/material/BottomNavigation";
+import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import RestoreIcon from "@mui/icons-material/Restore";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
+import { AssetContent, AssetHeader } from "./holding/Asset";
+import { HoldingContent, HoldingHeader } from "./holding/Holding";
+import { AccountContent, AccountHeader } from "./holding/Account";
 import {
   getSession,
   getUsers,
   getAccounts,
   createHoldingThunk,
   Account,
+  Holding,
 } from "../../../store/user";
 import {
   getAssetInfo,
@@ -35,6 +46,12 @@ import { assert } from "../../../utils/helpers";
 interface Props {
   holdingPk?: string;
   setCloseDialog: any;
+}
+
+enum HoldingDialogTab {
+  Asset = 0,
+  Holding = 1,
+  Account = 2,
 }
 
 export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
@@ -56,6 +73,7 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
   const [quantity, setQuantity] = React.useState(
     undefined as number | undefined
   );
+  const [selectedTab, setSelectedTab] = React.useState(HoldingDialogTab.Asset);
 
   let currentHolding;
   let currentAccount;
@@ -73,6 +91,7 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
   if (currentAccount && accountPk === undefined) {
     setAccountPk(currentAccount.pk);
   }
+
   if (currentHolding && assetPk === undefined) {
     const asset = assetInfo[currentHolding.asset];
     setAssetClassPk(asset.asset_class);
@@ -109,7 +128,6 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
   }
 
   const currentUser = users[session.user_pk];
-
   const asset = assetPk ? assetInfo[assetPk] : undefined;
   const account = accountPk ? accounts[accountPk] : undefined;
 
@@ -164,6 +182,84 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
     setAccountPk(event.target.value);
   };
 
+  const data = [
+    // {
+    //   label: "Price", value: {
+    //     current: 44301,
+    //     range: {
+    //       low: 43201,
+    //       high: 45921,
+    //     },
+    //     change: {
+    //       "1h": 0.1,
+    //       "24h": 0.1,
+    //       "7d": 0.1,
+    //       "30d": 0.1,
+    //     }
+    //   },
+    // },
+    // {
+    //   label: "Market Cap", value: {
+    //     current: 321231,
+    //     change: {
+    //       "24h": 0.2,
+    //     },
+    //   },
+    // },
+
+    {
+      label: "Supply",
+      value: {
+        circulating: 10,
+        total: 10,
+        max: 10,
+      },
+    },
+    // { label: "Inflation", value: 10 },
+
+    // { label: "Last Updated", value: 0.1 },
+
+    // { label: "Owned Value", value: [25400] },
+    // {
+    //   label: "Holdings", value: [
+    //     {
+    //       account: "Hodlnout",
+    //       value: 0.1,
+    //       apy: 0.072,
+    //     },
+    //     {
+    //       account: "BlockFi",
+    //       value: 0.02,
+    //       apy: 0.062,
+    //     },
+    //     {
+    //       account: "Celsius",
+    //       apy: 0.062,
+    //     }
+    //   ],
+    // },
+  ];
+
+  let content;
+  let header;
+  switch (selectedTab) {
+    case HoldingDialogTab.Holding: {
+      header = <HoldingHeader asset={asset} account={currentAccount} />;
+      content = <HoldingContent />;
+      break;
+    }
+    case HoldingDialogTab.Account: {
+      header = <AccountHeader />;
+      content = <AccountContent />;
+      break;
+    }
+    case HoldingDialogTab.Asset:
+    default: {
+      header = <AssetHeader asset={asset} />;
+      content = <AssetContent />;
+    }
+  }
+
   return (
     <Dialog
       sx={{ "& .MuiDialog-paper": { width: "80%", height: "80%" } }}
@@ -171,22 +267,17 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
       open={Boolean(holdingPk)}
     >
       <DialogTitle sx={{ display: "flex", flexDirection: "row" }}>
-        <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>
-          {asset?.symbol[0].toUpperCase()}
-        </Avatar>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Typography>{asset?.symbol.toUpperCase()}</Typography>
-          <Typography>{asset?.name}</Typography>
-        </Box>
+        {header}
       </DialogTitle>
-      <DialogContent dividers>
-        <Box>
+      <DialogContent dividers sx={{ p: 0 }}>
+        {content}
+        {/* <Box>
           <FormControl variant="standard">
             <InputLabel id="holding-asset-class-label">Class</InputLabel>
             <Select
               labelId="holding-asset-class-label"
               id="holding-asset-class"
-              value={assetClassPk}
+              value={assetClassPk || ""}
               onChange={handleAssetClassChange}
               label="Class"
             >
@@ -205,7 +296,7 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
             <Select
               labelId="holding-asset-label"
               id="holding-asset"
-              value={asset?.pk || ""}
+              value={asset ? asset.pk : ""}
               onChange={handleAssetChange}
               label="Asset"
             >
@@ -224,7 +315,7 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
             id="outlined-number"
             label="Quantity"
             type="number"
-            value={quantity}
+            value={quantity || ""}
             onChange={handleQuantityChange}
             InputLabelProps={{
               shrink: true,
@@ -252,14 +343,19 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
               ;
             </Select>
           </FormControl>
-        </Box>
+        </Box> */}
       </DialogContent>
-      <DialogActions>
-        <Button autoFocus onClick={handleCancel}>
-          Cancel
-        </Button>
-        <Button onClick={handleOk}>Ok</Button>
-      </DialogActions>
+      <BottomNavigation
+        showLabels
+        value={selectedTab}
+        onChange={(event, newValue) => {
+          setSelectedTab(newValue);
+        }}
+      >
+        <BottomNavigationAction label="Asset" icon={<RestoreIcon />} />
+        <BottomNavigationAction label="Holding" icon={<FavoriteIcon />} />
+        <BottomNavigationAction label="Account" icon={<LocationOnIcon />} />
+      </BottomNavigation>
     </Dialog>
   );
 }
