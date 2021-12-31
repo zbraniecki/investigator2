@@ -12,6 +12,7 @@ import { getSession, updateHoldingThunk } from "../../../store/user";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 import { getOutletContext } from "../../ui/Content";
+import { HoldingDialogTab } from "../../ui/edit/Holding";
 
 export interface Props {
   id: string;
@@ -39,7 +40,11 @@ export function Row({ id, data, tableMeta }: Props) {
 
   const handleRowInfoOpen = () => {
     const { value } = data.cells.id;
-    outletContext.setHoldingOpen(value);
+    outletContext.setHoldingState({
+      open: true,
+      selectedTab: HoldingDialogTab.Asset,
+      holdingPk: value,
+    });
   };
 
   return (

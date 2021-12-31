@@ -43,18 +43,25 @@ import {
 } from "../../../store/oracle";
 import { assert } from "../../../utils/helpers";
 
-interface Props {
-  holdingPk?: string;
-  setCloseDialog: any;
-}
-
-enum HoldingDialogTab {
+export enum HoldingDialogTab {
   Asset = 0,
   Holding = 1,
   Account = 2,
 }
 
-export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
+export interface DialogState {
+  open: boolean;
+  selectedTab?: HoldingDialogTab;
+  holdingPk?: string;
+}
+
+interface Props {
+  state: DialogState;
+  setCloseDialog: any;
+  updateHoldingState: any;
+}
+
+export function HoldingDialog({ state, updateHoldingState }: Props) {
   const dispatch = useDispatch();
 
   const session = useSelector(getSession);
@@ -73,14 +80,13 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
   const [quantity, setQuantity] = React.useState(
     undefined as number | undefined
   );
-  const [selectedTab, setSelectedTab] = React.useState(HoldingDialogTab.Asset);
 
   let currentHolding;
   let currentAccount;
 
   for (const account of Object.values<Account>(accounts)) {
     for (const h of account.holdings) {
-      if (h.pk === holdingPk) {
+      if (h.pk === state.holdingPk) {
         currentHolding = h;
         currentAccount = account;
         break;
@@ -132,7 +138,7 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
   const account = accountPk ? accounts[accountPk] : undefined;
 
   const handleCancel = () => {
-    setCloseDialog();
+    updateHoldingState(false);
   };
 
   const handleOk = () => {
@@ -159,7 +165,7 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
       if (resp.payload.pk) {
         setAssetPk(undefined);
         setAccountPk(undefined);
-        setCloseDialog();
+        updateHoldingState(false);
       }
     });
   };
@@ -238,16 +244,16 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
   ];
 
   const handleHoldingClick = (event: any) => {
-    setSelectedTab(HoldingDialogTab.Holding);
+    updateHoldingState(undefined, HoldingDialogTab.Holding);
   };
 
   const handleAccountClick = (event: any) => {
-    setSelectedTab(HoldingDialogTab.Account);
+    updateHoldingState(undefined, HoldingDialogTab.Account);
   };
 
   let content;
   let header;
-  switch (selectedTab) {
+  switch (state.selectedTab) {
     case HoldingDialogTab.Holding: {
       header = <HoldingHeader asset={asset} account={currentAccount} />;
       content = <HoldingContent />;
@@ -280,7 +286,7 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
         },
       }}
       maxWidth="xs"
-      open={Boolean(holdingPk)}
+      open={state.open}
       onClose={handleCancel}
     >
       <DialogTitle sx={{ display: "flex", flexDirection: "row" }}>
@@ -364,9 +370,9 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
       </DialogContent>
       <BottomNavigation
         showLabels
-        value={selectedTab}
+        value={state.selectedTab}
         onChange={(event, newValue) => {
-          setSelectedTab(newValue);
+          updateHoldingState(undefined, newValue);
         }}
       >
         <BottomNavigationAction label="Asset" icon={<RestoreIcon />} />

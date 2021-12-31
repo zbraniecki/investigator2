@@ -58,6 +58,8 @@ export function AssetContent({
   handleHoldingClick,
   handleAccountClick,
 }: Props) {
+  const [notesContent, setNotesContent] = React.useState("");
+
   return (
     <>
       <Stack sx={{ padding: "10px 0" }}>
@@ -231,8 +233,10 @@ export function AssetContent({
                 label="Notes"
                 multiline
                 fullWidth
-                value=" "
+                value={notesContent.length > 0 ? notesContent : " "}
+                onChange={(event: any) => setNotesContent(event.target.value)}
                 maxRows={4}
+                variant="standard"
                 sx={{ "& textarea": { fontSize: "0.8em" } }}
               />
             </TableCell>

@@ -2,13 +2,13 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { useOutletContext, Outlet } from "react-router-dom";
 
-type ContextType = { setHoldingOpen: any };
+type ContextType = { setHoldingState: any };
 
 export interface Props {
-  setHoldingOpen: any;
+  setHoldingState: any;
 }
 
-export default function Content({ setHoldingOpen }: Props) {
+export default function Content({ setHoldingState }: Props) {
   return (
     <Box
       component="main"
@@ -19,7 +19,7 @@ export default function Content({ setHoldingOpen }: Props) {
         height: "calc(100vh - 130px)",
       }}
     >
-      <Outlet context={{ setHoldingOpen }} />
+      <Outlet context={{ setHoldingState }} />
     </Box>
   );
 }

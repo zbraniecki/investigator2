@@ -17,14 +17,20 @@ import Content from "./Content";
 import { getLightMode, setLightMode, getInfoDisplayMode } from "../../store/ui";
 import { SettingsDialog } from "./Settings";
 import { TutorialDialog } from "./tutorial/Tutorial";
-import { HoldingDialog } from "./edit/Holding";
+import { HoldingDialog, HoldingDialogTab, DialogState } from "./edit/Holding";
 
 export function Chrome() {
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [tutorialOpen, setTutorialOpen] = React.useState(false);
-  const [holdingOpen, setHoldingOpen] = React.useState(
-    "aba1a933-f314-448f-a70a-8b78bc8d9157" as string | undefined
-  );
+  const [holdingState, setHoldingState] = React.useState({ open: false } as DialogState);
+
+  const updateHoldingState = (open?: boolean, selectedTab?: HoldingDialogTab) => {
+    setHoldingState({
+      open: open === undefined ? holdingState.open : open,
+      holdingPk: holdingState.holdingPk,
+      selectedTab: selectedTab === undefined ? holdingState.selectedTab : selectedTab,
+    });
+  }
 
   const storedLightMode: LightMode = useSelector(getLightMode);
   const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
@@ -41,7 +47,6 @@ export function Chrome() {
       }),
     [lightModeName]
   );
-
   const menuItems = getMenuItems();
 
   const children = [];
@@ -66,12 +71,12 @@ export function Chrome() {
   const routes = useRoutes([
     {
       path: "/",
-      element: <Content setHoldingOpen={setHoldingOpen} />,
+      element: <Content setHoldingState={setHoldingState} />,
       children,
     },
   ]);
 
-  const onSettingsOk = () => {};
+  const onSettingsOk = () => { };
 
   return (
     <ThemeProvider theme={theme}>
@@ -85,7 +90,7 @@ export function Chrome() {
       <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
         <InvestigatorDrawer
           menuItems={menuItems}
-          setHoldingOpen={setHoldingOpen}
+          setHoldingState={setHoldingState}
         />
         {routes}
       </Box>
@@ -96,8 +101,9 @@ export function Chrome() {
       />
       <TutorialDialog open={tutorialOpen} setOpen={setTutorialOpen} />
       <HoldingDialog
-        holdingPk={holdingOpen}
-        setCloseDialog={() => setHoldingOpen(undefined)}
+        state={holdingState}
+        setCloseDialog={() => updateHoldingState(false)}
+        updateHoldingState={updateHoldingState}
       />
     </ThemeProvider>
   );

@@ -12,18 +12,18 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import { useMatch, NavLink } from "react-router-dom";
-import { bindActionCreators } from "@reduxjs/toolkit";
 import { MenuItem } from "./Menu";
+import { HoldingDialogTab } from "./edit/Holding";
 /* import { getSession } from "../../store/account"; */
 
 interface Props {
   menuItems: Array<MenuItem>;
-  setHoldingOpen: any;
+  setHoldingState: any;
 }
 
 export default function InvestigatorDrawer({
   menuItems,
-  setHoldingOpen,
+  setHoldingState,
 }: Props) {
   /* const session = useSelector(getSession); */
   const index = Boolean(useMatch(`/`));
@@ -39,7 +39,11 @@ export default function InvestigatorDrawer({
   }
 
   const handleHoldingOpen = (event: any) => {
-    setHoldingOpen(true);
+    setHoldingState({
+      open: true,
+      holdingPk: "aba1a933-f314-448f-a70a-8b78bc8d9157",
+      selectedTab: HoldingDialogTab.Holding,
+    });
   };
 
   const actions = [

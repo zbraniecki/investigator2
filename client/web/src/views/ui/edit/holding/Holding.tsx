@@ -7,8 +7,6 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Stack from "@mui/material/Stack";
 import Chip from "@mui/material/Chip";
-import Slider from "@mui/material/Slider";
-import LinearProgress from "@mui/material/LinearProgress";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import { orange } from "@mui/material/colors";
