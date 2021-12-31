@@ -2,6 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
+import TableHead from "@mui/material/TableHead";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Stack from "@mui/material/Stack";
@@ -11,6 +12,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import { orange } from "@mui/material/colors";
+import Paper from "@mui/material/Paper";
 import { AssetInfo } from "../../../../store/oracle";
 import { Account } from "../../../../store/user";
 
@@ -38,10 +40,6 @@ export function HoldingHeader({ asset, account }: Props) {
           variant="outlined"
           size="small"
         />
-        <Stack>
-          <Typography sx={{ fontSize: "0.6em" }}>Owned: 0.4</Typography>
-          <Typography sx={{ fontSize: "0.6em" }}>Value: $26431.01</Typography>
-        </Stack>
       </Box>
     </>
   );
@@ -50,7 +48,7 @@ export function HoldingHeader({ asset, account }: Props) {
 export function HoldingContent() {
   return (
     <>
-      <Table>
+      <Table sx={{ "& tr:last-of-type td": { border: 0 } }}>
         <TableBody>
           <TableRow>
             <TableCell sx={{ width: "40%", fontSize: "0.8em" }}>
@@ -78,9 +76,50 @@ export function HoldingContent() {
           </TableRow>
         </TableBody>
       </Table>
-      <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
-        <Typography>Last Updated</Typography>
-        <Typography>2021-09-12 21:23 PDT</Typography>
+      <Paper>
+        <Typography
+          sx={{ paddingLeft: "15px", paddingTop: "5px", fontSize: "0.9em" }}
+        >
+          Transactions
+        </Typography>
+        <Table size="small" sx={{ "& *": { color: "#666666" } }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Date</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell>Quantity</TableCell>
+              <TableCell>Target</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>2021-09-12 13:45 PDT</TableCell>
+              <TableCell>SELL</TableCell>
+              <TableCell>0.2</TableCell>
+              <TableCell>Coinbase Wallet</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Paper>
+      <Stack
+        direction="row"
+        sx={{
+          justifyContent: "flex-end",
+          marginTop: "10px",
+          color: "#666666",
+          marginRight: "10px",
+          marginBottom: "10px",
+        }}
+      >
+        <Typography display="inline" sx={{ fontSize: "0.8em" }}>
+          Last Updated:{" "}
+        </Typography>
+        <Typography
+          display="inline"
+          sx={{ paddingLeft: "5px", fontSize: "0.8em" }}
+        >
+          2021-09-12 21:23 PDT
+        </Typography>
       </Stack>
     </>
   );

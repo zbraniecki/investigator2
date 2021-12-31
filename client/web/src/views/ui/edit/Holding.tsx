@@ -206,19 +206,16 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
     //     },
     //   },
     // },
-
-    {
-      label: "Supply",
-      value: {
-        circulating: 10,
-        total: 10,
-        max: 10,
-      },
-    },
+    // {
+    //   label: "Supply",
+    //   value: {
+    //     circulating: 10,
+    //     total: 10,
+    //     max: 10,
+    //   },
+    // },
     // { label: "Inflation", value: 10 },
-
     // { label: "Last Updated", value: 0.1 },
-
     // { label: "Owned Value", value: [25400] },
     // {
     //   label: "Holdings", value: [
@@ -240,6 +237,14 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
     // },
   ];
 
+  const handleHoldingClick = (event: any) => {
+    setSelectedTab(HoldingDialogTab.Holding);
+  };
+
+  const handleAccountClick = (event: any) => {
+    setSelectedTab(HoldingDialogTab.Account);
+  };
+
   let content;
   let header;
   switch (selectedTab) {
@@ -256,15 +261,27 @@ export function HoldingDialog({ holdingPk, setCloseDialog }: Props) {
     case HoldingDialogTab.Asset:
     default: {
       header = <AssetHeader asset={asset} />;
-      content = <AssetContent />;
+      content = (
+        <AssetContent
+          handleHoldingClick={handleHoldingClick}
+          handleAccountClick={handleAccountClick}
+        />
+      );
     }
   }
 
   return (
     <Dialog
-      sx={{ "& .MuiDialog-paper": { width: "80%", height: "80%" } }}
+      sx={{
+        "& .MuiDialog-paper": {
+          maxWidth: "calc(100% - 120px)",
+          width: "640px",
+          height: "80%",
+        },
+      }}
       maxWidth="xs"
       open={Boolean(holdingPk)}
+      onClose={handleCancel}
     >
       <DialogTitle sx={{ display: "flex", flexDirection: "row" }}>
         {header}
