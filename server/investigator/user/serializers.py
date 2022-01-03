@@ -8,11 +8,25 @@ from .models import (
     PortfolioUI,
     WatchlistUI,
     User,
+    Transaction,
 )
 from investigator.oracle.models import Asset, Tag
 from investigator.strategy.models import StrategyUI
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = [
+            "pk",
+            "account",
+            "asset",
+            "type",
+            "quantity",
+            "timestamp",
+        ]
 
 
 class HoldingSerializer(serializers.ModelSerializer):
@@ -73,10 +87,11 @@ class WatchlistSerializer(serializers.ModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField("get_name")
     holdings = HoldingSerializer(many=True, read_only=True)
+    transactions = TransactionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Account
-        fields = ["pk", "owner", "name", "service", "holdings"]
+        fields = ["pk", "owner", "name", "service", "holdings", "transactions"]
 
     def get_name(self, obj):
         if obj.name:

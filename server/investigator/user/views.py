@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from .models import Portfolio, Holding, Watchlist, Account
+from .models import Portfolio, Holding, Watchlist, Account, Transaction
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import (
@@ -9,7 +9,17 @@ from .serializers import (
     WatchlistSerializer,
     AccountSerializer,
     UserSerializer,
+    TransactionSerializer,
 )
+
+
+class TransactionViewSet(viewsets.ModelViewSet):
+    serializer_class = TransactionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Transaction.objects.filter(account__owner=user).order_by("-timestamp")
 
 
 class PortfolioViewSet(viewsets.ModelViewSet):

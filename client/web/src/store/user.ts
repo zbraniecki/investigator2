@@ -11,6 +11,7 @@ import {
   updateUserInfo,
 } from "../api/user";
 import { createHolding, updateHolding } from "../api/holding";
+import { createTransaction } from "../api/account";
 import { Watchlist } from "./oracle";
 import { getFromLocalStorage } from "./main";
 
@@ -56,6 +57,20 @@ export const updateUserInfoThunk = createAsyncThunk(
   updateUserInfo
 );
 
+export const createTransactionThunk = createAsyncThunk(
+  "user/createTransaction",
+  createTransaction
+);
+
+export interface Transaction {
+  pk: string;
+  account: string;
+  asset: string;
+  type: string;
+  quantity: number;
+  timestamp: string;
+}
+
 export interface Holding {
   pk: string;
   asset: string;
@@ -90,6 +105,7 @@ export interface Account {
   name: string;
   service: string;
   holdings: Holding[];
+  transactions: Transaction[];
 }
 
 export enum AuthenticateState {
@@ -99,12 +115,14 @@ export enum AuthenticateState {
   Error,
 }
 
+export interface Session {
+  authenticateState: AuthenticateState;
+  token?: string;
+  user_pk?: string;
+}
+
 interface AccountState {
-  session: {
-    authenticateState: AuthenticateState;
-    token?: string;
-    user_pk?: string;
-  };
+  session: Session;
   portfolios: Record<string, Portfolio>;
   watchlists: Record<string, Watchlist>;
   accounts: Record<string, Account>;

@@ -13,17 +13,17 @@ import ShowChartIcon from "@mui/icons-material/ShowChart";
 import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import { useMatch, NavLink } from "react-router-dom";
 import { MenuItem } from "./Menu";
-import { HoldingDialogTab } from "./edit/Holding";
+import { DialogTab } from "./edit/Dialog";
 /* import { getSession } from "../../store/account"; */
 
 interface Props {
   menuItems: Array<MenuItem>;
-  setHoldingState: any;
+  updateDialogState: any;
 }
 
 export default function InvestigatorDrawer({
   menuItems,
-  setHoldingState,
+  updateDialogState,
 }: Props) {
   /* const session = useSelector(getSession); */
   const index = Boolean(useMatch(`/`));
@@ -39,10 +39,14 @@ export default function InvestigatorDrawer({
   }
 
   const handleHoldingOpen = (event: any) => {
-    setHoldingState({
+    updateDialogState({
       open: true,
-      holdingPk: "aba1a933-f314-448f-a70a-8b78bc8d9157",
-      selectedTab: HoldingDialogTab.Holding,
+      editable: {
+        quantity: true,
+        asset: true,
+        account: true,
+      },
+      selectedTab: DialogTab.Holding,
     });
   };
 

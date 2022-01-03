@@ -12,7 +12,7 @@ import { getSession, updateHoldingThunk } from "../../../store/user";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 import { getOutletContext } from "../../ui/Content";
-import { HoldingDialogTab } from "../../ui/edit/Holding";
+import { DialogTab } from "../../ui/edit/Dialog";
 
 export interface Props {
   id: string;
@@ -38,12 +38,28 @@ export function Row({ id, data, tableMeta }: Props) {
     );
   };
 
-  const handleRowInfoOpen = () => {
+  const handleAssetOpen = () => {
     const { value } = data.cells.id;
-    outletContext.setHoldingState({
+    outletContext.updateDialogState({
       open: true,
-      selectedTab: HoldingDialogTab.Asset,
-      holdingPk: value,
+      selectedTab: DialogTab.Asset,
+      value: {
+        holding: value,
+      },
+    });
+  };
+
+  const handleHoldingOpen = () => {
+    const { value } = data.cells.id;
+    outletContext.updateDialogState({
+      open: true,
+      selectedTab: DialogTab.Holding,
+      value: {
+        holding: value,
+      },
+      editable: {
+        quantity: true,
+      },
     });
   };
 
@@ -95,8 +111,10 @@ export function Row({ id, data, tableMeta }: Props) {
                 formatter={column.formatter}
                 showValue={!hideValue}
                 onClick={
-                  ["name", "account"].includes(column.key)
-                    ? handleRowInfoOpen
+                  column.key === "name"
+                    ? handleAssetOpen
+                    : column.key === "account"
+                    ? handleHoldingOpen
                     : undefined
                 }
               />

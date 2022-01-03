@@ -52,7 +52,9 @@ class TransactionType(models.TextChoices):
 
 class Transaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey(
+        Account, related_name="transactions", on_delete=models.CASCADE
+    )
     asset = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
     quantity = models.FloatField(blank=True, null=True)
     fee = models.FloatField(blank=True, null=True)

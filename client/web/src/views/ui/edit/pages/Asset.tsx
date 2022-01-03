@@ -17,20 +17,21 @@ import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import { AssetInfo } from "../../../../store/oracle";
+import { ResolvedDialogState } from "../Dialog";
 
 interface HeaderProps {
-  asset: AssetInfo;
+  state: ResolvedDialogState;
 }
 
-export function AssetHeader({ asset }: HeaderProps) {
+export function AssetHeader({ state }: HeaderProps) {
   return (
     <>
       <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>
-        {asset?.symbol[0].toUpperCase()}
+        {state.asset?.symbol[0].toUpperCase()}
       </Avatar>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Typography>{asset?.symbol.toUpperCase()}</Typography>
-        <Typography>{asset?.name}</Typography>
+        <Typography>{state.asset?.symbol.toUpperCase()}</Typography>
+        <Typography>{state.asset?.name}</Typography>
         <Typography />
       </Box>
       <Box sx={{ flex: 1 }} />
@@ -59,6 +60,60 @@ export function AssetContent({
   handleAccountClick,
 }: Props) {
   const [notesContent, setNotesContent] = React.useState("");
+  const data = [
+    // {
+    //   label: "Price", value: {
+    //     current: 44301,
+    //     range: {
+    //       low: 43201,
+    //       high: 45921,
+    //     },
+    //     change: {
+    //       "1h": 0.1,
+    //       "24h": 0.1,
+    //       "7d": 0.1,
+    //       "30d": 0.1,
+    //     }
+    //   },
+    // },
+    // {
+    //   label: "Market Cap", value: {
+    //     current: 321231,
+    //     change: {
+    //       "24h": 0.2,
+    //     },
+    //   },
+    // },
+    // {
+    //   label: "Supply",
+    //   value: {
+    //     circulating: 10,
+    //     total: 10,
+    //     max: 10,
+    //   },
+    // },
+    // { label: "Inflation", value: 10 },
+    // { label: "Last Updated", value: 0.1 },
+    // { label: "Owned Value", value: [25400] },
+    // {
+    //   label: "Holdings", value: [
+    //     {
+    //       account: "Hodlnout",
+    //       value: 0.1,
+    //       apy: 0.072,
+    //     },
+    //     {
+    //       account: "BlockFi",
+    //       value: 0.02,
+    //       apy: 0.062,
+    //     },
+    //     {
+    //       account: "Celsius",
+    //       apy: 0.062,
+    //     }
+    //   ],
+    // },
+  ];
 
   return (
     <>
@@ -276,7 +331,7 @@ export function AssetContent({
         >
           Accounts
         </Typography>
-        <Table sx={{ opacity: "0.7" }}>
+        <Table sx={{ opacity: "0.8" }}>
           <TableHead>
             <TableRow>
               <TableCell sx={{ width: "60%" }}>Name</TableCell>

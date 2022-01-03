@@ -21,6 +21,7 @@ router.register(r"user/watchlist", user_views.WatchlistViewSet, "watchlist")
 router.register(r"user/portfolios", user_views.PortfolioViewSet, "portfolio")
 router.register(r"user/accounts", user_views.AccountViewSet)
 router.register(r"user/users", user_views.UserViewSet, "user")
+router.register(r"user/transactions", user_views.TransactionViewSet, "transaction")
 
 router.register(r"strategy/list", strategy_views.StrategyViewSet)
 

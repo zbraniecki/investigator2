@@ -2,13 +2,13 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { useOutletContext, Outlet } from "react-router-dom";
 
-type ContextType = { setHoldingState: any };
+type ContextType = { updateDialogState: any };
 
 export interface Props {
-  setHoldingState: any;
+  updateDialogState: any;
 }
 
-export default function Content({ setHoldingState }: Props) {
+export default function Content({ updateDialogState }: Props) {
   return (
     <Box
       component="main"
@@ -19,7 +19,7 @@ export default function Content({ setHoldingState }: Props) {
         height: "calc(100vh - 130px)",
       }}
     >
-      <Outlet context={{ setHoldingState }} />
+      <Outlet context={{ updateDialogState }} />
     </Box>
   );
 }
