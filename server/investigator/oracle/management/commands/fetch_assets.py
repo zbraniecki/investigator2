@@ -127,6 +127,7 @@ def fetch_batch(source, batch_idx, crypto, usd, enable, only_update):
         defaults = {
             "api_id": api_id,
             "symbol": symbol,
+            "asset_class": crypto,
             "name": entry["name"],
             "active": active,
             "base": usd,
@@ -150,12 +151,11 @@ def fetch_batch(source, batch_idx, crypto, usd, enable, only_update):
         else:
             asset, created = Asset.all_objects.update_or_create(
                 api_id=api_id,
-                tags__in=[crypto],
+                asset_class=crypto,
                 defaults=defaults,
             )
             if created:
                 print(f"{MAX_BATCH*batch_idx + idx}: {api_id} {symbol} (added)")
-                asset.tags.add(crypto)
             else:
                 print(f"{MAX_BATCH*batch_idx + idx}: {api_id} {symbol} (updated)")
 
@@ -166,7 +166,7 @@ def fetch_crypto_assets(active=False, dry=False):
     fiat = Tag.objects.get(name="fiat", category__in=[asset_class])
     usd, created = Asset.all_objects.update_or_create(
         symbol="usd",
-        tags__in=[fiat],
+        asset_class=fiat,
         defaults={
             "id": "usd",
             "symbol": "usd",

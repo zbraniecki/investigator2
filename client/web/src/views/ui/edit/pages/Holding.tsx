@@ -74,17 +74,17 @@ export function HoldingHeader({
 
     assetDOM = (
       <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={assetList}
-          sx={{ width: 300 }}
-          onChange={handleAssetSelect}
-          isOptionEqualToValue={(option, value) => option.pk === value.pk}
-          getOptionLabel={(option) =>
-            `${option.name} (${option.symbol.toUpperCase()})`
-          }
-          renderInput={(params) => <TextField {...params} />}
-        />
+        disablePortal
+        id="combo-box-demo"
+        options={assetList}
+        sx={{ width: 300 }}
+        onChange={handleAssetSelect}
+        isOptionEqualToValue={(option, value) => option.pk === value.pk}
+        getOptionLabel={(option) =>
+          `${option.name} (${option.symbol.toUpperCase()})`
+        }
+        renderInput={(params) => <TextField {...params} />}
+      />
     );
   }
 
@@ -113,15 +113,15 @@ export function HoldingHeader({
 
     accountDOM = (
       <Autocomplete
-          disablePortal
-          id="account-select"
-          options={accountList}
-          sx={{ width: 300 }}
-          onChange={handleAccountSelect}
-          isOptionEqualToValue={(option, value) => option.pk === value.pk}
-          getOptionLabel={(option) => `${option.name}`}
-          renderInput={(params) => <TextField {...params} />}
-        />
+        disablePortal
+        id="account-select"
+        options={accountList}
+        sx={{ width: 300 }}
+        onChange={handleAccountSelect}
+        isOptionEqualToValue={(option, value) => option.pk === value.pk}
+        getOptionLabel={(option) => `${option.name}`}
+        renderInput={(params) => <TextField {...params} />}
+      />
     );
   }
 
@@ -175,8 +175,8 @@ export function HoldingContent({
 
   let price;
   if (state.value.quantity && state.asset?.info.value) {
-    const q = parseInt(state.value.quantity, 10);
-    price = q * state.asset.info.value;
+    const q = parseFloat(state.value.quantity);
+    price = currency(q * state.asset.info.value);
   }
   let quantity: string = " ";
   if (state.value.quantity) {
