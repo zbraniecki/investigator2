@@ -2,42 +2,35 @@
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
-  fetchPortfolios,
-  fetchWatchlists,
-  fetchAccounts,
+  fetchPortfoliosThunk,
+  fetchWatchlistsThunk,
+  fetchAccountsThunk,
+  fetchUsersThunk,
   authenticate,
   logout,
-  fetchUserInfo,
   updateUserInfo,
 } from "../api/user";
-import { fetchHoldings, createHolding, updateHolding } from "../api/holding";
+import {
+  fetchHoldingsThunk,
+  createHolding,
+  updateHolding,
+} from "../api/holding";
 import { createTransaction } from "../api/account";
-import { Watchlist } from "./oracle";
+import {
+  Watchlist,
+  Portfolio,
+  Session,
+  Account,
+  Holding,
+  User,
+  AuthenticateState,
+} from "../types";
 import { getFromLocalStorage } from "./main";
-
-export const fetchPortfoliosThunk = createAsyncThunk(
-  "user/fetchPortfolios",
-  fetchPortfolios
-);
-
-export const fetchWatchlistsThunk = createAsyncThunk(
-  "user/fetchWatchlists",
-  fetchWatchlists
-);
-
-export const fetchAccountsThunk = createAsyncThunk(
-  "user/fetchAccounts",
-  fetchAccounts
-);
+import { setFetchEntitiesReducer } from "./helpers";
 
 export const authenticateThunk = createAsyncThunk(
   "user/authenticate",
   authenticate
-);
-
-export const fetchUserInfoThunk = createAsyncThunk(
-  "user/userInfo",
-  fetchUserInfo
 );
 
 export const logoutThunk = createAsyncThunk("user/logout", logout);
@@ -61,70 +54,6 @@ export const createTransactionThunk = createAsyncThunk(
   "user/createTransaction",
   createTransaction
 );
-
-export const fetchHoldingsThunk = createAsyncThunk(
-  "user/fetchHoldings",
-  fetchHoldings,
-);
-
-export interface Transaction {
-  pk: string;
-  account: string;
-  asset: string;
-  type: string;
-  quantity: number;
-  timestamp: string;
-}
-
-export interface Holding {
-  pk: string;
-  asset: string;
-  quantity: number;
-  account?: string;
-}
-
-export interface Portfolio {
-  pk: string;
-  name: string;
-  holdings: string[];
-  portfolios: string[];
-  accounts: string[];
-  tags: string[];
-  value?: number;
-}
-
-export interface User {
-  pk: string;
-  username: string;
-  email: string;
-  ui: {
-    portfolios: string[];
-    watchlists: string[];
-    strategies: string[];
-  };
-}
-
-export interface Account {
-  pk: string;
-  owner: string;
-  name: string;
-  service: string;
-  holdings: string[];
-  transactions: Transaction[];
-}
-
-export enum AuthenticateState {
-  None,
-  Authenticating,
-  Session,
-  Error,
-}
-
-export interface Session {
-  authenticateState: AuthenticateState;
-  token?: string;
-  user_pk?: string;
-}
 
 interface AccountState {
   session: Session;
@@ -159,7 +88,7 @@ function cleanSlice(state: any) {
   state.users = {};
 }
 
-export const userSlice = createSlice({
+const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -171,34 +100,12 @@ export const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchPortfoliosThunk.fulfilled, (state, action) => {
-      state.portfolios = {};
-      for (const item of action.payload) {
-        // XXX: Switch to undefined in Serializer
-        if (item.value === null) {
-          item.value = undefined;
-        }
-        state.portfolios[item.pk] = item;
-      }
-    });
-    builder.addCase(fetchHoldingsThunk.fulfilled, (state, action) => {
-      state.holdings = {};
-      for (const item of action.payload) {
-        state.holdings[item.pk] = item;
-      }
-    });
-    builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
-      state.watchlists = {};
-      for (const item of action.payload) {
-        state.watchlists[item.id] = item;
-      }
-    });
-    builder.addCase(fetchAccountsThunk.fulfilled, (state, action) => {
-      state.accounts = {};
-      for (const item of action.payload) {
-        state.accounts[item.pk] = item;
-      }
-    });
+    setFetchEntitiesReducer(builder, fetchPortfoliosThunk, "portfolios");
+    setFetchEntitiesReducer(builder, fetchHoldingsThunk, "holdings");
+    setFetchEntitiesReducer(builder, fetchWatchlistsThunk, "watchlists");
+    setFetchEntitiesReducer(builder, fetchAccountsThunk, "accounts");
+    setFetchEntitiesReducer(builder, fetchUsersThunk, "users");
+
     builder.addCase(authenticateThunk.fulfilled, (state, action) => {
       if (action.payload.error) {
         state.session.authenticateState = AuthenticateState.Error;
@@ -211,17 +118,6 @@ export const userSlice = createSlice({
     });
     builder.addCase(logoutThunk.fulfilled, (state) => {
       cleanSlice(state);
-    });
-    builder.addCase(fetchUserInfoThunk.fulfilled, (state, action) => {
-      if (action.payload.detail) {
-        cleanSlice(state);
-        return;
-      }
-
-      state.users = {};
-      for (const item of action.payload) {
-        state.users[item.pk] = item;
-      }
     });
     builder.addCase(updateHoldingThunk.fulfilled, (state, action) => {
       if (action.payload.error !== null) {

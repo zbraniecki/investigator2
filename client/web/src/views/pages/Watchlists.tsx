@@ -11,18 +11,16 @@ import {
   prepareWatchlistTableData,
   computeWatchlistTableDataStyle,
 } from "../../utils/watchlist";
-import {
-  getAssetInfo,
-  getWatchlists as getPublicWatchlists,
-  Watchlist,
-} from "../../store/oracle";
+import { Watchlist } from "../../types";
 import {
   getPortfolios,
   getWatchlists as getUserWatchlists,
   getUsers,
   getSession,
   getHoldings,
-} from "../../store/user";
+  getAssets,
+  getPublicWatchlists,
+} from "../../store";
 import { TabInfo } from "../components/Tabs";
 
 const baseTableMeta: BaseTableMeta = {
@@ -142,7 +140,7 @@ export function Watchlists() {
     useSelector(getPublicWatchlists);
   const userWatchlists: Record<string, Watchlist> | undefined =
     useSelector(getUserWatchlists);
-  const assetInfo = useSelector(getAssetInfo);
+  const assets = useSelector(getAssets);
   const portfolios = useSelector(getPortfolios);
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
@@ -150,11 +148,11 @@ export function Watchlists() {
 
   const watchlists: Record<string, Watchlist> = {};
   for (const list of Object.values(publicWatchlists)) {
-    watchlists[list.id] = list;
+    watchlists[list.pk] = list;
   }
   if (userWatchlists !== undefined) {
     for (const list of Object.values(userWatchlists)) {
-      watchlists[list.id] = list;
+      watchlists[list.pk] = list;
     }
   }
 
@@ -174,7 +172,7 @@ export function Watchlists() {
       .map((wid) => {
         const watchlist = watchlists[wid];
         return {
-          id: watchlist.id,
+          id: watchlist.pk,
           label: watchlist.name,
         };
       });
@@ -184,9 +182,9 @@ export function Watchlists() {
     const data = prepareWatchlistTableData(
       id,
       watchlists,
-      assetInfo,
+      assets,
       portfolios,
-      holdings,
+      holdings
     );
     if (data === undefined) {
       return undefined;

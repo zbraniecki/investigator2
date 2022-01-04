@@ -1,43 +1,38 @@
+import { makeAsyncThunk, fetchEntries, fetchAuthEntriesType } from "./helpers";
 import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
-import { User } from "../store/user";
+import { Watchlist, Portfolio, Account, User } from "../types";
 
-export const fetchPortfolios = async ({ token }: { token: string }) => {
-  const p = new Promise((resolve) => {
-    setTimeout(resolve, 500);
-  });
-  await p;
-  const data = await fetch(`${BASE_URL}user/portfolios/`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`,
-    },
-  });
-  return data.json();
-};
+const fetchPortfolios = fetchEntries.bind(
+  undefined,
+  "user/portfolios/"
+) as fetchAuthEntriesType<Portfolio>;
+const fetchAccounts = fetchEntries.bind(
+  undefined,
+  "user/accounts/"
+) as fetchAuthEntriesType<Account>;
+const fetchWatchlists = fetchEntries.bind(
+  undefined,
+  "user/watchlists/"
+) as fetchAuthEntriesType<Watchlist>;
+const fetchUsers = fetchEntries.bind(
+  undefined,
+  "user/users/"
+) as fetchAuthEntriesType<User>;
 
-export const fetchWatchlists = async ({ token }: { token: string }) => {
-  const data = await fetch(`${BASE_URL}user/watchlist/`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`,
-    },
-  });
-  return data.json();
-};
-
-export const fetchAccounts = async ({ token }: { token: string }) => {
-  const data = await fetch(`${BASE_URL}user/accounts/`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`,
-    },
-  });
-  return data.json();
-};
+export const fetchPortfoliosThunk = makeAsyncThunk(
+  "user/fetchPortfolios",
+  fetchPortfolios
+);
+export const fetchAccountsThunk = makeAsyncThunk(
+  "user/fetchAccounts",
+  fetchAccounts
+);
+export const fetchWatchlistsThunk = makeAsyncThunk(
+  "user/fetchWatchlists",
+  fetchWatchlists
+);
+export const fetchUsersThunk = makeAsyncThunk("user/fetchUsers", fetchUsers);
 
 export const authenticate = async ({
   email,
@@ -84,23 +79,6 @@ export const logout = async ({ token }: { token: string }) => {
   });
   const resp = await data.json();
   assert(resp.detail);
-};
-
-export const fetchUserInfo = async ({ token }: { token: string }) => {
-  const p = new Promise((resolve) => {
-    setTimeout(resolve, 500);
-  });
-  await p;
-
-  const data = await fetch(`${BASE_URL}user/users/`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`,
-    },
-  });
-  const resp = await data.json();
-  return resp;
 };
 
 export const updateUserInfo = async ({

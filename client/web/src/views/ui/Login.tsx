@@ -11,11 +11,8 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import IconButton from "@mui/material/IconButton";
 import { useDispatch } from "react-redux";
-import {
-  AuthenticateState,
-  setAuthenticateState,
-  authenticateThunk,
-} from "../../store/user";
+import { AuthenticateState } from "../../types";
+import { setAuthenticateState, authenticateThunk } from "../../store/user";
 import { assert } from "../../utils/helpers";
 
 interface Props {

@@ -16,24 +16,20 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { QuestionAnswerTwoTone } from "@mui/icons-material";
-import { AssetInfo } from "../../../../store/oracle";
+import { Asset, Account, Session, User, Transaction } from "../../../../types";
 import { ResolvedDialogState } from "../Dialog";
 import {
   createHoldingThunk,
   createTransactionThunk,
   updateHoldingThunk,
-  Account,
-  Session,
-  User,
-  Transaction,
-} from "../../../../store/user";
+} from "../../../../store";
 import { currency } from "../../../../utils/formatters";
 import { assert } from "../../../../utils/helpers";
 import { AssetHeader } from "./Asset";
 
 interface HeaderProps {
   state: ResolvedDialogState;
-  assetInfo: Record<string, AssetInfo>;
+  assetInfo: Record<string, Asset>;
   accounts: Record<string, Account>;
   updateDialogState: any;
 }
@@ -56,7 +52,7 @@ export function HoldingHeader({
   } else {
     const assetList = Object.values(assetInfo);
 
-    const handleAssetSelect = (event: any, newValue: AssetInfo | null) => {
+    const handleAssetSelect = (event: any, newValue: Asset | null) => {
       if (newValue) {
         updateDialogState({
           value: {
@@ -89,9 +85,7 @@ export function HoldingHeader({
   }
 
   if (!state.editable.account) {
-    accountDOM = (
-      <Typography>{state.account?.name}</Typography>
-    );
+    accountDOM = <Typography>{state.account?.name}</Typography>;
   } else {
     const accountList = Object.values(accounts);
 
@@ -315,11 +309,13 @@ export function HoldingActions({
       dispatch(
         createTransactionThunk({
           token: session.token,
-          accountPk: state.account.pk,
-          assetPk: state.asset.pk,
-          type: change > 0 ? "BY" : "SL",
-          quantity: Math.abs(change),
-          timestamp: new Date(),
+          input: {
+            account: state.account.pk,
+            asset: state.asset.pk,
+            type: change > 0 ? "BY" : "SL",
+            quantity: Math.abs(change),
+            timestamp: new Date(),
+          },
         })
       );
     });
@@ -338,10 +334,12 @@ export function HoldingActions({
     const p = dispatch(
       createHoldingThunk({
         token: session.token,
-        assetPk: state.asset.pk,
-        accountPk: state.account.pk,
-        ownerPk: currentUser.pk,
-        quantity: q,
+        input: {
+          asset: state.asset.pk,
+          account: state.account.pk,
+          owner: currentUser.pk,
+          quantity: q,
+        },
       }) as unknown as Promise<any>
     );
     p.then((resp: any) => {
@@ -365,11 +363,13 @@ export function HoldingActions({
       dispatch(
         createTransactionThunk({
           token: session.token,
-          accountPk: state.account.pk,
-          assetPk: state.asset.pk,
-          type: "BY",
-          quantity: parseFloat(state.value.quantity),
-          timestamp: new Date(),
+          input: {
+            account: state.account.pk,
+            asset: state.asset.pk,
+            type: "BY",
+            quantity: parseFloat(state.value.quantity),
+            timestamp: new Date(),
+          },
         })
       );
     });

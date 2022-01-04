@@ -1,10 +1,10 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import { useSelector } from "react-redux";
-import { TableContainer } from "../components/table/Contrainer";
 import Typography from "@mui/material/Typography";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import { TableContainer } from "../components/table/Contrainer";
 import {
   CellAlign,
   SortDirection,
@@ -19,15 +19,14 @@ import {
   getSession,
   getHoldings,
   getAccounts,
-} from "../../store/user";
+  getAssets,
+  getPublicWatchlists,
+  getStrategies,
+} from "../../store";
+import { Watchlist } from "../../types";
 import {
-  getAssetInfo,
-  getWatchlists as getPublicWatchlists,
-  Watchlist,
-} from "../../store/oracle";
-import { getStrategies } from "../../store/strategy";
-import {
-  prepareStrategyTableData, computeStrategyTableDataStyle,
+  prepareStrategyTableData,
+  computeStrategyTableDataStyle,
 } from "../../utils/strategy";
 import { currency, percent } from "../../utils/formatters";
 import { TabInfo } from "../components/Tabs";
@@ -79,7 +78,7 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Currency,
       sensitive: true,
     },
-  }
+  },
 };
 
 const tableSettings: TableSettings = {
@@ -112,10 +111,9 @@ const tableSettings: TableSettings = {
   ],
 };
 
-
 export function Strategy() {
   const portfolios = useSelector(getPortfolios);
-  const assetInfo = useSelector(getAssetInfo);
+  const assets = useSelector(getAssets);
   const accounts = useSelector(getAccounts);
   const strategies = useSelector(getStrategies);
   const users = useSelector(getUsers);
@@ -124,7 +122,10 @@ export function Strategy() {
 
   let tabs: TabInfo[] = [];
 
-  const ready = Object.keys(strategies).length > 0 && Object.keys(users).length > 0 && session.user_pk;
+  const ready =
+    Object.keys(strategies).length > 0 &&
+    Object.keys(users).length > 0 &&
+    session.user_pk;
 
   if (ready) {
     const wids: string[] = users[session.user_pk].visible_lists.strategies;
@@ -146,7 +147,7 @@ export function Strategy() {
       strategies,
       portfolios,
       holdings,
-      assetInfo,
+      assets
     );
     if (data === undefined) {
       return undefined;

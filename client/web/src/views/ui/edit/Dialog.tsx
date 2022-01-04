@@ -8,23 +8,23 @@ import { AssetContent, AssetHeader } from "./pages/Asset";
 import { HoldingContent, HoldingHeader, HoldingActions } from "./pages/Holding";
 import { AccountContent, AccountHeader } from "./pages/Account";
 import {
-  getSession,
-  getUsers,
-  getAccounts,
-  Account,
-  Holding,
-  getPortfolios,
-  getHoldings,
-} from "../../../store/user";
-import {
-  getAssetInfo,
-  getTaxonomies,
   Category,
   Tag,
   Service,
-  AssetInfo,
+  Asset,
+  Account,
+  Holding,
+} from "../../../types";
+import {
+  getSession,
+  getUsers,
+  getAccounts,
+  getAssets,
+  getTaxonomies,
   getServices,
-} from "../../../store/oracle";
+  getPortfolios,
+  getHoldings,
+} from "../../../store";
 import { assert } from "../../../utils/helpers";
 
 export enum DialogTab {
@@ -64,7 +64,7 @@ export interface ResolvedDialogState {
     account: boolean;
   };
   assetClass?: Tag;
-  asset?: AssetInfo;
+  asset?: Asset;
   account?: Account;
   holding?: Holding;
   quantity?: number;
@@ -78,7 +78,7 @@ interface Props {
 export function HoldingDialog({ state, updateDialogState }: Props) {
   const session = useSelector(getSession);
   const users = useSelector(getUsers);
-  const assetInfo = useSelector(getAssetInfo);
+  const assets = useSelector(getAssets);
   const taxonomies = useSelector(getTaxonomies);
   const accounts = useSelector(getAccounts);
   const portfolios = useSelector(getPortfolios);
@@ -97,7 +97,7 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
           if (hid === state.value.holding) {
             account = a;
             holding = holdings[hid];
-            asset = assetInfo[holding.asset];
+            asset = assets[holding.asset];
             assetClass = taxonomies.tags[asset.asset_class];
             quantity = holding.quantity;
             break;
@@ -106,7 +106,7 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
       }
     } else {
       if (state.value?.asset) {
-        const info = assetInfo[state.value.asset];
+        const info = assets[state.value.asset];
         assert(info);
         asset = info;
         assetClass = taxonomies.tags[asset.asset_class];
@@ -170,7 +170,7 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
       header = (
         <HoldingHeader
           state={resolvedDialogState}
-          assetInfo={assetInfo}
+          assetInfo={assets}
           accounts={accounts}
           updateDialogState={updateDialogState}
         />

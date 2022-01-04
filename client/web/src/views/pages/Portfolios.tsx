@@ -11,15 +11,16 @@ import {
   preparePortfolioTableData,
   computePortfolioTableDataStyle,
 } from "../../utils/portfolio";
+import { Portfolio } from "../../types";
 import {
-  Portfolio,
   getPortfolios,
   getUsers,
   getSession,
   getAccounts,
   getHoldings,
-} from "../../store/user";
-import { getAssetInfo, getServices } from "../../store/oracle";
+  getAssets,
+  getServices,
+} from "../../store";
 import { TabInfo } from "../components/Tabs";
 
 const baseTableMeta: BaseTableMeta = {
@@ -116,7 +117,7 @@ const tableSettings: TableSettings = {
 
 export function Portfolios() {
   const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
-  const assetInfo = useSelector(getAssetInfo);
+  const assets = useSelector(getAssets);
   const services = useSelector(getServices);
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
@@ -143,10 +144,10 @@ export function Portfolios() {
     const data = preparePortfolioTableData(
       id,
       portfolios,
-      assetInfo,
+      assets,
       services,
       accounts,
-      holdings,
+      holdings
     );
     if (data === undefined) {
       return undefined;

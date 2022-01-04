@@ -1,15 +1,23 @@
 {
-"compilerOptions": {
-  "lib": ["es2021", "dom"],
-  "noImplicitAny": true,
-  "noImplicitThis": true,
-  "strictNullChecks": true,
-  "noEmit": true,
-  "allowSyntheticDefaultImports": true,
-  "skipLibCheck": true,
-  "downlevelIteration": true,
-  "jsx": "react-jsx"
-},
-"include": ["src/**/*"],
-"exclude": ["node_modules"]
+  "compilerOptions": {
+    "lib": [
+      "es2021",
+      "dom"
+    ],
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "strictBindCallApply": true,
+    "downlevelIteration": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

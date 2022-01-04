@@ -2,65 +2,50 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchPortfoliosThunk,
-  fetchWatchlistsThunk as fetchUserWatchlistsThunk,
+  fetchWatchlistsThunk,
   fetchAccountsThunk,
-  fetchUserInfoThunk,
+  fetchUsersThunk,
   fetchHoldingsThunk,
-  getSession,
-} from "../store/user";
-import {
-  fetchAssetInfoThunk,
+  fetchAssetsThunk,
   fetchServicesThunk,
-  fetchWatchlistsThunk as fetchPublicWatchlistsThunk,
-  getAssetInfo,
-  fetchTaxonomiesThunk,
-} from "../store/oracle";
-import { fetchStrategiesThunk } from "../store/strategy";
+  fetchPublicWatchlistsThunk,
+  fetchTagsThunk,
+  fetchCategoriesThunk,
+  fetchStrategiesThunk,
+} from "../api";
+import { getSession } from "../store";
 import { Chrome } from "./ui/Chrome";
-import { fetchHoldings } from "../api/holding";
 
 export function App() {
   const dispatch = useDispatch();
   const session = useSelector(getSession);
-  const assetInfo = useSelector(getAssetInfo);
 
   useEffect(() => {
-    console.log("in effect");
-    if (session.token) {
-      console.log("fetching user info");
-      const p = dispatch(
-        fetchUserInfoThunk({ token: session.token })
-      ) as unknown as Promise<any>;
-      p.then(async () => {
-        console.log("Fetched info, fetching portfolio");
-        dispatch(fetchPortfoliosThunk({ token: session.token }));
-        dispatch(fetchStrategiesThunk({ token: session.token }));
-        dispatch(fetchUserWatchlistsThunk({ token: session.token }));
-        dispatch(fetchAccountsThunk({ token: session.token }));
-        dispatch(fetchHoldingsThunk({ token: session.token }));
-        console.log("Fetched user stuff");
-      });
-    }
-  }, [session.token, session.user_pk, session.authenticateState]);
-
-  useEffect(() => {
-    if (Object.keys(assetInfo).length === 0) {
-      console.log("fetching public studd");
-      const p = Promise.all([
-        dispatch(fetchAssetInfoThunk({})),
-        dispatch(fetchPublicWatchlistsThunk()),
-        dispatch(fetchTaxonomiesThunk()),
-        dispatch(fetchServicesThunk()),
-      ]);
-      p.then(() => {
-        console.log("fetched public stuff");
-      });
-    }
+    const p = Promise.all([
+      dispatch(fetchAssetsThunk()),
+      dispatch(fetchPublicWatchlistsThunk()),
+      dispatch(fetchTagsThunk()),
+      dispatch(fetchCategoriesThunk()),
+      dispatch(fetchServicesThunk()),
+    ]);
   });
 
-  // if (!session.username) {
-  //   menuItems = menuItems.filter(item => !["strategies", "portfolios", "wallets"].includes(item.id));
-  // }
+  useEffect(() => {
+    if (session.token) {
+      const p = dispatch(
+        fetchUsersThunk({ token: session.token })
+      ) as unknown as Promise<any>;
+      p.then(() =>
+        Promise.all([
+          dispatch(fetchPortfoliosThunk({ token: session.token })),
+          dispatch(fetchAccountsThunk({ token: session.token })),
+          dispatch(fetchHoldingsThunk({ token: session.token })),
+          dispatch(fetchStrategiesThunk({ token: session.token })),
+          dispatch(fetchWatchlistsThunk({ token: session.token })),
+        ])
+      );
+    }
+  }, [session.token, session.user_pk, session.authenticateState]);
 
   return <Chrome />;
 }

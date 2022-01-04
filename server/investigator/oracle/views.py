@@ -68,21 +68,3 @@ class TagViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Tag.objects.filter(owner__isnull=True).order_by("-name")
         return queryset
-
-
-class TaxonomyViewSet(viewsets.ViewSet):
-    def list(self, request, format=None):
-        categories = {
-            category.pk.__str__(): CategorySerializer(category).data
-            for category in Category.objects.filter(owner__isnull=True)
-        }
-        tags = {
-            tag.pk.__str__(): TagSerializer(tag).data
-            for tag in Tag.objects.filter(owner__isnull=True)
-        }
-        return Response(
-            {
-                "categories": categories,
-                "tags": tags,
-            }
-        )

@@ -6,7 +6,7 @@ import {
   RowsPerPageOption,
 } from "../components/settings";
 
-export const uiSlice = createSlice({
+const uiSlice = createSlice({
   name: "ui",
   initialState: {
     lightMode: getFromLocalStorage("lightMode", "string", LightMode.Automatic),

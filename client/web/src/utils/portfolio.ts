@@ -1,7 +1,6 @@
 /* eslint camelcase: "off" */
 
-import { Portfolio, Account, Holding } from "../store/user";
-import { AssetInfo, Service } from "../store/oracle";
+import { Portfolio, Account, Holding, Asset, Service } from "../types";
 import { getServiceAsset } from "./service";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
 import {
@@ -81,27 +80,26 @@ export function buildPortfolioTableData(
   portfolio: Portfolio,
   portfolios: Record<string, Portfolio>,
   holdings: Record<string, Holding>,
-  assetInfo: Record<string, AssetInfo>
+  assetInfo: Record<string, Asset>
 ): PortfolioTableRow[] {
-  const rows: PortfolioTableRow[] = portfolio.holdings.map(hid => {
-    let { pk, asset: assetPk, quantity } = holdings[hid];
-      const asset = assetInfo[assetPk];
-      assert(asset);
+  const rows: PortfolioTableRow[] = portfolio.holdings.map((hid) => {
+    const { pk, asset: assetPk, quantity } = holdings[hid];
+    const asset = assetInfo[assetPk];
+    assert(asset);
 
-      return {
-        cells: {
-          id: pk,
-          asset: asset.pk,
-          name: asset.name,
-          symbol: asset.symbol,
-          price: asset.info.value,
-          quantity,
-          value: asset.info.value * quantity,
-        },
-        type: RowType.Asset,
-      };
-    }
-  );
+    return {
+      cells: {
+        id: pk,
+        asset: asset.pk,
+        name: asset.name,
+        symbol: asset.symbol,
+        price: asset.info.value,
+        quantity,
+        value: asset.info.value * quantity,
+      },
+      type: RowType.Asset,
+    };
+  });
   const res2: PortfolioTableRow[] = portfolio.portfolios.map((pid) => {
     const subPortfolio = portfolios[pid];
     assert(subPortfolio);
@@ -110,7 +108,12 @@ export function buildPortfolioTableData(
         id: subPortfolio.pk,
         name: subPortfolio.name,
       },
-      children: buildPortfolioTableData(subPortfolio, portfolios, holdings, assetInfo),
+      children: buildPortfolioTableData(
+        subPortfolio,
+        portfolios,
+        holdings,
+        assetInfo
+      ),
       type: RowType.Portfolio,
     };
   });
@@ -121,38 +124,37 @@ export function buildPortfolioTableData(
 export function createPortfolioTableData(
   portfolio: Portfolio,
   portfolios: Record<string, Portfolio>,
-  assetInfo: Record<string, AssetInfo>,
+  assetInfo: Record<string, Asset>,
   services: Record<string, Service>,
   accounts: Record<string, Account>,
   holdings: Record<string, Holding>,
   topLevel: boolean
 ): PortfolioTableRow {
-  const rows: PortfolioTableRow[] = portfolio.holdings.map(hid => {
-    let {pk, asset: assetId, quantity, account: accountId} = holdings[hid];
-      const asset = assetInfo[assetId];
-      assert(asset, `Missing asset: ${assetId}`);
-      const account = accountId ? accounts[accountId] : undefined;
-      let serviceAsset;
-      if (account) {
-        serviceAsset = getServiceAsset(account.pk, asset.pk, services);
-      }
-
-      return {
-        cells: {
-          id: pk,
-          asset: asset.pk,
-          name: asset.name,
-          symbol: asset.symbol,
-          price: asset.info.value,
-          quantity,
-          value: asset.info.value * quantity,
-          account: account?.name,
-          yield: serviceAsset?.apy,
-        },
-        type: RowType.Asset,
-      };
+  const rows: PortfolioTableRow[] = portfolio.holdings.map((hid) => {
+    const { pk, asset: assetId, quantity, account: accountId } = holdings[hid];
+    const asset = assetInfo[assetId];
+    assert(asset, `Missing asset: ${assetId}`);
+    const account = accountId ? accounts[accountId] : undefined;
+    let serviceAsset;
+    if (account) {
+      serviceAsset = getServiceAsset(account.pk, asset.pk, services);
     }
-  );
+
+    return {
+      cells: {
+        id: pk,
+        asset: asset.pk,
+        name: asset.name,
+        symbol: asset.symbol,
+        price: asset.info.value,
+        quantity,
+        value: asset.info.value * quantity,
+        account: account?.name,
+        yield: serviceAsset?.apy,
+      },
+      type: RowType.Asset,
+    };
+  });
   const res2 = portfolio.portfolios.map((pid) => {
     const subPortfolio = portfolios[pid];
     assert(subPortfolio);
@@ -212,10 +214,10 @@ export function createPortfolioTableData(
 export function preparePortfolioTableData(
   pid: string,
   portfolios: Record<string, Portfolio>,
-  assetInfo: Record<string, AssetInfo>,
+  assetInfo: Record<string, Asset>,
   services: Record<string, Service>,
   accounts: Record<string, Account>,
-  holdings: Record<string, Holding>,
+  holdings: Record<string, Holding>
 ): PortfolioTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);

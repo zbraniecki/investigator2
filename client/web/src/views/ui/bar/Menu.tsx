@@ -18,7 +18,8 @@ import Typography from "@mui/material/Typography";
 import { LightMode } from "../../../components/settings";
 import { AppBarColors } from "../AppBar";
 import { LoginModal } from "../Login";
-import { AuthenticateState, getUsers, logoutThunk } from "../../../store/user";
+import { AuthenticateState } from "../../../types";
+import { getUsers, logoutThunk } from "../../../store/user";
 
 interface Props {
   session: any;

@@ -1,5 +1,4 @@
-import { Portfolio, Holding } from "../store/user";
-import { AssetInfo, Service, ServiceAsset } from "../store/oracle";
+import { Portfolio, Holding, Asset, Service, ServiceAsset } from "../types";
 import { createPortfolioTableData } from "./portfolio";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
 import { TableMeta } from "../views/components/table/data/Table";
@@ -40,9 +39,9 @@ export interface WalletTableRow extends RowData {
 export function prepareWalletTableData(
   pid: string,
   portfolios: Record<string, Portfolio>,
-  assetInfo: Record<string, AssetInfo>,
+  assetInfo: Record<string, Asset>,
   services: Record<string, Service>,
-  holdings: Record<string, Holding>,
+  holdings: Record<string, Holding>
 ): WalletTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);

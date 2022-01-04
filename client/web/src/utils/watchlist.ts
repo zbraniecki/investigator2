@@ -1,5 +1,4 @@
-import { AssetInfo, Watchlist } from "../store/oracle";
-import { Portfolio, Holding } from "../store/user";
+import { Asset, Watchlist, Portfolio, Holding } from "../types";
 import { assert } from "./helpers";
 import {
   RowData,
@@ -87,7 +86,7 @@ function computeHeaderData(
 function getAssetsFromPortfolio(
   portfolio: Portfolio,
   portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>,
+  holdings: Record<string, Holding>
 ): Set<string> {
   const symbols: Set<string> = new Set();
   for (const hid of portfolio.holdings) {
@@ -106,9 +105,9 @@ function getAssetsFromPortfolio(
 export function createWatchlistTableData(
   watchlist: Watchlist,
   watchlists: Record<string, Watchlist>,
-  assetInfo: Record<string, AssetInfo>,
+  assetInfo: Record<string, Asset>,
   portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>,
+  holdings: Record<string, Holding>
 ): WatchlistTableRow {
   const symbols: Set<string> = new Set(watchlist.assets);
 
@@ -152,9 +151,9 @@ export function createWatchlistTableData(
 export function prepareWatchlistTableData(
   wid: string,
   watchlists: Record<string, Watchlist>,
-  assetInfo: Record<string, AssetInfo>,
+  assetInfo: Record<string, Asset>,
   portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>,
+  holdings: Record<string, Holding>
 ): WatchlistTableRow | undefined {
   if (Object.keys(watchlists).length === 0) {
     return undefined;
@@ -177,7 +176,7 @@ export function prepareWatchlistTableData(
     watchlists,
     assetInfo,
     portfolios,
-    holdings,
+    holdings
   );
   return data;
 }

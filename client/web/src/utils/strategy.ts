@@ -1,8 +1,6 @@
 /* eslint camelcase: "off" */
 
-import { Portfolio, Holding } from "../store/user";
-import { AssetInfo } from "../store/oracle";
-import { Strategy } from "../store/strategy";
+import { Portfolio, Holding, Asset, Strategy } from "../types";
 import { buildPortfolioTableData } from "./portfolio";
 import {
   assert,
@@ -48,7 +46,7 @@ export interface StyledStrategyTableRow extends StyledRowData {
 export function createStrategyTableData(
   strategy: Strategy,
   portfolios: Record<string, Portfolio>,
-  assetInfo: Record<string, AssetInfo>,
+  assetInfo: Record<string, Asset>,
   computedTableData: Record<string, Record<string, any>>
 ): StrategyTableRow {
   const totalPortfolioValue = Object.values(computedTableData).reduce(
@@ -134,7 +132,7 @@ export function prepareStrategyTableData(
   strategies: Record<string, Strategy>,
   portfolios: Record<string, Portfolio>,
   holdings: Record<string, Holding>,
-  assetInfo: Record<string, AssetInfo>
+  assetInfo: Record<string, Asset>
 ): StrategyTableRow | undefined {
   const strategy = strategies[sid];
   assert(strategy);
@@ -161,9 +159,10 @@ export function prepareStrategyTableData(
     true
   );
   assert(groupedPortfolioData.ungrouped.length === 0);
-  const computedTableData = computeGroupedTableData(groupedPortfolioData.grouped, [
-    "value",
-  ]);
+  const computedTableData = computeGroupedTableData(
+    groupedPortfolioData.grouped,
+    ["value"]
+  );
 
   const data = createStrategyTableData(
     strategy,

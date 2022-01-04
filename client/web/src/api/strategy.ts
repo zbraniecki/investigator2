@@ -1,12 +1,12 @@
-import { BASE_URL } from "./main";
+import { makeAsyncThunk, fetchEntries, fetchAuthEntriesType } from "./helpers";
+import { Strategy } from "../types";
 
-export const fetchStrategies = async ({ token }: { token: string }) => {
-  const data = await fetch(`${BASE_URL}strategy/list/`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`,
-    },
-  });
-  return data.json();
-};
+const fetchStrategies = fetchEntries.bind(
+  undefined,
+  "strategy/list/"
+) as fetchAuthEntriesType<Strategy>;
+
+export const fetchStrategiesThunk = makeAsyncThunk(
+  "strategy/fetchList",
+  fetchStrategies
+);

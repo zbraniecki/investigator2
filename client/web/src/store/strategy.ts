@@ -1,25 +1,10 @@
 /* eslint camelcase: "off" */
 
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchStrategies } from "../api/strategy";
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchStrategiesThunk } from "../api";
 import { logoutThunk } from "./user";
-
-export const fetchStrategiesThunk = createAsyncThunk(
-  "account/fetchStrategies",
-  fetchStrategies
-);
-
-export interface Strategy {
-  id: string;
-  portfolio: string;
-  targets: Target[];
-}
-
-export interface Target {
-  asset: string;
-  contains: string[];
-  percent: number;
-}
+import { Strategy } from "../types";
+import { setFetchEntitiesReducer } from "./helpers";
 
 interface StrategyState {
   strategies: Record<string, Strategy>;
@@ -29,17 +14,12 @@ const initialState = {
   strategies: {},
 } as StrategyState;
 
-export const strategySlice = createSlice({
+const strategySlice = createSlice({
   name: "strategy",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchStrategiesThunk.fulfilled, (state, action) => {
-      state.strategies = {};
-      for (const item of action.payload) {
-        state.strategies[item.id] = item;
-      }
-    });
+    setFetchEntitiesReducer(builder, fetchStrategiesThunk, "strategies");
     builder.addCase(logoutThunk.fulfilled, (state) => {
       state.strategies = {};
     });

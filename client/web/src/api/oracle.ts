@@ -1,37 +1,45 @@
-import { BASE_URL } from "./main";
+import {
+  makeAsyncThunk,
+  fetchEntries,
+  fetchPublicEntriesType,
+} from "./helpers";
+import { Asset, Watchlist, Tag, Category, Service } from "../types";
 
-export const fetchAssetInfo = async ({
-  refresh,
-  token,
-}: {
-  refresh?: boolean;
-  token?: string;
-}) => {
-  if (refresh && token) {
-    const data = await fetch(`${BASE_URL}oracle/assets/?refresh=1`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${token}`,
-      },
-    });
-    return data.json();
-  }
-  const resp = await fetch(`${BASE_URL}oracle/assets/`);
-  return resp.json();
-};
+const fetchAssets = fetchEntries.bind(
+  undefined,
+  "oracle/assets/"
+) as fetchPublicEntriesType<Asset>;
+const fetchPublicWatchlists = fetchEntries.bind(
+  undefined,
+  "oracle/watchlists/"
+) as fetchPublicEntriesType<Watchlist>;
+const fetchTags = fetchEntries.bind(
+  undefined,
+  "oracle/tags/"
+) as fetchPublicEntriesType<Tag>;
+const fetchCategories = fetchEntries.bind(
+  undefined,
+  "oracle/categories/"
+) as fetchPublicEntriesType<Category>;
+const fetchServices = fetchEntries.bind(
+  undefined,
+  "oracle/services/"
+) as fetchPublicEntriesType<Service>;
 
-export const fetchServices = async () => {
-  const resp = await fetch(`${BASE_URL}oracle/services/`);
-  return resp.json();
-};
-
-export const fetchWatchlists = async () => {
-  const resp = await fetch(`${BASE_URL}oracle/watchlists/`);
-  return resp.json();
-};
-
-export const fetchTaxonomies = async () => {
-  const resp = await fetch(`${BASE_URL}oracle/taxonomy/`);
-  return resp.json();
-};
+export const fetchAssetsThunk = makeAsyncThunk(
+  "oracle/fetchAssets",
+  fetchAssets
+);
+export const fetchPublicWatchlistsThunk = makeAsyncThunk(
+  "oracle/fetchWatchlists",
+  fetchPublicWatchlists
+);
+export const fetchTagsThunk = makeAsyncThunk("oracle/fetchTags", fetchTags);
+export const fetchCategoriesThunk = makeAsyncThunk(
+  "oracle/fetchCategories",
+  fetchCategories
+);
+export const fetchServicesThunk = makeAsyncThunk(
+  "oracle/fetchServices",
+  fetchServices
+);
