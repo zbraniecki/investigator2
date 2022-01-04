@@ -1,5 +1,5 @@
 import { AssetInfo, Watchlist } from "../store/oracle";
-import { Portfolio } from "../store/user";
+import { Portfolio, Holding } from "../store/user";
 import { assert } from "./helpers";
 import {
   RowData,
@@ -86,16 +86,18 @@ function computeHeaderData(
 
 function getAssetsFromPortfolio(
   portfolio: Portfolio,
-  portfolios: Record<string, Portfolio>
+  portfolios: Record<string, Portfolio>,
+  holdings: Record<string, Holding>,
 ): Set<string> {
   const symbols: Set<string> = new Set();
-  // for (const holding of portfolio.holdings) {
-  //   symbols.add(holding.asset);
-  // }
+  for (const hid of portfolio.holdings) {
+    const holding = holdings[hid];
+    symbols.add(holding.asset);
+  }
   for (const pid of portfolio.portfolios) {
     const p = portfolios[pid];
     assert(p);
-    const subset = getAssetsFromPortfolio(p, portfolios);
+    const subset = getAssetsFromPortfolio(p, portfolios, holdings);
     subset.forEach(symbols.add, symbols);
   }
   return symbols;
@@ -105,14 +107,15 @@ export function createWatchlistTableData(
   watchlist: Watchlist,
   watchlists: Record<string, Watchlist>,
   assetInfo: Record<string, AssetInfo>,
-  portfolios: Record<string, Portfolio>
+  portfolios: Record<string, Portfolio>,
+  holdings: Record<string, Holding>,
 ): WatchlistTableRow {
   const symbols: Set<string> = new Set(watchlist.assets);
 
   if (watchlist.portfolio) {
     const portfolio = portfolios[watchlist.portfolio];
     assert(portfolio);
-    const subset = getAssetsFromPortfolio(portfolio, portfolios);
+    const subset = getAssetsFromPortfolio(portfolio, portfolios, holdings);
     subset.forEach(symbols.add, symbols);
   }
 
@@ -150,7 +153,8 @@ export function prepareWatchlistTableData(
   wid: string,
   watchlists: Record<string, Watchlist>,
   assetInfo: Record<string, AssetInfo>,
-  portfolios: Record<string, Portfolio>
+  portfolios: Record<string, Portfolio>,
+  holdings: Record<string, Holding>,
 ): WatchlistTableRow | undefined {
   if (Object.keys(watchlists).length === 0) {
     return undefined;
@@ -172,7 +176,8 @@ export function prepareWatchlistTableData(
     watchlist,
     watchlists,
     assetInfo,
-    portfolios
+    portfolios,
+    holdings,
   );
   return data;
 }
@@ -234,6 +239,9 @@ export function computeWatchlistTableDataStyle(
   for (const [key, cell] of Object.entries(result.cells)) {
     const info = stylingInfo[key];
     if (info === undefined) {
+      continue;
+    }
+    if (cell.value === null) {
       continue;
     }
     assert(typeof cell.value === "number");

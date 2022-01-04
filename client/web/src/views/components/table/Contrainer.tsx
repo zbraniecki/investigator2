@@ -87,6 +87,9 @@ export function TableContainer({
         for (const [key, query] of Object.entries(tableMeta.filter || {})) {
           if (key in row.cells) {
             const cell = row.cells[key];
+            if (!cell) {
+              continue;
+            }
             assert(typeof cell.value === "string");
             const hasUpperCase = query.toLowerCase() !== query;
             const matchingValue = hasUpperCase

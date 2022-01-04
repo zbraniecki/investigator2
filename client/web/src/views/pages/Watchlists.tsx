@@ -21,12 +21,14 @@ import {
   getWatchlists as getUserWatchlists,
   getUsers,
   getSession,
+  getHoldings,
 } from "../../store/user";
 import { TabInfo } from "../components/Tabs";
 
 const baseTableMeta: BaseTableMeta = {
   name: "watchlists",
   nested: false,
+  showHeaders: true,
   columns: {
     id: {
       label: "ID",
@@ -144,6 +146,7 @@ export function Watchlists() {
   const portfolios = useSelector(getPortfolios);
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
+  const holdings = useSelector(getHoldings);
 
   const watchlists: Record<string, Watchlist> = {};
   for (const list of Object.values(publicWatchlists)) {
@@ -182,7 +185,8 @@ export function Watchlists() {
       id,
       watchlists,
       assetInfo,
-      portfolios
+      portfolios,
+      holdings,
     );
     if (data === undefined) {
       return undefined;

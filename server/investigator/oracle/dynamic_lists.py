@@ -7,7 +7,7 @@ def get_top30_assets():
     asset_class = Category.objects.get(name="asset_class")
     crypto = Tag.objects.get(name="crypto", category__in=[asset_class])
 
-    assets = Asset.objects.filter(tags__in=[crypto]).order_by("-market_cap", "symbol")
+    assets = Asset.objects.filter(asset_class=crypto).order_by("-market_cap", "symbol")
     return [asset.id for asset in assets][:count]
 
 

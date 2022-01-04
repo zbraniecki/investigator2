@@ -181,12 +181,13 @@ def fetch_crypto_assets(active=False, dry=False):
 
     if active:
         active_asset_ids = list(
-            Asset.objects.filter(tags__in=[crypto], api_id__isnull=False)
+            Asset.objects.filter(asset_class=crypto, api_id__isnull=False)
             .order_by("market_cap_rank")
             .values_list("api_id", flat=True)
         )
         while True:
             slice = active_asset_ids[0:40]
+            print(slice)
             source = requests.get(
                 COIN_SELECTED_LIST_URL.replace("%IDS%", ",".join(slice))
             ).json()
