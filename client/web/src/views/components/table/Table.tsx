@@ -21,11 +21,11 @@ function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
   const bottom =
     sortColumn.direction === SortDirection.Asc ? Infinity : -Infinity;
 
-  let aval = a.cells[sortColumn.column].value;
+  let aval = a.cells[sortColumn.column]?.value;
   if (aval === undefined || aval === null) {
     aval = bottom;
   }
-  let bval = b.cells[sortColumn.column].value;
+  let bval = b.cells[sortColumn.column]?.value;
   if (bval === undefined || bval === null) {
     bval = bottom;
   }

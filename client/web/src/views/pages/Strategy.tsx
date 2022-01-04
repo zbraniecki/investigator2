@@ -1,145 +1,165 @@
-// import React from "react";
-// import Box from "@mui/material/Box";
-// import { useSelector } from "react-redux";
-// import Typography from "@mui/material/Typography";
-// import Tabs from "@mui/material/Tabs";
-// import Tab from "@mui/material/Tab";
-// import { Component as Table, Props as TableProps } from "../components/Table";
-// import { Portfolio, getPortfolios, getUsers, getSession } from "../../store/account";
-// import { getAssetInfo, getWallets } from "../../store/oracle";
-// import { getStrategies } from "../../store/strategy";
-// import { StrategyTableRow, prepareStrategyTableData } from "../../utils/strategy";
-// import { InfoDisplayMode, getInfoDisplayMode } from "../../store/ui";
-// import { currency, percent } from "../../utils/formatters";
+import React from "react";
+import Box from "@mui/material/Box";
+import { useSelector } from "react-redux";
+import { TableContainer } from "../components/table/Contrainer";
+import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import {
+  CellAlign,
+  SortDirection,
+  Formatter,
+} from "../components/table/data/Column";
+import { BaseTableMeta, TableSettings } from "../components/table/data/Table";
+import { StyledRowData } from "../components/table/data/Row";
+import {
+  getPortfolios,
+  getWatchlists as getUserWatchlists,
+  getUsers,
+  getSession,
+  getHoldings,
+  getAccounts,
+} from "../../store/user";
+import {
+  getAssetInfo,
+  getWatchlists as getPublicWatchlists,
+  Watchlist,
+} from "../../store/oracle";
+import { getStrategies } from "../../store/strategy";
+import {
+  prepareStrategyTableData, computeStrategyTableDataStyle,
+} from "../../utils/strategy";
+import { currency, percent } from "../../utils/formatters";
+import { TabInfo } from "../components/Tabs";
 
-// const tableMeta: TableProps["meta"] = {
-//   id: "strategy",
-//   sort: {
-//     column: "target",
-//     direction: "desc",
-//   },
-//   nested: true,
-//   headers: [
-//     {
-//       label: "Name",
-//       id: "name",
-//       align: "left",
-//       width: 0.15,
-//       formatter: "symbol",
-//     },
-//     {
-//       label: "Target",
-//       id: "target",
-//       align: "left",
-//       width: 0.15,
-//       formatter: "percent",
-//     },
-//     {
-//       label: "Current",
-//       id: "current",
-//       align: "left",
-//       width: "auto",
-//       formatter: "percent",
-//     },
-//     {
-//       label: "Deviation",
-//       id: "deviation",
-//       align: "right",
-//       width: 0.1,
-//       formatter: "percent",
-//     },
-//     {
-//       label: "Delta",
-//       id: "delta",
-//       align: "right",
-//       width: 0.1,
-//       formatter: "percent",
-//     },
-//     {
-//       label: "USD Delta",
-//       id: "deltaUsd",
-//       align: "right",
-//       width: 0.15,
-//       formatter: "currency-delta",
-//       sensitive: true,
-//     },
-//   ],
-//   pager: true,
-//   header: true,
-//   outline: true,
-// };
+const baseTableMeta: BaseTableMeta = {
+  name: "strategy",
+  nested: true,
+  showHeaders: true,
+  columns: {
+    name: {
+      label: "Name",
+      align: CellAlign.Left,
+      sortDirection: SortDirection.Asc,
+      width: "15%",
+    },
+    target: {
+      label: "Target",
+      align: CellAlign.Left,
+      sortDirection: SortDirection.Desc,
+      width: "15%",
+      formatter: Formatter.Percent,
+    },
+    current: {
+      label: "Current",
+      align: CellAlign.Left,
+      sortDirection: SortDirection.Desc,
+      width: "auto",
+      formatter: Formatter.Percent,
+    },
+    deviation: {
+      label: "Deviation",
+      align: CellAlign.Right,
+      sortDirection: SortDirection.Asc,
+      width: "10%",
+      formatter: Formatter.Percent,
+    },
+    delta: {
+      label: "Delta",
+      align: CellAlign.Right,
+      sortDirection: SortDirection.Asc,
+      width: "10%",
+      formatter: Formatter.Percent,
+    },
+    deltaUsd: {
+      label: "USD Delta",
+      align: CellAlign.Right,
+      sortDirection: SortDirection.Asc,
+      width: "15%",
+      formatter: Formatter.Currency,
+      sensitive: true,
+    },
+  }
+};
 
-// export function Strategy() {
-//   const portfolios = useSelector(getPortfolios);
-//   const assetInfo = useSelector(getAssetInfo);
-//   const wallets = useSelector(getWallets);
-//   const strategies = useSelector(getStrategies);
-//   const users = useSelector(getUsers);
-//   const session = useSelector(getSession);
-//   const infoDisplayMode = useSelector(getInfoDisplayMode);
+const tableSettings: TableSettings = {
+  sortColumns: ["target", "current"],
+  columns: [
+    {
+      key: "name",
+      visible: true,
+    },
+    {
+      key: "target",
+      visible: true,
+    },
+    {
+      key: "current",
+      visible: true,
+    },
+    {
+      key: "deviation",
+      visible: true,
+    },
+    {
+      key: "delta",
+      visible: true,
+    },
+    {
+      key: "deltaUsd",
+      visible: true,
+    },
+  ],
+};
 
-//   const [sIdx, setsIdx] = React.useState(0);
-//   const handleChange = (event: any, newValue: any) => {
-//     setsIdx(newValue);
-//   };
 
-//   let tableData: Array<StrategyTableRow> = [];
-//   let subHeaderRow: StrategyTableRow | undefined;
+export function Strategy() {
+  const portfolios = useSelector(getPortfolios);
+  const assetInfo = useSelector(getAssetInfo);
+  const accounts = useSelector(getAccounts);
+  const strategies = useSelector(getStrategies);
+  const users = useSelector(getUsers);
+  const session = useSelector(getSession);
+  const holdings = useSelector(getHoldings);
 
-//   let currentUser = session.username ? users[session.username] : undefined;
-//   let slists = currentUser?.ui.strategies || [];
+  let tabs: TabInfo[] = [];
 
-//   let tabs: {id: string, name: string}[] = slists
-//     .filter((sid: string) => {
-//       return strategies[sid] !== undefined;
-//     })
-//     .map((sid: string) => {
-//       let strategy = strategies[sid];
-//       return {
-//         id: strategy.id,
-//         name: strategy.name,
-//       };
-//     });
+  const ready = Object.keys(strategies).length > 0 && Object.keys(users).length > 0 && session.user_pk;
 
-//   if (tabs.length >= sIdx + 1) {
-//     const sid = tabs[sIdx].id;
-//     let data = prepareStrategyTableData(
-//       sid,
-//       strategies,
-//       portfolios,
-//       assetInfo,
-//     );
-//     if (data !== undefined) {
-//       let { cells, children } = data;
-//       if (children !== undefined) {
-//         subHeaderRow = {
-//           cells,
-//           type: "asset",
-//         };
-//         tableData = children;
-//       }
-//     }
-//   }
+  if (ready) {
+    const wids: string[] = users[session.user_pk].visible_lists.strategies;
 
-//   return (
-//     <>
-//       <Box sx={{ display: "flex", flexDirection: "row" }}>
-//         <Box sx={{ flexGrow: 1 }}>
-//           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-//             <Tabs value={sIdx} onChange={handleChange}>
-//               {tabs.map((tab) => (
-//                 <Tab key={`tab-${tab.id}`} label={tab.name} />
-//               ))}
-//             </Tabs>
-//           </Box>
-//         </Box>
-//       </Box>
-//       <Table
-//         meta={tableMeta}
-//         data={tableData}
-//         subHeaderRow={subHeaderRow}
-//         hideSensitive={infoDisplayMode === InfoDisplayMode.HideValues}
-//       />
-//     </>
-//   );
-// }
+    tabs = wids
+      .filter((sid) => sid in strategies)
+      .map((sid) => {
+        const strategy = strategies[sid];
+        return {
+          id: strategy.id,
+          label: strategy.name,
+        };
+      });
+  }
+
+  const getTableData = (id: string): StyledRowData | undefined => {
+    const data = prepareStrategyTableData(
+      id,
+      strategies,
+      portfolios,
+      holdings,
+      assetInfo,
+    );
+    if (data === undefined) {
+      return undefined;
+    }
+    return computeStrategyTableDataStyle(data);
+  };
+
+  return (
+    <TableContainer
+      tabs={tabs}
+      baseMeta={baseTableMeta}
+      settings={tableSettings}
+      getTableData={getTableData}
+    />
+  );
+}
