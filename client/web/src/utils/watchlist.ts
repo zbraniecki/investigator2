@@ -89,9 +89,9 @@ function getAssetsFromPortfolio(
   portfolios: Record<string, Portfolio>
 ): Set<string> {
   const symbols: Set<string> = new Set();
-  for (const holding of portfolio.holdings) {
-    symbols.add(holding.asset);
-  }
+  // for (const holding of portfolio.holdings) {
+  //   symbols.add(holding.asset);
+  // }
   for (const pid of portfolio.portfolios) {
     const p = portfolios[pid];
     assert(p);

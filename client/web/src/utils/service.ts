@@ -1,4 +1,4 @@
-import { Portfolio } from "../store/user";
+import { Portfolio, Holding } from "../store/user";
 import { AssetInfo, Service, ServiceAsset } from "../store/oracle";
 import { createPortfolioTableData } from "./portfolio";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
@@ -41,7 +41,8 @@ export function prepareWalletTableData(
   pid: string,
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>,
-  services: Record<string, Service>
+  services: Record<string, Service>,
+  holdings: Record<string, Holding>,
 ): WalletTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);
@@ -55,6 +56,7 @@ export function prepareWalletTableData(
     assetInfo,
     services,
     {}, // XXX: This is really accounts, not services
+    holdings,
     true
   ) as WalletTableRow;
 

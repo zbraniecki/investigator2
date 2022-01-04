@@ -86,7 +86,6 @@ class WatchlistSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField("get_name")
-    holdings = HoldingSerializer(many=True, read_only=True)
     transactions = TransactionSerializer(many=True, read_only=True)
 
     class Meta:

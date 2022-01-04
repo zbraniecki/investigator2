@@ -2,6 +2,17 @@ import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
 import { Holding } from "../store/user";
 
+export const fetchHoldings = async ({ token }: { token: string }) => {
+  const data = await fetch(`${BASE_URL}user/holdings/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+  });
+  return data.json();
+};
+
 export const createHolding = async ({
   token,
   assetPk,

@@ -91,7 +91,7 @@ export function Table({ meta, summary, rows, slice }: Props) {
 
   return (
     <MUITable>
-      {meta.columns.length > 0 && (
+      {meta.showHeaders && meta.columns.length > 0 && (
         <TableHead
           sx={{
             position: "sticky",

@@ -330,7 +330,9 @@ def upload_portfolio_data(data, dt, dry=False):
 
             if "add" in diff_accounts[provider][symbol]:
                 for quantity in diff_accounts[provider][symbol]["add"]:
-                    holding = Holding(asset=asset, account=account, quantity=quantity)
+                    holding = Holding(
+                        asset=asset, account=account, quantity=quantity, owner=user
+                    )
                     if not dry:
                         holding.save()
                     transaction = Transaction(

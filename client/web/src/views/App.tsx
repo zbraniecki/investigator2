@@ -5,6 +5,7 @@ import {
   fetchWatchlistsThunk as fetchUserWatchlistsThunk,
   fetchAccountsThunk,
   fetchUserInfoThunk,
+  fetchHoldingsThunk,
   getSession,
 } from "../store/user";
 import {
@@ -16,6 +17,7 @@ import {
 } from "../store/oracle";
 import { fetchStrategiesThunk } from "../store/strategy";
 import { Chrome } from "./ui/Chrome";
+import { fetchHoldings } from "../api/holding";
 
 export function App() {
   const dispatch = useDispatch();
@@ -35,6 +37,7 @@ export function App() {
         dispatch(fetchStrategiesThunk({ token: session.token }));
         dispatch(fetchUserWatchlistsThunk({ token: session.token }));
         dispatch(fetchAccountsThunk({ token: session.token }));
+        dispatch(fetchHoldingsThunk({ token: session.token }));
         console.log("Fetched user stuff");
       });
     }

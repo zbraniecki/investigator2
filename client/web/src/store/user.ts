@@ -10,7 +10,7 @@ import {
   fetchUserInfo,
   updateUserInfo,
 } from "../api/user";
-import { createHolding, updateHolding } from "../api/holding";
+import { fetchHoldings, createHolding, updateHolding } from "../api/holding";
 import { createTransaction } from "../api/account";
 import { Watchlist } from "./oracle";
 import { getFromLocalStorage } from "./main";
@@ -62,6 +62,11 @@ export const createTransactionThunk = createAsyncThunk(
   createTransaction
 );
 
+export const fetchHoldingsThunk = createAsyncThunk(
+  "user/fetchHoldings",
+  fetchHoldings,
+);
+
 export interface Transaction {
   pk: string;
   account: string;
@@ -81,7 +86,7 @@ export interface Holding {
 export interface Portfolio {
   pk: string;
   name: string;
-  holdings: Holding[];
+  holdings: string[];
   portfolios: string[];
   accounts: string[];
   tags: string[];
@@ -104,7 +109,7 @@ export interface Account {
   owner: string;
   name: string;
   service: string;
-  holdings: Holding[];
+  holdings: string[];
   transactions: Transaction[];
 }
 
@@ -126,6 +131,7 @@ interface AccountState {
   portfolios: Record<string, Portfolio>;
   watchlists: Record<string, Watchlist>;
   accounts: Record<string, Account>;
+  holdings: Record<string, Holding>;
   users: Record<string, User>;
 }
 
@@ -138,6 +144,7 @@ const initialState = {
   portfolios: {},
   watchlists: {},
   accounts: {},
+  holdings: {},
   users: {},
 } as AccountState;
 
@@ -148,6 +155,7 @@ function cleanSlice(state: any) {
   state.portfolios = {};
   state.watchlists = {};
   state.accounts = {};
+  state.holdings = {};
   state.users = {};
 }
 
@@ -171,6 +179,12 @@ export const userSlice = createSlice({
           item.value = undefined;
         }
         state.portfolios[item.pk] = item;
+      }
+    });
+    builder.addCase(fetchHoldingsThunk.fulfilled, (state, action) => {
+      state.holdings = {};
+      for (const item of action.payload) {
+        state.holdings[item.pk] = item;
       }
     });
     builder.addCase(fetchWatchlistsThunk.fulfilled, (state, action) => {
@@ -215,22 +229,17 @@ export const userSlice = createSlice({
         return;
       }
       const { pk, quantity } = action.payload;
-      for (const account of Object.values(state.accounts)) {
-        for (const holding of account.holdings) {
-          if (holding.pk === pk) {
-            holding.quantity = quantity;
-          }
-        }
-      }
+      state.holdings[pk].quantity = quantity;
     });
     builder.addCase(createHoldingThunk.fulfilled, (state, action) => {
       const account = action.payload.account as string;
-      state.accounts[account].holdings.push({
+      state.holdings[action.payload.pk] = {
         pk: action.payload.pk,
         asset: action.payload.asset,
         quantity: action.payload.quantity,
         account,
-      });
+      };
+      state.accounts[account].holdings.push(action.payload.pk);
     });
     builder.addCase(updateUserInfoThunk.fulfilled, (state, action) => {
       state.users[action.payload.pk] = action.payload;
@@ -240,6 +249,7 @@ export const userSlice = createSlice({
 
 export const getPortfolios = (state: any) => state.user.portfolios;
 export const getWatchlists = (state: any) => state.user.watchlists;
+export const getHoldings = (state: any) => state.user.holdings;
 export const getSession = (state: any) => state.user.session;
 export const getUsers = (state: any) => state.user.users;
 export const getAccounts = (state: any) => state.user.accounts;

@@ -1,6 +1,6 @@
 /* eslint camelcase: "off" */
 
-import { Portfolio, Account } from "../store/user";
+import { Portfolio, Account, Holding } from "../store/user";
 import { AssetInfo, Service } from "../store/oracle";
 import { getServiceAsset } from "./service";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
@@ -80,10 +80,11 @@ function computeHeaderData(
 export function buildPortfolioTableData(
   portfolio: Portfolio,
   portfolios: Record<string, Portfolio>,
+  holdings: Record<string, Holding>,
   assetInfo: Record<string, AssetInfo>
 ): PortfolioTableRow[] {
-  const rows: PortfolioTableRow[] = portfolio.holdings.map(
-    ({ pk, asset: assetPk, quantity }) => {
+  const rows: PortfolioTableRow[] = portfolio.holdings.map(hid => {
+    let { pk, asset: assetPk, quantity } = holdings[hid];
       const asset = assetInfo[assetPk];
       assert(asset);
 
@@ -109,7 +110,7 @@ export function buildPortfolioTableData(
         id: subPortfolio.pk,
         name: subPortfolio.name,
       },
-      children: buildPortfolioTableData(subPortfolio, portfolios, assetInfo),
+      children: buildPortfolioTableData(subPortfolio, portfolios, holdings, assetInfo),
       type: RowType.Portfolio,
     };
   });
@@ -123,12 +124,13 @@ export function createPortfolioTableData(
   assetInfo: Record<string, AssetInfo>,
   services: Record<string, Service>,
   accounts: Record<string, Account>,
+  holdings: Record<string, Holding>,
   topLevel: boolean
 ): PortfolioTableRow {
-  const rows: PortfolioTableRow[] = portfolio.holdings.map(
-    ({ pk, asset: assetId, quantity, account: accountId }) => {
+  const rows: PortfolioTableRow[] = portfolio.holdings.map(hid => {
+    let {pk, asset: assetId, quantity, account: accountId} = holdings[hid];
       const asset = assetInfo[assetId];
-      assert(asset);
+      assert(asset, `Missing asset: ${assetId}`);
       const account = accountId ? accounts[accountId] : undefined;
       let serviceAsset;
       if (account) {
@@ -160,13 +162,15 @@ export function createPortfolioTableData(
       assetInfo,
       services,
       accounts,
+      holdings,
       false
     );
   });
   rows.push(...res2);
   if (portfolio.tags.length > 0) {
     Object.values(accounts).forEach((account) => {
-      account.holdings.forEach((holding) => {
+      account.holdings.forEach((hid) => {
+        const holding = holdings[hid];
         const asset = assetInfo[holding.asset];
         assert(asset);
         if (portfolio.tags.includes(asset.asset_class)) {
@@ -210,7 +214,8 @@ export function preparePortfolioTableData(
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, AssetInfo>,
   services: Record<string, Service>,
-  accounts: Record<string, Account>
+  accounts: Record<string, Account>,
+  holdings: Record<string, Holding>,
 ): PortfolioTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);
@@ -224,12 +229,13 @@ export function preparePortfolioTableData(
     assetInfo,
     services,
     accounts,
+    holdings,
     true
   );
   if (data.children !== undefined) {
     data.children = groupTableDataByColumn(
       data.children,
-      "asset_id",
+      "asset",
       [
         { key: "name", strategy: GroupingStrategy.IfSame },
         { key: "price", strategy: GroupingStrategy.IfSame },

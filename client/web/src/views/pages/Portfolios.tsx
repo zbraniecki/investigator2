@@ -17,6 +17,7 @@ import {
   getUsers,
   getSession,
   getAccounts,
+  getHoldings,
 } from "../../store/user";
 import { getAssetInfo, getServices } from "../../store/oracle";
 import { TabInfo } from "../components/Tabs";
@@ -24,6 +25,7 @@ import { TabInfo } from "../components/Tabs";
 const baseTableMeta: BaseTableMeta = {
   name: "portfolios",
   nested: true,
+  showHeaders: true,
   columns: {
     id: {
       label: "ID",
@@ -119,6 +121,7 @@ export function Portfolios() {
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
   const accounts = useSelector(getAccounts);
+  const holdings = useSelector(getHoldings);
 
   let tabs: TabInfo[] = [];
 
@@ -142,7 +145,8 @@ export function Portfolios() {
       portfolios,
       assetInfo,
       services,
-      accounts
+      accounts,
+      holdings,
     );
     if (data === undefined) {
       return undefined;

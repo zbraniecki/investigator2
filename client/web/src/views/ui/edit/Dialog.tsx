@@ -14,6 +14,7 @@ import {
   Account,
   Holding,
   getPortfolios,
+  getHoldings,
 } from "../../../store/user";
 import {
   getAssetInfo,
@@ -81,6 +82,7 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
   const taxonomies = useSelector(getTaxonomies);
   const accounts = useSelector(getAccounts);
   const portfolios = useSelector(getPortfolios);
+  const holdings = useSelector(getHoldings);
 
   const resolveDialogState = (state: DialogState): ResolvedDialogState => {
     console.log(`resolving dialog state`);
@@ -91,13 +93,13 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
     let quantity;
     if (state.value?.holding) {
       for (const a of Object.values<Account>(accounts)) {
-        for (const h of a.holdings) {
-          if (h.pk === state.value.holding) {
+        for (const hid of a.holdings) {
+          if (hid === state.value.holding) {
             account = a;
-            holding = h;
+            holding = holdings[hid];
             asset = assetInfo[holding.asset];
             assetClass = taxonomies.tags[asset.asset_class];
-            quantity = h.quantity;
+            quantity = holding.quantity;
             break;
           }
         }
