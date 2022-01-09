@@ -5,7 +5,7 @@
 * Add wealth change over time chart
 * Add ability to edit/build strategies
 * Add ability to add/edit/remove portfolios, watchlists, wallets (providers, services, accounts)
-* Add chart to track strategy divergence over time
+* Add chart to track strategy divergence (and targets) over time
 * Add ability to add expected investment money and simulate using it to reduce divergence
 * Suggest different divergence reduction options based on the amount of money and approaches:
  * Limit transactions
@@ -21,3 +21,6 @@
 * Improve "assets to monitor"
 * Alert when asset you monitor reaches X
 * Reason about dry-powder, how much, where to hold (include APY)
+* Add custom "entries" about assets/holdings, timers that activate at certain condition like time, duration, value, etc.
+* Add ability to store holdings/assets as categories (my tesla 3 2020 is a holding of an asset tesla 3 2020, which is part of tesla 3 category, which is part of tesla category which is part of cars category. Each category can be going up/down and the value of my holding will be affected or even reasoned as above/below category)
+* When adjusting targets, suggest progressive changes, rather than drastic.
