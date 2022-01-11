@@ -121,6 +121,7 @@ node_modules/
 .parcel-cache/
 
 .yarn/*
+client/web/.yarn/cache/
 #!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
