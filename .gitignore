@@ -119,4 +119,11 @@ GitHub.sublime-settings
 res/
 node_modules/
 .parcel-cache/
-yarn.lock
+
+.yarn/*
+#!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
