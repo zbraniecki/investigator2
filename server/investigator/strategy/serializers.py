@@ -14,10 +14,10 @@ class StrategySerializer(serializers.ModelSerializer):
         for target in obj.targets.all():
             contains = []
             for asset in target.contains.all():
-                contains.append(asset.symbol)
+                contains.append(asset.pk)
             result.append(
                 {
-                    "asset": target.asset.id,
+                    "asset": target.asset.pk,
                     "contains": contains,
                     "percent": target.percent,
                 }

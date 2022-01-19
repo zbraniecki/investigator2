@@ -94,7 +94,14 @@ export function createStrategyTableData(
 
     const computedData = computedTableData[asset.pk];
 
-    const currentValue = computedData?.value || 0;
+    let currentValue = computedData?.value || 0;
+
+    for (const a of target.contains) {
+      const asset = assetInfo[a];
+      assert(asset);
+      const computedData = computedTableData[asset.pk];
+      currentValue += computedData?.value || 0;
+    }
     const targetValue = totalPortfolioValue * target.percent;
     const currentPercent = currentValue / totalPortfolioValue;
     const deviation = Math.abs(target.percent - currentPercent);
@@ -114,7 +121,9 @@ export function createStrategyTableData(
     };
   });
 
-  const targettedAssetIds = strategy.targets.map((target) => target.asset);
+  const targettedAssetIds = strategy.targets.map((target) => {
+    return [target.asset, ...target.contains];
+  }).flat();
   const unlistedAssetIds: Set<string> = new Set();
   for (const asset of Object.keys(computedTableData)) {
     if (!targettedAssetIds.includes(asset)) {
