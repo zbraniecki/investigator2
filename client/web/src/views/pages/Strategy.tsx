@@ -21,6 +21,7 @@ import {
   getAccounts,
   getAssets,
   getPublicWatchlists,
+  getServices,
   getStrategies,
 } from "../../store";
 import { Watchlist } from "../../types";
@@ -119,6 +120,7 @@ export function Strategy() {
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
   const holdings = useSelector(getHoldings);
+  const services = useSelector(getServices);
 
   let tabs: TabInfo[] = [];
 
@@ -135,7 +137,7 @@ export function Strategy() {
       .map((sid) => {
         const strategy = strategies[sid];
         return {
-          id: strategy.id,
+          id: strategy.pk,
           label: strategy.name,
         };
       });
@@ -147,7 +149,9 @@ export function Strategy() {
       strategies,
       portfolios,
       holdings,
-      assets
+      assets,
+      accounts,
+      services
     );
     if (data === undefined) {
       return undefined;

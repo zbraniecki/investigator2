@@ -1,6 +1,13 @@
 /* eslint camelcase: "off" */
 
-import { Portfolio, Holding, Asset, Strategy } from "../types";
+import {
+  Portfolio,
+  Holding,
+  Asset,
+  Strategy,
+  Account,
+  Service,
+} from "../types";
 import { buildPortfolioTableData } from "./portfolio";
 import {
   assert,
@@ -41,6 +48,33 @@ export interface StyledStrategyTableRow extends StyledRowData {
   };
   children?: StyledStrategyTableRow[];
   type: RowType;
+}
+
+function computeHeaderData(
+  strategy: Strategy,
+  data: StrategyTableRow[]
+): StrategyTableRow["cells"] {
+  const deltaUsd = data.reduce(
+    (total, curr) =>
+      total +
+      (curr.cells.deltaUsd && curr.cells.deltaUsd > 0
+        ? curr.cells.deltaUsd
+        : 0),
+    0
+  );
+  const deviation = data.reduce(
+    (total, curr) =>
+      total +
+      (curr.cells.deviation && isFinite(curr.cells.deviation)
+        ? curr.cells.deviation
+        : 0),
+    0
+  );
+  const cells = {
+    deltaUsd,
+    deviation,
+  };
+  return cells;
 }
 
 export function createStrategyTableData(
@@ -120,8 +154,10 @@ export function createStrategyTableData(
     });
   }
 
+  const cells = computeHeaderData(strategy, rows);
+
   return {
-    cells: {},
+    cells,
     children: rows.length > 0 ? rows : undefined,
     type: RowType.Asset,
   };
@@ -132,7 +168,9 @@ export function prepareStrategyTableData(
   strategies: Record<string, Strategy>,
   portfolios: Record<string, Portfolio>,
   holdings: Record<string, Holding>,
-  assetInfo: Record<string, Asset>
+  assetInfo: Record<string, Asset>,
+  accounts: Record<string, Account>,
+  services: Record<string, Service>
 ): StrategyTableRow | undefined {
   const strategy = strategies[sid];
   assert(strategy);
@@ -151,7 +189,9 @@ export function prepareStrategyTableData(
     portfolio,
     portfolios,
     holdings,
-    assetInfo
+    assetInfo,
+    accounts,
+    services
   );
   const groupedPortfolioData = groupTableDataByColumn2(
     portfolioData,

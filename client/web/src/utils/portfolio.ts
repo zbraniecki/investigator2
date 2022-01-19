@@ -55,9 +55,8 @@ function computeHeaderData(
 ): PortfolioTableRow["cells"] {
   const cells: PortfolioTableRow["cells"] = {
     value:
-      portfolio.value !== undefined
-        ? portfolio.value
-        : data.reduce((total, curr) => total + (curr.cells.value || 0), 0),
+      portfolio.value ??
+      data.reduce((total, curr) => total + (curr.cells.value || 0), 0),
   };
 
   if (!topLevel) {
@@ -86,7 +85,9 @@ export function buildPortfolioTableData(
   portfolio: Portfolio,
   portfolios: Record<string, Portfolio>,
   holdings: Record<string, Holding>,
-  assetInfo: Record<string, Asset>
+  assetInfo: Record<string, Asset>,
+  accounts: Record<string, Account>,
+  services: Record<string, Service>
 ): PortfolioTableRow[] {
   const rows: PortfolioTableRow[] = portfolio.holdings.map((hid) => {
     const { pk, asset: assetPk, quantity } = holdings[hid];
@@ -102,7 +103,8 @@ export function buildPortfolioTableData(
         price: asset.info.value,
         quantity,
         value: asset.info.value * quantity,
-        mcap_share: quantity / asset.info.circulating_supply * MCAP_SHARE_FACTOR,
+        mcap_share:
+          (quantity / asset.info.circulating_supply) * MCAP_SHARE_FACTOR,
         minted_perc: asset.info.circulating_supply / asset.info.max_supply,
       },
       type: RowType.Asset,
@@ -120,12 +122,49 @@ export function buildPortfolioTableData(
         subPortfolio,
         portfolios,
         holdings,
-        assetInfo
+        assetInfo,
+        accounts,
+        services
       ),
       type: RowType.Portfolio,
     };
   });
   rows.push(...res2);
+  if (portfolio.tags.length > 0) {
+    Object.values(accounts).forEach((account) => {
+      account.holdings.forEach((hid) => {
+        const holding = holdings[hid];
+        const asset = assetInfo[holding.asset];
+        assert(asset);
+        if (portfolio.tags.includes(asset.asset_class)) {
+          let serviceAsset;
+          if (account) {
+            serviceAsset = getServiceAsset(account.pk, asset.pk, services);
+          }
+
+          rows.push({
+            cells: {
+              id: holding.pk,
+              asset: asset.pk,
+              name: asset.name,
+              symbol: asset.symbol,
+              price: asset.info.value,
+              quantity: holding.quantity,
+              value: asset.info.value * holding.quantity,
+              account: account?.name,
+              yield: serviceAsset?.apy,
+              mcap_share:
+                (holding.quantity / asset.info.circulating_supply) *
+                MCAP_SHARE_FACTOR,
+              minted_perc:
+                asset.info.circulating_supply / asset.info.max_supply,
+            },
+            type: RowType.Asset,
+          });
+        }
+      });
+    });
+  }
   return rows;
 }
 
@@ -159,7 +198,8 @@ export function createPortfolioTableData(
         value: asset.info.value * quantity,
         account: account?.name,
         yield: serviceAsset?.apy,
-        mcap_share: quantity / asset.info.circulating_supply * MCAP_SHARE_FACTOR,
+        mcap_share:
+          (quantity / asset.info.circulating_supply) * MCAP_SHARE_FACTOR,
         minted_perc: asset.info.circulating_supply / asset.info.max_supply,
       },
       type: RowType.Asset,
@@ -202,8 +242,11 @@ export function createPortfolioTableData(
               value: asset.info.value * holding.quantity,
               account: account?.name,
               yield: serviceAsset?.apy,
-              mcap_share: holding.quantity / asset.info.circulating_supply * MCAP_SHARE_FACTOR,
-              minted_perc: asset.info.circulating_supply / asset.info.max_supply,
+              mcap_share:
+                (holding.quantity / asset.info.circulating_supply) *
+                MCAP_SHARE_FACTOR,
+              minted_perc:
+                asset.info.circulating_supply / asset.info.max_supply,
             },
             type: RowType.Asset,
           });

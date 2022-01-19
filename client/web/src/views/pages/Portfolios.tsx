@@ -172,6 +172,7 @@ export function Portfolios() {
       accounts,
       holdings
     );
+    console.log(data);
     if (data === undefined) {
       return undefined;
     }

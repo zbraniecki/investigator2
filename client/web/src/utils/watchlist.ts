@@ -1,4 +1,5 @@
-import { Asset, Watchlist, Portfolio, Holding } from "../types";
+import { Asset, Watchlist, Portfolio, Holding, Account } from "../types";
+import { getServiceAsset } from "./service";
 import { assert } from "./helpers";
 import {
   RowData,
@@ -86,7 +87,9 @@ function computeHeaderData(
 function getAssetsFromPortfolio(
   portfolio: Portfolio,
   portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>
+  holdings: Record<string, Holding>,
+  accounts: Record<string, Account>,
+  assetInfo: Record<string, Asset>
 ): Set<string> {
   const symbols: Set<string> = new Set();
   for (const hid of portfolio.holdings) {
@@ -96,8 +99,26 @@ function getAssetsFromPortfolio(
   for (const pid of portfolio.portfolios) {
     const p = portfolios[pid];
     assert(p);
-    const subset = getAssetsFromPortfolio(p, portfolios, holdings);
+    const subset = getAssetsFromPortfolio(
+      p,
+      portfolios,
+      holdings,
+      accounts,
+      assetInfo
+    );
     subset.forEach(symbols.add, symbols);
+  }
+  if (portfolio.tags.length > 0) {
+    Object.values(accounts).forEach((account) => {
+      account.holdings.forEach((hid) => {
+        const holding = holdings[hid];
+        const asset = assetInfo[holding.asset];
+        assert(asset);
+        if (portfolio.tags.includes(asset.asset_class)) {
+          symbols.add(asset.pk);
+        }
+      });
+    });
   }
   return symbols;
 }
@@ -107,14 +128,21 @@ export function createWatchlistTableData(
   watchlists: Record<string, Watchlist>,
   assetInfo: Record<string, Asset>,
   portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>
+  holdings: Record<string, Holding>,
+  accounts: Record<string, Account>
 ): WatchlistTableRow {
   const symbols: Set<string> = new Set(watchlist.assets);
 
   if (watchlist.portfolio) {
     const portfolio = portfolios[watchlist.portfolio];
     assert(portfolio);
-    const subset = getAssetsFromPortfolio(portfolio, portfolios, holdings);
+    const subset = getAssetsFromPortfolio(
+      portfolio,
+      portfolios,
+      holdings,
+      accounts,
+      assetInfo
+    );
     subset.forEach(symbols.add, symbols);
   }
 
@@ -153,7 +181,8 @@ export function prepareWatchlistTableData(
   watchlists: Record<string, Watchlist>,
   assetInfo: Record<string, Asset>,
   portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>
+  holdings: Record<string, Holding>,
+  accounts: Record<string, Account>
 ): WatchlistTableRow | undefined {
   if (Object.keys(watchlists).length === 0) {
     return undefined;
@@ -176,7 +205,8 @@ export function prepareWatchlistTableData(
     watchlists,
     assetInfo,
     portfolios,
-    holdings
+    holdings,
+    accounts
   );
   return data;
 }

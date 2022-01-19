@@ -20,6 +20,7 @@ import {
   getHoldings,
   getAssets,
   getPublicWatchlists,
+  getAccounts,
 } from "../../store";
 import { TabInfo } from "../components/Tabs";
 
@@ -145,6 +146,7 @@ export function Watchlists() {
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
   const holdings = useSelector(getHoldings);
+  const accounts = useSelector(getAccounts);
 
   const watchlists: Record<string, Watchlist> = {};
   for (const list of Object.values(publicWatchlists)) {
@@ -163,8 +165,8 @@ export function Watchlists() {
     : Object.keys(watchlists).length > 0;
 
   if (ready) {
-    const wids: string[] = session.username
-      ? users[session.username].ui.watchlists
+    const wids: string[] = session.user_pk
+      ? users[session.user_pk].visible_lists.watchlists
       : Object.keys(watchlists);
 
     tabs = wids
@@ -184,7 +186,8 @@ export function Watchlists() {
       watchlists,
       assets,
       portfolios,
-      holdings
+      holdings,
+      accounts
     );
     if (data === undefined) {
       return undefined;
