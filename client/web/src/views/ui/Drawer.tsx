@@ -1,5 +1,3 @@
-import React from "react";
-/* import { useSelector } from "react-redux"; */
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -13,8 +11,7 @@ import ShowChartIcon from "@mui/icons-material/ShowChart";
 import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import { useMatch, NavLink } from "react-router-dom";
 import { MenuItem } from "./Menu";
-import { DialogTab } from "./edit/Dialog";
-/* import { getSession } from "../../store/account"; */
+import { DialogTab } from "./modal/edit/Dialog";
 
 interface Props {
   menuItems: Array<MenuItem>;
@@ -25,7 +22,6 @@ export default function InvestigatorDrawer({
   menuItems,
   updateDialogState,
 }: Props) {
-  /* const session = useSelector(getSession); */
   const index = Boolean(useMatch(`/`));
 
   function isSelected(item: MenuItem): boolean {
@@ -38,7 +34,7 @@ export default function InvestigatorDrawer({
     return false;
   }
 
-  const handleHoldingOpen = (event: any) => {
+  const handleHoldingOpen = () => {
     updateDialogState({
       open: true,
       editable: {

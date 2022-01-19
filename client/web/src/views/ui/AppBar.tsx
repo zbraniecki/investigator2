@@ -3,12 +3,9 @@ import AppBar from "@mui/material/AppBar";
 import { PaletteMode } from "@mui/material";
 import { Logo } from "./bar/Logo";
 import { Controls } from "./bar/Controls";
-import { InfoDisplayMode } from "../../components/settings";
 
 interface Props {
-  setLightMode: any;
   lightModeName: PaletteMode;
-  infoDisplayMode: InfoDisplayMode;
   setSettingsOpen: any;
 }
 
@@ -20,12 +17,7 @@ export interface AppBarColors {
   accent: string;
 }
 
-export function InvestigatorAppBar({
-  setLightMode,
-  lightModeName,
-  infoDisplayMode,
-  setSettingsOpen,
-}: Props) {
+export function InvestigatorAppBar({ lightModeName, setSettingsOpen }: Props) {
   let colors: AppBarColors = {
     primary: "primary.50",
     background: "transparent",
@@ -58,9 +50,7 @@ export function InvestigatorAppBar({
       <Logo colors={colors} />
       <Box sx={{ flex: 1 }} />
       <Controls
-        infoDisplayMode={infoDisplayMode}
         lightModeName={lightModeName}
-        setLightMode={setLightMode}
         setSettingsOpen={setSettingsOpen}
         colors={colors}
       />

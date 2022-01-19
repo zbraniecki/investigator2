@@ -20,12 +20,12 @@ import { AppBarColors } from "../AppBar";
 import { LoginModal } from "../Login";
 import { AuthenticateState } from "../../../types";
 import { getUsers, logoutThunk } from "../../../store/user";
+import { setLightMode } from "../../../store/ui";
 
 interface Props {
   session: any;
   colors: AppBarColors;
   lightModeName: PaletteMode;
-  setLightMode: any;
   setSettingsOpen: any;
 }
 
@@ -33,7 +33,6 @@ export function AccountMenu({
   session,
   colors,
   lightModeName,
-  setLightMode,
   setSettingsOpen,
 }: Props) {
   const dispatch = useDispatch();

@@ -14,7 +14,7 @@ import {
   Asset,
   Account,
   Holding,
-} from "../../../types";
+} from "../../../../types";
 import {
   getSession,
   getUsers,
@@ -24,8 +24,8 @@ import {
   getServices,
   getPortfolios,
   getHoldings,
-} from "../../../store";
-import { assert } from "../../../utils/helpers";
+} from "../../../../store";
+import { assert } from "../../../../utils/helpers";
 
 export enum DialogTab {
   Asset = 0,

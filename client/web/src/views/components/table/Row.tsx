@@ -12,7 +12,7 @@ import { getSession, updateHoldingThunk } from "../../../store/user";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 import { getOutletContext } from "../../ui/Content";
-import { DialogTab } from "../../ui/edit/Dialog";
+import { DialogTab } from "../../ui/modal/edit/Dialog";
 
 export interface Props {
   id: string;

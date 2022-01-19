@@ -16,7 +16,7 @@ import Link from "@mui/material/Link";
 import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
-import { Asset } from "../../../../types";
+import { Asset } from "../../../../../types";
 import { ResolvedDialogState } from "../Dialog";
 
 interface HeaderProps {

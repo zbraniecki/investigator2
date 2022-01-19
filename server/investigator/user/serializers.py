@@ -60,7 +60,7 @@ class WatchlistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Watchlist
-        fields = ["id", "name", "type", "assets", "portfolio", "dynamic"]
+        fields = ["pk", "name", "type", "assets", "portfolio", "dynamic"]
 
     def get_portfolio(self, obj):
         if obj.type == WatchlistType.PORTFOLIO:

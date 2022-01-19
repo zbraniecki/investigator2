@@ -11,6 +11,8 @@ import {
   newCellData,
 } from "../views/components/table/data/Row";
 
+const MCAP_SHARE_FACTOR = 1000000;
+
 export interface PortfolioTableRow extends RowData {
   cells: {
     id?: string;
@@ -22,6 +24,8 @@ export interface PortfolioTableRow extends RowData {
     value?: number;
     account?: string;
     yield?: number;
+    mcap_share?: number;
+    minted_perc?: number;
   };
   children?: PortfolioTableRow[];
   type: RowType;
@@ -37,6 +41,8 @@ export interface StyledPortfolioTableRow extends StyledRowData {
     value?: CellData<number>;
     account?: CellData<string>;
     yield?: CellData<number>;
+    mcap_share?: CellData<number>;
+    minted_perc?: CellData<number>;
   };
   children?: StyledPortfolioTableRow[];
   type: RowType;
@@ -96,6 +102,8 @@ export function buildPortfolioTableData(
         price: asset.info.value,
         quantity,
         value: asset.info.value * quantity,
+        mcap_share: quantity / asset.info.circulating_supply * MCAP_SHARE_FACTOR,
+        minted_perc: asset.info.circulating_supply / asset.info.max_supply,
       },
       type: RowType.Asset,
     };
@@ -151,6 +159,8 @@ export function createPortfolioTableData(
         value: asset.info.value * quantity,
         account: account?.name,
         yield: serviceAsset?.apy,
+        mcap_share: quantity / asset.info.circulating_supply * MCAP_SHARE_FACTOR,
+        minted_perc: asset.info.circulating_supply / asset.info.max_supply,
       },
       type: RowType.Asset,
     };
@@ -192,6 +202,8 @@ export function createPortfolioTableData(
               value: asset.info.value * holding.quantity,
               account: account?.name,
               yield: serviceAsset?.apy,
+              mcap_share: holding.quantity / asset.info.circulating_supply * MCAP_SHARE_FACTOR,
+              minted_perc: asset.info.circulating_supply / asset.info.max_supply,
             },
             type: RowType.Asset,
           });
@@ -244,6 +256,8 @@ export function preparePortfolioTableData(
         { key: "account", strategy: GroupingStrategy.IfSame },
         { key: "yield", strategy: GroupingStrategy.IfSame },
         { key: "quantity", strategy: GroupingStrategy.Sum },
+        { key: "mcap_share", strategy: GroupingStrategy.Sum },
+        { key: "minted_perc", strategy: GroupingStrategy.IfSame },
       ],
       false
     ) as PortfolioTableRow[];
@@ -280,6 +294,8 @@ export function computePortfolioTableDataStyle(
       value: newCellData(data.cells.value),
       account: newCellData(data.cells.account),
       yield: newCellData(data.cells.yield),
+      mcap_share: newCellData(data.cells.mcap_share),
+      minted_perc: newCellData(data.cells.minted_perc),
     },
     children: data.children?.map((row) => computePortfolioTableDataStyle(row)),
     type: data.type,

@@ -8,7 +8,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import CircularProgress from "@mui/material/CircularProgress";
 import { AccountMenu } from "./Menu";
 import { Switch } from "../../components/Switch";
-import { setInfoDisplayMode } from "../../../store/ui";
+import { setInfoDisplayMode, getInfoDisplayMode } from "../../../store/ui";
 import { InfoDisplayMode } from "../../../components/settings";
 import { getSession } from "../../../store/user";
 import { fetchAssetsThunk } from "../../../api/oracle";
@@ -16,25 +16,18 @@ import { getAssetUpdated } from "../../../store/oracle";
 import { AppBarColors } from "../AppBar";
 
 interface Props {
-  infoDisplayMode: InfoDisplayMode;
   lightModeName: PaletteMode;
-  setLightMode: any;
   setSettingsOpen: any;
   colors: AppBarColors;
 }
 
-export function Controls({
-  infoDisplayMode,
-  lightModeName,
-  setLightMode,
-  setSettingsOpen,
-  colors,
-}: Props) {
+export function Controls({ lightModeName, setSettingsOpen, colors }: Props) {
   const dispatch = useDispatch();
   const [refreshInProgress, setRefreshInProgress] = React.useState(false);
 
   const session = useSelector(getSession);
   const lastUpdate = useSelector(getAssetUpdated);
+  const infoDisplayMode: InfoDisplayMode = useSelector(getInfoDisplayMode);
   let lastUpdatedFmt = "";
 
   if (lastUpdate) {
@@ -99,7 +92,6 @@ export function Controls({
         session={session}
         colors={colors}
         lightModeName={lightModeName}
-        setLightMode={setLightMode}
         setSettingsOpen={setSettingsOpen}
       />
     </Toolbar>

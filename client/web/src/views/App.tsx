@@ -21,7 +21,7 @@ export function App() {
   const session = useSelector(getSession);
 
   useEffect(() => {
-    const p = Promise.all([
+    Promise.all([
       dispatch(fetchAssetsThunk()),
       dispatch(fetchPublicWatchlistsThunk()),
       dispatch(fetchTagsThunk()),

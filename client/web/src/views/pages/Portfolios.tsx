@@ -79,6 +79,21 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Currency,
       sensitive: true,
     },
+    mcap_share: {
+      label: "Mcap Share",
+      align: CellAlign.Right,
+      sortDirection: SortDirection.Desc,
+      width: "10%",
+      formatter: Formatter.Percent,
+      sensitive: true,
+    },
+    minted_perc: {
+      label: "Minted %",
+      align: CellAlign.Right,
+      sortDirection: SortDirection.Desc,
+      width: "10%",
+      formatter: Formatter.Percent,
+    },
   },
   //   pager: true,
   //   header: true,
@@ -111,6 +126,14 @@ const tableSettings: TableSettings = {
     {
       key: "value",
       visible: true,
+    },
+    {
+      key: "mcap_share",
+      visible: false,
+    },
+    {
+      key: "minted_perc",
+      visible: false,
     },
   ],
 };
