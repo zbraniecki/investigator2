@@ -1,4 +1,9 @@
-import { percent, currency, number } from "../../../../utils/formatters";
+import {
+  percent,
+  currency,
+  number,
+  fraction,
+} from "../../../../utils/formatters";
 import { CellValue } from "./Row";
 
 export enum SortDirection {
@@ -11,6 +16,7 @@ export enum Formatter {
   Currency,
   Symbol,
   Number,
+  Fraction,
 }
 
 export enum CellAlign {
@@ -75,6 +81,10 @@ export function formatValue(
     }
     case Formatter.Number: {
       formattedValue = number(input);
+      break;
+    }
+    case Formatter.Fraction: {
+      formattedValue = fraction(input);
       break;
     }
     default: {

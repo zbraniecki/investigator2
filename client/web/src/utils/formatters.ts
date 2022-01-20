@@ -15,6 +15,10 @@ const cfmt = new Intl.NumberFormat(undefined, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+const fracfmt = new Intl.NumberFormat(undefined, {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
 
 export function currency(input: any): string {
   return cfmt.format(input);
@@ -27,4 +31,9 @@ export function percent(input: any): string {
 }
 export function symbol(input: any): string {
   return input.symbol.toUpperCase();
+}
+
+export function fraction(input: any): string {
+  const v = 1 / input;
+  return `1/${fracfmt.format(v)}`;
 }

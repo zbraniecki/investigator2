@@ -11,8 +11,6 @@ import {
   newCellData,
 } from "../views/components/table/data/Row";
 
-const MCAP_SHARE_FACTOR = 1000000;
-
 export interface PortfolioTableRow extends RowData {
   cells: {
     id?: string;
@@ -94,6 +92,10 @@ export function buildPortfolioTableData(
     const asset = assetInfo[assetPk];
     assert(asset);
 
+    const mcap_share = asset.info.circulating_supply
+      ? quantity / asset.info.circulating_supply
+      : undefined;
+
     return {
       cells: {
         id: pk,
@@ -103,8 +105,7 @@ export function buildPortfolioTableData(
         price: asset.info.value,
         quantity,
         value: asset.info.value * quantity,
-        mcap_share:
-          (quantity / asset.info.circulating_supply) * MCAP_SHARE_FACTOR,
+        mcap_share,
         minted_perc: asset.info.circulating_supply / asset.info.max_supply,
       },
       type: RowType.Asset,
@@ -141,6 +142,9 @@ export function buildPortfolioTableData(
           if (account) {
             serviceAsset = getServiceAsset(account.service, asset.pk, services);
           }
+          const mcap_share = asset.info.circulating_supply
+            ? holding.quantity / asset.info.circulating_supply
+            : undefined;
 
           rows.push({
             cells: {
@@ -153,9 +157,7 @@ export function buildPortfolioTableData(
               value: asset.info.value * holding.quantity,
               account: account?.name,
               yield: serviceAsset?.apy,
-              mcap_share:
-                (holding.quantity / asset.info.circulating_supply) *
-                MCAP_SHARE_FACTOR,
+              mcap_share,
               minted_perc:
                 asset.info.circulating_supply / asset.info.max_supply,
             },
@@ -186,6 +188,9 @@ export function createPortfolioTableData(
     if (account) {
       serviceAsset = getServiceAsset(account.service, asset.pk, services);
     }
+    const mcap_share = asset.info.circulating_supply
+      ? quantity / asset.info.circulating_supply
+      : undefined;
 
     return {
       cells: {
@@ -198,8 +203,7 @@ export function createPortfolioTableData(
         value: asset.info.value * quantity,
         account: account?.name,
         yield: serviceAsset?.apy,
-        mcap_share:
-          (quantity / asset.info.circulating_supply) * MCAP_SHARE_FACTOR,
+        mcap_share,
         minted_perc: asset.info.circulating_supply / asset.info.max_supply,
       },
       type: RowType.Asset,
@@ -231,6 +235,10 @@ export function createPortfolioTableData(
             serviceAsset = getServiceAsset(account.service, asset.pk, services);
           }
 
+          const mcap_share = asset.info.circulating_supply
+            ? holding.quantity / asset.info.circulating_supply
+            : undefined;
+
           rows.push({
             cells: {
               id: holding.pk,
@@ -242,9 +250,7 @@ export function createPortfolioTableData(
               value: asset.info.value * holding.quantity,
               account: account?.name,
               yield: serviceAsset?.apy,
-              mcap_share:
-                (holding.quantity / asset.info.circulating_supply) *
-                MCAP_SHARE_FACTOR,
+              mcap_share,
               minted_perc:
                 asset.info.circulating_supply / asset.info.max_supply,
             },

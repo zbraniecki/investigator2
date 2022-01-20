@@ -84,7 +84,7 @@ const baseTableMeta: BaseTableMeta = {
       align: CellAlign.Right,
       sortDirection: SortDirection.Desc,
       width: "10%",
-      formatter: Formatter.Percent,
+      formatter: Formatter.Fraction,
       sensitive: true,
     },
     minted_perc: {
