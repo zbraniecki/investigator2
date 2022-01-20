@@ -121,9 +121,9 @@ export function createStrategyTableData(
     };
   });
 
-  const targettedAssetIds = strategy.targets.map((target) => {
-    return [target.asset, ...target.contains];
-  }).flat();
+  const targettedAssetIds = strategy.targets
+    .map((target) => [target.asset, ...target.contains])
+    .flat();
   const unlistedAssetIds: Set<string> = new Set();
   for (const asset of Object.keys(computedTableData)) {
     if (!targettedAssetIds.includes(asset)) {

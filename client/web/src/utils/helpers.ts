@@ -12,6 +12,7 @@ export enum GroupingStrategy {
   Always,
   IfSame,
   Sum,
+  Average,
 }
 
 function isSame(
@@ -165,6 +166,30 @@ export function groupTableDataByColumn(
             if (v) {
               assert(typeof v === "number");
               return total + v;
+            }
+            return total;
+          }, 0);
+          cells[groupColumn.key] = value;
+          break;
+        }
+        case GroupingStrategy.Average: {
+          const sum = children.reduce((total, child) => {
+            const v = child.cells.value;
+            if (v) {
+              assert(typeof v === "number");
+              return total + v;
+            }
+            return total;
+          }, 0);
+
+          const value = children.reduce((total, child) => {
+            const val = child.cells.value;
+            const v = child.cells[groupColumn.key];
+            if (v && val) {
+              assert(typeof v === "number");
+              assert(typeof val === "number");
+              const perc = val / sum;
+              return total + v * perc;
             }
             return total;
           }, 0);

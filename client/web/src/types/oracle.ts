@@ -33,7 +33,7 @@ export interface Asset {
 }
 
 export interface ServiceAsset {
-  id: string;
+  asset_pk: string;
   apy: number;
   yield_type: "ST" | "LP" | "INT";
 }

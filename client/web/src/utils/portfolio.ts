@@ -139,7 +139,7 @@ export function buildPortfolioTableData(
         if (portfolio.tags.includes(asset.asset_class)) {
           let serviceAsset;
           if (account) {
-            serviceAsset = getServiceAsset(account.pk, asset.pk, services);
+            serviceAsset = getServiceAsset(account.service, asset.pk, services);
           }
 
           rows.push({
@@ -184,7 +184,7 @@ export function createPortfolioTableData(
     const account = accountId ? accounts[accountId] : undefined;
     let serviceAsset;
     if (account) {
-      serviceAsset = getServiceAsset(account.pk, asset.pk, services);
+      serviceAsset = getServiceAsset(account.service, asset.pk, services);
     }
 
     return {
@@ -228,7 +228,7 @@ export function createPortfolioTableData(
         if (portfolio.tags.includes(asset.asset_class)) {
           let serviceAsset;
           if (account) {
-            serviceAsset = getServiceAsset(account.pk, asset.pk, services);
+            serviceAsset = getServiceAsset(account.service, asset.pk, services);
           }
 
           rows.push({
@@ -297,7 +297,7 @@ export function preparePortfolioTableData(
         { key: "name", strategy: GroupingStrategy.IfSame },
         { key: "price", strategy: GroupingStrategy.IfSame },
         { key: "account", strategy: GroupingStrategy.IfSame },
-        { key: "yield", strategy: GroupingStrategy.IfSame },
+        { key: "yield", strategy: GroupingStrategy.Average },
         { key: "quantity", strategy: GroupingStrategy.Sum },
         { key: "mcap_share", strategy: GroupingStrategy.Sum },
         { key: "minted_perc", strategy: GroupingStrategy.IfSame },

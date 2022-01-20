@@ -15,7 +15,7 @@ export function getServiceAsset(
     return null;
   }
   for (const asset of service.assets) {
-    if (asset.id === assetId) {
+    if (asset.asset_pk === assetId) {
       return asset;
     }
   }
