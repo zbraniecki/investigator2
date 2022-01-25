@@ -22,6 +22,7 @@ export interface PortfolioTableRow extends RowData {
     value?: number;
     account?: string;
     yield?: number;
+    mcap?: number;
     mcap_share?: number;
     minted_perc?: number;
   };
@@ -39,6 +40,7 @@ export interface StyledPortfolioTableRow extends StyledRowData {
     value?: CellData<number>;
     account?: CellData<string>;
     yield?: CellData<number>;
+    mcap?: CellData<number>;
     mcap_share?: CellData<number>;
     minted_perc?: CellData<number>;
   };
@@ -105,6 +107,7 @@ export function buildPortfolioTableData(
         price: asset.info.value,
         quantity,
         value: asset.info.value * quantity,
+        mcap: asset.info.market_cap,
         mcap_share,
         minted_perc: asset.info.circulating_supply / asset.info.max_supply,
       },
@@ -157,6 +160,7 @@ export function buildPortfolioTableData(
               value: asset.info.value * holding.quantity,
               account: account?.name,
               yield: serviceAsset?.apy,
+              mcap: asset.info.market_cap,
               mcap_share,
               minted_perc:
                 asset.info.circulating_supply / asset.info.max_supply,
@@ -203,6 +207,7 @@ export function createPortfolioTableData(
         value: asset.info.value * quantity,
         account: account?.name,
         yield: serviceAsset?.apy,
+        mcap: asset.info.market_cap,
         mcap_share,
         minted_perc: asset.info.circulating_supply / asset.info.max_supply,
       },
@@ -250,6 +255,7 @@ export function createPortfolioTableData(
               value: asset.info.value * holding.quantity,
               account: account?.name,
               yield: serviceAsset?.apy,
+              mcap: asset.info.market_cap,
               mcap_share,
               minted_perc:
                 asset.info.circulating_supply / asset.info.max_supply,
@@ -305,6 +311,7 @@ export function preparePortfolioTableData(
         { key: "account", strategy: GroupingStrategy.IfSame },
         { key: "yield", strategy: GroupingStrategy.Average },
         { key: "quantity", strategy: GroupingStrategy.Sum },
+        { key: "mcap", strategy: GroupingStrategy.IfSame },
         { key: "mcap_share", strategy: GroupingStrategy.Sum },
         { key: "minted_perc", strategy: GroupingStrategy.IfSame },
       ],
@@ -343,6 +350,7 @@ export function computePortfolioTableDataStyle(
       value: newCellData(data.cells.value),
       account: newCellData(data.cells.account),
       yield: newCellData(data.cells.yield),
+      mcap: newCellData(data.cells.mcap),
       mcap_share: newCellData(data.cells.mcap_share),
       minted_perc: newCellData(data.cells.minted_perc),
     },

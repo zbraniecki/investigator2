@@ -79,6 +79,13 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Currency,
       sensitive: true,
     },
+    mcap: {
+      label: "Market Cap",
+      align: CellAlign.Right,
+      sortDirection: SortDirection.Desc,
+      width: "10%",
+      formatter: Formatter.Currency,
+    },
     mcap_share: {
       label: "Mcap Share",
       align: CellAlign.Right,
