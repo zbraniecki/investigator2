@@ -21,6 +21,7 @@ class HoldingInline(admin.TabularInline):
 
 class TransactionInline(admin.TabularInline):
     model = Transaction
+    ordering = ("-timestamp",)
 
 
 @admin.register(Account)

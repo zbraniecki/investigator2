@@ -12,6 +12,7 @@ const fetchHoldings = fetchEntries.bind(
   undefined,
   "user/holdings/"
 ) as fetchAuthEntriesType<Holding>;
+
 export const createHolding = createEntry.bind(
   undefined,
   "user/holdings/"

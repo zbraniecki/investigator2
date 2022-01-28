@@ -15,7 +15,7 @@ import {
   createHolding,
   updateHolding,
 } from "../api/holding";
-import { createTransaction } from "../api/account";
+import { createTransaction } from "../api/transaction";
 import {
   Watchlist,
   Portfolio,
@@ -136,6 +136,10 @@ const userSlice = createSlice({
         account,
       };
       state.accounts[account].holdings.push(action.payload.pk);
+    });
+    builder.addCase(createTransactionThunk.fulfilled, (state, action) => {
+      const account = action.payload.account as string;
+      state.accounts[account].transactions.push(action.payload);
     });
     builder.addCase(updateUserInfoThunk.fulfilled, (state, action) => {
       state.users[action.payload.pk] = action.payload;

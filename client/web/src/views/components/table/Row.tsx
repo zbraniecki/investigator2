@@ -8,7 +8,14 @@ import Collapse from "@mui/material/Collapse";
 import { useSelector, useDispatch } from "react-redux";
 import { TableMeta } from "./data/Table";
 import { StyledRowData } from "./data/Row";
-import { getSession, updateHoldingThunk } from "../../../store/user";
+import {
+  getSession,
+  getHoldings,
+  getAccounts,
+  updateHoldingThunk,
+  createTransactionThunk,
+} from "../../../store/user";
+import { TransactionType } from "../../../types";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 import { getOutletContext } from "../../ui/Content";
@@ -22,6 +29,8 @@ export interface Props {
 export function Row({ id, data, tableMeta }: Props) {
   const [open, setOpen] = React.useState(false);
   const session = useSelector(getSession);
+  const holdings = useSelector(getHoldings);
+  const accounts = useSelector(getAccounts);
   const outletContext = getOutletContext();
 
   const dispatch = useDispatch();
@@ -29,13 +38,30 @@ export function Row({ id, data, tableMeta }: Props) {
   const handleCellUpdate = async (cid: string, quantity: number) => {
     console.log("handling cell update");
     const { value } = data.cells.id;
-    return dispatch(
-      updateHoldingThunk({
-        token: session.token,
-        pk: value as string,
-        quantity,
-      })
-    );
+    const holding = holdings[value];
+    const diffQuantity = quantity - holding.quantity;
+
+    return Promise.all([
+      dispatch(
+        createTransactionThunk({
+          token: session.token,
+          input: {
+            account: holding.account,
+            asset: holding.asset,
+            type: TransactionType.Interest,
+            quantity: diffQuantity,
+            timestamp: new Date(),
+          },
+        })
+      ),
+      dispatch(
+        updateHoldingThunk({
+          token: session.token,
+          pk: value as string,
+          quantity,
+        })
+      ),
+    ]);
   };
 
   const handleAssetOpen = () => {

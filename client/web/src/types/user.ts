@@ -1,8 +1,16 @@
+export enum TransactionType {
+  Buy = "BY",
+  Sell = "SL",
+  Withdraw = "WD",
+  Deposit = "DP",
+  Interest = "IN",
+}
+
 export interface Transaction {
   pk: string;
   account: string;
   asset: string;
-  type: string;
+  type: TransactionType;
   quantity: number;
   timestamp: Date;
 }

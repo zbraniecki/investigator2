@@ -22,6 +22,7 @@ import {
   Session,
   User,
   Transaction,
+  TransactionType,
 } from "../../../../../types";
 import { ResolvedDialogState } from "../Dialog";
 import {
@@ -318,7 +319,7 @@ export function HoldingActions({
           input: {
             account: state.account.pk,
             asset: state.asset.pk,
-            type: change > 0 ? "BY" : "SL",
+            type: change > 0 ? TransactionType.Buy : TransactionType.Sell,
             quantity: Math.abs(change),
             timestamp: new Date(),
           },
@@ -372,7 +373,7 @@ export function HoldingActions({
           input: {
             account: state.account.pk,
             asset: state.asset.pk,
-            type: "BY",
+            type: TransactionType.Buy,
             quantity: parseFloat(state.value.quantity),
             timestamp: new Date(),
           },
