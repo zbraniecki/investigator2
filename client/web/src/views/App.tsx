@@ -12,6 +12,8 @@ import {
   fetchTagsThunk,
   fetchCategoriesThunk,
   fetchStrategiesThunk,
+  fetchTargetsThunk,
+  fetchTargetChangesThunk,
 } from "../api";
 import { getSession } from "../store";
 import { Chrome } from "./ui/Chrome";
@@ -42,6 +44,8 @@ export function App() {
           dispatch(fetchHoldingsThunk({ token: session.token })),
           dispatch(fetchStrategiesThunk({ token: session.token })),
           dispatch(fetchWatchlistsThunk({ token: session.token })),
+          dispatch(fetchTargetsThunk({ token: session.token })),
+          dispatch(fetchTargetChangesThunk({ token: session.token })),
         ])
       );
     }

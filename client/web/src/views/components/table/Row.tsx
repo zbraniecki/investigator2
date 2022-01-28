@@ -11,15 +11,86 @@ import { StyledRowData } from "./data/Row";
 import {
   getSession,
   getHoldings,
+  getTargets,
   updateHoldingThunk,
+  updateTargetThunk,
   createTransactionThunk,
+  createTargetChangeThunk,
   getPortfolioInlineQuantityTransactionType,
 } from "../../../store";
-import { TransactionType } from "../../../types";
+import { Holding, TransactionType, Strategy, Target } from "../../../types";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 import { getOutletContext } from "../../ui/Content";
 import { DialogTab } from "../../ui/modal/edit/Dialog";
+import { assert } from "../../../utils/helpers";
+
+const handleQuantityUpdate = (
+  dispatch: any,
+  token: string,
+  holding: Holding,
+  quantity: number,
+  inlineQuantityTransactionType: TransactionType
+): Promise<any> => {
+  const diffQuantity = quantity - holding.quantity;
+
+  let type = inlineQuantityTransactionType;
+  if (type === TransactionType.Buy && diffQuantity < 0) {
+    type = TransactionType.Sell;
+  }
+  assert(holding.account);
+  return Promise.all([
+    dispatch(
+      createTransactionThunk({
+        token,
+        input: {
+          account: holding.account,
+          asset: holding.asset,
+          type,
+          quantity: diffQuantity,
+          timestamp: new Date(),
+        },
+      })
+    ),
+    dispatch(
+      updateHoldingThunk({
+        token,
+        pk: holding.pk,
+        quantity,
+      })
+    ),
+  ]);
+};
+
+const handleTargetUpdate = (
+  dispatch: any,
+  token: string,
+  target: Target,
+  percent: number
+): Promise<any> => {
+  const diffPercent = percent - target.percent;
+
+  return Promise.all([
+    dispatch(
+      createTargetChangeThunk({
+        token,
+        input: {
+          strategy: target.strategy,
+          asset: target.asset,
+          change: diffPercent,
+          timestamp: new Date(),
+        },
+      })
+    ),
+    dispatch(
+      updateTargetThunk({
+        token,
+        pk: target.pk,
+        percent,
+      })
+    ),
+  ]);
+};
 
 export interface Props {
   id: string;
@@ -30,42 +101,37 @@ export function Row({ id, data, tableMeta }: Props) {
   const [open, setOpen] = React.useState(false);
   const session = useSelector(getSession);
   const holdings = useSelector(getHoldings);
-  const portfolioInlineQuantityTransactionType = useSelector(getPortfolioInlineQuantityTransactionType);
+  const targets = useSelector(getTargets);
+  const portfolioInlineQuantityTransactionType = useSelector(
+    getPortfolioInlineQuantityTransactionType
+  );
   const outletContext = getOutletContext();
 
   const dispatch = useDispatch();
 
-  const handleCellUpdate = async (cid: string, quantity: number) => {
-    console.log("handling cell update");
-    const { value } = data.cells.id;
-    const holding = holdings[value];
-    const diffQuantity = quantity - holding.quantity;
-
-    let type = portfolioInlineQuantityTransactionType;
-    if (type === TransactionType.Buy && diffQuantity < 0) {
-      type = TransactionType.Sell;
+  const handleCellUpdate = async (cid: string, value: number) => {
+    console.log(`handling cell update: ${cid}`);
+    switch (cid) {
+      case "quantity": {
+        const hid = data.cells.id.value;
+        const holding = holdings[hid];
+        return handleQuantityUpdate(
+          dispatch,
+          session.token,
+          holding,
+          value,
+          portfolioInlineQuantityTransactionType
+        );
+      }
+      case "target": {
+        const tid = data.cells.id.value;
+        let target = targets[tid];
+        return handleTargetUpdate(dispatch, session.token, target, value);
+      }
+      default: {
+        return Promise.resolve();
+      }
     }
-    return Promise.all([
-      dispatch(
-        createTransactionThunk({
-          token: session.token,
-          input: {
-            account: holding.account,
-            asset: holding.asset,
-            type,
-            quantity: diffQuantity,
-            timestamp: new Date(),
-          },
-        })
-      ),
-      dispatch(
-        updateHoldingThunk({
-          token: session.token,
-          pk: value as string,
-          quantity,
-        })
-      ),
-    ]);
   };
 
   const handleAssetOpen = () => {
@@ -144,8 +210,8 @@ export function Row({ id, data, tableMeta }: Props) {
                   column.key === "name"
                     ? handleAssetOpen
                     : column.key === "account"
-                      ? handleHoldingOpen
-                      : undefined
+                    ? handleHoldingOpen
+                    : undefined
                 }
               />
             );

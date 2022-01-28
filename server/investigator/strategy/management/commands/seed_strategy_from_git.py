@@ -13,8 +13,8 @@ from investigator.user.models import (
 )
 from investigator.strategy.models import (
     Strategy,
-    StrategyChange,
-    StrategyTarget,
+    TargetChange,
+    Target,
 )
 from django.core.management.base import BaseCommand
 from django.db.models import Q
@@ -59,7 +59,7 @@ def upload_strategy_data(data, dt, dry=False):
     for coin in coins:
         symbol = normalize_symbol(coin["symbol"])
         asset = Asset.objects.get(symbol__iexact=symbol)
-        target = StrategyTarget.objects.filter(
+        target = Target.objects.filter(
             strategy=strat,
             asset=asset,
         ).first()
@@ -68,8 +68,9 @@ def upload_strategy_data(data, dt, dry=False):
             delta = Decimal(coin["percent"]) - Decimal(target.percent)
             if delta == 0.0:
                 continue
-            change = StrategyChange(
-                target=target,
+            change = TargetChange(
+                strategy=target.strategy,
+                asset=target.asset,
                 change=delta,
                 timestamp=dt,
             )
@@ -79,13 +80,12 @@ def upload_strategy_data(data, dt, dry=False):
             if not dry:
                 target.save()
         else:
-            target = StrategyTarget(
-                strategy=strat, asset=asset, percent=coin["percent"]
-            )
+            target = Target(strategy=strat, asset=asset, percent=coin["percent"])
             if not dry:
                 target.save()
-            change = StrategyChange(
-                target=target,
+            change = TargetChange(
+                strategy=strat,
+                asset=target.asset,
                 change=coin["percent"],
                 timestamp=dt,
             )
@@ -101,8 +101,9 @@ def upload_strategy_data(data, dt, dry=False):
                 found = True
                 break
         if not found:
-            change = StrategyChange(
-                target=target,
+            change = TargetChange(
+                strategy=strat,
+                asset=target.asset,
                 change=target.percent * -1,
                 timestamp=dt,
             )

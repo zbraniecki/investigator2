@@ -23,6 +23,8 @@ router.register(r"user/users", user_views.UserViewSet, "user")
 router.register(r"user/transactions", user_views.TransactionViewSet, "transaction")
 
 router.register(r"strategy/list", strategy_views.StrategyViewSet)
+router.register(r"strategy/targets", strategy_views.TargetViewSet)
+router.register(r"strategy/changes", strategy_views.TargetChangeViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),

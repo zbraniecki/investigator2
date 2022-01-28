@@ -5,6 +5,8 @@ import {
   Holding,
   Asset,
   Strategy,
+  Target,
+  TargetChange,
   Account,
   Service,
 } from "../types";
@@ -79,6 +81,8 @@ function computeHeaderData(
 
 export function createStrategyTableData(
   strategy: Strategy,
+  targets: Record<string, Target>,
+  targetChanges: Record<string, TargetChange>,
   portfolios: Record<string, Portfolio>,
   assetInfo: Record<string, Asset>,
   computedTableData: Record<string, Record<string, any>>
@@ -88,41 +92,47 @@ export function createStrategyTableData(
     0
   );
 
-  const rows: StrategyTableRow[] = strategy.targets.map((target) => {
-    const asset = assetInfo[target.asset];
-    assert(asset);
-
-    const computedData = computedTableData[asset.pk];
-
-    let currentValue = computedData?.value || 0;
-
-    for (const a of target.contains) {
-      const asset = assetInfo[a];
+  const rows: StrategyTableRow[] = Object.values(strategy.targets).map(
+    (tid) => {
+      const target = targets[tid];
+      const asset = assetInfo[target.asset];
       assert(asset);
-      const computedData = computedTableData[asset.pk];
-      currentValue += computedData?.value || 0;
-    }
-    const targetValue = totalPortfolioValue * target.percent;
-    const currentPercent = currentValue / totalPortfolioValue;
-    const deviation = Math.abs(target.percent - currentPercent);
-    const delta = targetValue / currentValue - 1;
-    const deltaUsd = targetValue - currentValue;
-    return {
-      cells: {
-        id: asset.pk,
-        name: asset.name,
-        target: target.percent,
-        current: currentPercent,
-        deviation,
-        delta,
-        deltaUsd,
-      },
-      type: RowType.Asset,
-    };
-  });
 
-  const targettedAssetIds = strategy.targets
-    .map((target) => [target.asset, ...target.contains])
+      const computedData = computedTableData[asset.pk];
+
+      let currentValue = computedData?.value || 0;
+
+      for (const a of target.contains) {
+        const asset = assetInfo[a];
+        assert(asset);
+        const computedData = computedTableData[asset.pk];
+        currentValue += computedData?.value || 0;
+      }
+      const targetValue = totalPortfolioValue * target.percent;
+      const currentPercent = currentValue / totalPortfolioValue;
+      const deviation = Math.abs(target.percent - currentPercent);
+      const delta = targetValue / currentValue - 1;
+      const deltaUsd = targetValue - currentValue;
+      return {
+        cells: {
+          id: target.pk,
+          name: asset.name,
+          target: target.percent,
+          current: currentPercent,
+          deviation,
+          delta,
+          deltaUsd,
+        },
+        type: RowType.Asset,
+      };
+    }
+  );
+
+  const targettedAssetIds = Object.values(strategy.targets)
+    .map((tid) => {
+      const target = targets[tid];
+      return [target.asset, ...target.contains];
+    })
     .flat();
   const unlistedAssetIds: Set<string> = new Set();
   for (const asset of Object.keys(computedTableData)) {
@@ -175,6 +185,8 @@ export function createStrategyTableData(
 export function prepareStrategyTableData(
   sid: string,
   strategies: Record<string, Strategy>,
+  targets: Record<string, Target>,
+  targetChanges: Record<string, TargetChange>,
   portfolios: Record<string, Portfolio>,
   holdings: Record<string, Holding>,
   assetInfo: Record<string, Asset>,
@@ -215,6 +227,8 @@ export function prepareStrategyTableData(
 
   const data = createStrategyTableData(
     strategy,
+    targets,
+    targetChanges,
     portfolios,
     assetInfo,
     computedTableData

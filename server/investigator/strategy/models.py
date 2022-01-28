@@ -14,7 +14,7 @@ class Strategy(models.Model):
         return f"{self.portfolio} {self.name} Strategy"
 
 
-class StrategyTarget(models.Model):
+class Target(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     strategy = models.ForeignKey(
         Strategy, related_name="targets", on_delete=models.CASCADE
@@ -33,16 +33,17 @@ class StrategyTarget(models.Model):
             return f"{self.strategy} - {self.portfolio}"
 
 
-class StrategyChange(models.Model):
+class TargetChange(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    target = models.ForeignKey(
-        StrategyTarget, related_name="changes", on_delete=models.CASCADE
+    strategy = models.ForeignKey(
+        Strategy, related_name="changes", on_delete=models.CASCADE
     )
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     change = models.FloatField()
-    timestamp = models.DateField()
+    timestamp = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.target.asset} - {self.change} - {self.timestamp}"
+        return f"{self.asset} - {self.change} - {self.timestamp}"
 
 
 class StrategyUI(models.Model):

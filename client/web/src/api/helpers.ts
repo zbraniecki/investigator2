@@ -10,7 +10,7 @@ export async function createEntry<E>(
   path: string,
   { token, input }: { token: string; input: Omit<E, "pk"> }
 ): Promise<E> {
-  const data = await fetch(`${BASE_URL}user/transactions/`, {
+  const data = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

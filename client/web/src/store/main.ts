@@ -34,7 +34,10 @@ function saveToLocalStorage(state: any) {
   localStorage.setItem("lightMode", state.ui.lightMode);
   localStorage.setItem("info-display-mode", state.ui.infoDisplayMode);
   localStorage.setItem("rows-per-page-option", state.ui.rowsPerPageOption);
-  localStorage.setItem("portfolio-inline-quantity-transaction-type", state.ui.portfolioInlineQuantityTransactionType);
+  localStorage.setItem(
+    "portfolio-inline-quantity-transaction-type",
+    state.ui.portfolioInlineQuantityTransactionType
+  );
   if (state.user.session.token) {
     localStorage.setItem("token", state.user.session.token);
     localStorage.setItem("user_pk", state.user.session.user_pk);

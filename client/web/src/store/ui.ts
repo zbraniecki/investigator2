@@ -24,8 +24,8 @@ const uiSlice = createSlice({
     portfolioInlineQuantityTransactionType: getFromLocalStorage(
       "portfolio-inline-quantity-transaction-type",
       "enum",
-      TransactionType.Buy,
-    )
+      TransactionType.Buy
+    ),
   },
   reducers: {
     setLightMode: (state, { payload }: { payload: LightMode }) => {
@@ -47,7 +47,8 @@ const uiSlice = createSlice({
 export const getLightMode = (state: any) => state.ui.lightMode;
 export const getInfoDisplayMode = (state: any) => state.ui.infoDisplayMode;
 export const getRowsPerPageOption = (state: any) => state.ui.rowsPerPageOption;
-export const getPortfolioInlineQuantityTransactionType = (state: any) => state.ui.portfolioInlineQuantityTransactionType;
+export const getPortfolioInlineQuantityTransactionType = (state: any) =>
+  state.ui.portfolioInlineQuantityTransactionType;
 
 export const { setLightMode, setInfoDisplayMode, setRowsPerPageOption } =
   uiSlice.actions;

@@ -1,32 +1,31 @@
 from django.contrib import admin
-from .models import Strategy, StrategyTarget, StrategyChange
+from .models import Strategy, Target, TargetChange
 
 
 def percent(input):
     return "{:.2%}".format(input)
 
 
-class StrategyChangeTabularInline(admin.TabularInline):
-    model = StrategyChange
+class TargetChangeTabularInline(admin.TabularInline):
+    model = TargetChange
     fields = ("timestamp", "change")
     ordering = ("-timestamp",)
 
 
-class StrategyTargetTabularInline(admin.TabularInline):
-    model = StrategyTarget
+class TargetTabularInline(admin.TabularInline):
+    model = Target
     fields = ("asset", "portfolio", "percent")
     ordering = ("-percent",)
 
 
 @admin.register(Strategy)
 class StrategyAdmin(admin.ModelAdmin):
-    inlines = [StrategyTargetTabularInline]
+    inlines = [TargetTabularInline, TargetChangeTabularInline]
     # list_display = ["strategy", "timestamp"]
 
 
-@admin.register(StrategyTarget)
-class StrategyTargetAdmin(admin.ModelAdmin):
-    inlines = [StrategyChangeTabularInline]
+@admin.register(Target)
+class TargetAdmin(admin.ModelAdmin):
     list_display = ["asset", "portfolio", "perc", "strategy"]
     ordering = ("asset",)
 
@@ -34,20 +33,14 @@ class StrategyTargetAdmin(admin.ModelAdmin):
         return percent(obj.percent)
 
 
-@admin.register(StrategyChange)
-class StrategyChangeAdmin(admin.ModelAdmin):
+@admin.register(TargetChange)
+class TargetChangeAdmin(admin.ModelAdmin):
     list_display = ["timestamp", "asset", "perc", "strategy"]
     list_filter = (
         "timestamp",
-        "target__asset",
+        "asset",
     )
-    ordering = ("-timestamp", "target__asset")
-
-    def strategy(self, obj):
-        return obj.target.strategy
-
-    def asset(self, obj):
-        return obj.target.asset
+    ordering = ("-timestamp", "asset")
 
     def perc(self, obj):
         return percent(obj.change)

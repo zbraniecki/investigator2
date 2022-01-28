@@ -20,9 +20,10 @@ import {
   getHoldings,
   getAccounts,
   getAssets,
-  getPublicWatchlists,
   getServices,
   getStrategies,
+  getTargets,
+  getTargetChanges,
 } from "../../store";
 import { Watchlist } from "../../types";
 import {
@@ -49,6 +50,7 @@ const baseTableMeta: BaseTableMeta = {
       sortDirection: SortDirection.Desc,
       width: "15%",
       formatter: Formatter.Percent,
+      editable: true,
     },
     current: {
       label: "Current",
@@ -117,6 +119,8 @@ export function Strategy() {
   const assets = useSelector(getAssets);
   const accounts = useSelector(getAccounts);
   const strategies = useSelector(getStrategies);
+  const targets = useSelector(getTargets);
+  const targetChanges = useSelector(getTargetChanges);
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
   const holdings = useSelector(getHoldings);
@@ -127,6 +131,8 @@ export function Strategy() {
   const ready =
     Object.keys(strategies).length > 0 &&
     Object.keys(users).length > 0 &&
+    Object.keys(targets).length > 0 &&
+    Object.keys(targetChanges).length > 0 &&
     session.user_pk;
 
   if (ready) {
@@ -147,6 +153,8 @@ export function Strategy() {
     const data = prepareStrategyTableData(
       id,
       strategies,
+      targets,
+      targetChanges,
       portfolios,
       holdings,
       assets,
