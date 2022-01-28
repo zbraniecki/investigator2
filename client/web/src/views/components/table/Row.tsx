@@ -11,10 +11,10 @@ import { StyledRowData } from "./data/Row";
 import {
   getSession,
   getHoldings,
-  getAccounts,
   updateHoldingThunk,
   createTransactionThunk,
-} from "../../../store/user";
+  getPortfolioInlineQuantityTransactionType,
+} from "../../../store";
 import { TransactionType } from "../../../types";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
@@ -30,7 +30,7 @@ export function Row({ id, data, tableMeta }: Props) {
   const [open, setOpen] = React.useState(false);
   const session = useSelector(getSession);
   const holdings = useSelector(getHoldings);
-  const accounts = useSelector(getAccounts);
+  const portfolioInlineQuantityTransactionType = useSelector(getPortfolioInlineQuantityTransactionType);
   const outletContext = getOutletContext();
 
   const dispatch = useDispatch();
@@ -41,6 +41,10 @@ export function Row({ id, data, tableMeta }: Props) {
     const holding = holdings[value];
     const diffQuantity = quantity - holding.quantity;
 
+    let type = portfolioInlineQuantityTransactionType;
+    if (type === TransactionType.Buy && diffQuantity < 0) {
+      type = TransactionType.Sell;
+    }
     return Promise.all([
       dispatch(
         createTransactionThunk({
@@ -48,7 +52,7 @@ export function Row({ id, data, tableMeta }: Props) {
           input: {
             account: holding.account,
             asset: holding.asset,
-            type: TransactionType.Interest,
+            type,
             quantity: diffQuantity,
             timestamp: new Date(),
           },
@@ -140,8 +144,8 @@ export function Row({ id, data, tableMeta }: Props) {
                   column.key === "name"
                     ? handleAssetOpen
                     : column.key === "account"
-                    ? handleHoldingOpen
-                    : undefined
+                      ? handleHoldingOpen
+                      : undefined
                 }
               />
             );

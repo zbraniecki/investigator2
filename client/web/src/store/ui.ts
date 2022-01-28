@@ -5,6 +5,7 @@ import {
   InfoDisplayMode,
   RowsPerPageOption,
 } from "../components/settings";
+import { TransactionType } from "../types";
 
 const uiSlice = createSlice({
   name: "ui",
@@ -12,7 +13,7 @@ const uiSlice = createSlice({
     lightMode: getFromLocalStorage("lightMode", "string", LightMode.Automatic),
     infoDisplayMode: getFromLocalStorage(
       "info-display-mode",
-      "string",
+      "enum",
       InfoDisplayMode.ShowAll
     ),
     rowsPerPageOption: getFromLocalStorage(
@@ -20,6 +21,11 @@ const uiSlice = createSlice({
       "number",
       RowsPerPageOption.Count30
     ),
+    portfolioInlineQuantityTransactionType: getFromLocalStorage(
+      "portfolio-inline-quantity-transaction-type",
+      "enum",
+      TransactionType.Buy,
+    )
   },
   reducers: {
     setLightMode: (state, { payload }: { payload: LightMode }) => {
@@ -41,6 +47,7 @@ const uiSlice = createSlice({
 export const getLightMode = (state: any) => state.ui.lightMode;
 export const getInfoDisplayMode = (state: any) => state.ui.infoDisplayMode;
 export const getRowsPerPageOption = (state: any) => state.ui.rowsPerPageOption;
+export const getPortfolioInlineQuantityTransactionType = (state: any) => state.ui.portfolioInlineQuantityTransactionType;
 
 export const { setLightMode, setInfoDisplayMode, setRowsPerPageOption } =
   uiSlice.actions;

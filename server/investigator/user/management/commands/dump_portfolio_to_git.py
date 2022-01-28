@@ -72,7 +72,10 @@ class Command(BaseCommand):
         path = kwargs["path"]
         user = User.objects.get(username="zbraniecki")
         holdings = Holding.objects.filter(account__owner=user).order_by(
-            "account__service__provider__id", "-quantity", "asset__symbol"
+            "account__service__provider__id",
+            "asset__symbol",
+            "-quantity",
+            "asset__symbol",
         )
 
         result = []
