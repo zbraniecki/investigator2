@@ -72,8 +72,13 @@ function computeHeaderData(
         : 0),
     0
   );
+  const target = data.reduce(
+    (total, curr) => total + (curr.cells.target ?? 0),
+    0
+  );
   const cells = {
     deltaUsd,
+    target: target === 1.0 ? undefined : target,
     deviation,
   };
   return cells;
