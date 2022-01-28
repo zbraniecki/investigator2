@@ -125,7 +125,7 @@ export function Row({ id, data, tableMeta }: Props) {
       }
       case "target": {
         const tid = data.cells.id.value;
-        let target = targets[tid];
+        const target = targets[tid];
         return handleTargetUpdate(dispatch, session.token, target, value);
       }
       default: {

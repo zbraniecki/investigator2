@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from investigator.strategy.models import (
     Strategy,
-    StrategyChange,
-    StrategyTarget,
+    TargetChange,
+    Target,
 )
 from investigator.user.models import (
     User,
@@ -62,7 +62,7 @@ class Command(BaseCommand):
         strat = Strategy.objects.get(owner=user)
 
         result = []
-        for target in strat.targets.all().order_by("-percent"):
+        for target in strat.targets.all().order_by("asset__symbol"):
             contains = []
             for asset in target.contains.all().order_by("symbol"):
                 contains.append(asset.symbol)
