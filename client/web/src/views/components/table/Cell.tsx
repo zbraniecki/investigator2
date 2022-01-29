@@ -40,7 +40,7 @@ export function Cell({
     : "";
 
   const sx: Record<string, any> = {};
-  if (data?.color) {
+  if (showValue && data?.color) {
     sx.color = data.color;
   }
   return (

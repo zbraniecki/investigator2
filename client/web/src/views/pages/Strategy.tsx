@@ -58,6 +58,7 @@ const baseTableMeta: BaseTableMeta = {
       sortDirection: SortDirection.Desc,
       width: "auto",
       formatter: Formatter.Percent,
+      sensitive: true,
     },
     deviation: {
       label: "Deviation",
@@ -65,6 +66,7 @@ const baseTableMeta: BaseTableMeta = {
       sortDirection: SortDirection.Asc,
       width: "10%",
       formatter: Formatter.Percent,
+      sensitive: true,
     },
     delta: {
       label: "Delta",
@@ -72,6 +74,7 @@ const baseTableMeta: BaseTableMeta = {
       sortDirection: SortDirection.Asc,
       width: "10%",
       formatter: Formatter.Percent,
+      sensitive: true,
     },
     deltaUsd: {
       label: "USD Delta",
