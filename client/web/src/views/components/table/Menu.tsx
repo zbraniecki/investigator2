@@ -26,9 +26,8 @@ export function TableMenu({
   tableMeta,
   handleColumnVisibilityChange,
 }: Props) {
-  const handleCheckedChange = (event: any) => {
-    const key = event.currentTarget.value;
-    handleColumnVisibilityChange(key);
+  const handleCheckedChange = (columnId: string) => {
+    handleColumnVisibilityChange(columnId);
   };
 
   return (
@@ -77,6 +76,7 @@ export function TableMenu({
             sx={{
               display: "flex",
             }}
+            onClick={() => handleCheckedChange(key)}
           >
             <ListItemText sx={{ minWidth: "100px", flex: 1 }}>
               {column.label}
@@ -91,10 +91,8 @@ export function TableMenu({
               }}
             >
               <Checkbox
-                value={key}
                 checked={visible}
                 disabled={disabled}
-                onChange={handleCheckedChange}
               />
             </ListItemIcon>
           </MenuItem>

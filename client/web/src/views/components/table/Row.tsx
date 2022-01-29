@@ -70,7 +70,7 @@ const handleTargetUpdate = (
 ): Promise<any> => {
   const diffPercent = percent - target.percent;
 
-  //XXX: Check if a target change for today exists and if so, just update it.
+  // XXX: Check if a target change for today exists and if so, just update it.
   return Promise.all([
     dispatch(
       createTargetChangeThunk({
@@ -211,8 +211,8 @@ export function Row({ id, data, tableMeta }: Props) {
                   column.key === "name"
                     ? handleAssetOpen
                     : column.key === "account"
-                      ? handleHoldingOpen
-                      : undefined
+                    ? handleHoldingOpen
+                    : undefined
                 }
               />
             );
