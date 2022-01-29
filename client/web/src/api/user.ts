@@ -5,19 +5,23 @@ import { Watchlist, Portfolio, Account, User } from "../types";
 
 const fetchPortfolios = fetchEntries.bind(
   undefined,
-  "user/portfolios/"
+  "user/portfolios/",
+  undefined
 ) as fetchAuthEntriesType<Portfolio>;
 const fetchAccounts = fetchEntries.bind(
   undefined,
-  "user/accounts/"
+  "user/accounts/",
+  undefined
 ) as fetchAuthEntriesType<Account>;
 const fetchWatchlists = fetchEntries.bind(
   undefined,
-  "user/watchlists/"
+  "user/watchlists/",
+  undefined
 ) as fetchAuthEntriesType<Watchlist>;
 const fetchUsers = fetchEntries.bind(
   undefined,
-  "user/users/"
+  "user/users/",
+  undefined
 ) as fetchAuthEntriesType<User>;
 
 export const fetchPortfoliosThunk = makeAsyncThunk(

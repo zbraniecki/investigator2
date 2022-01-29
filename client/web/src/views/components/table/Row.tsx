@@ -12,13 +12,15 @@ import {
   getSession,
   getHoldings,
   getTargets,
+  getTargetChanges,
   updateHoldingThunk,
   updateTargetThunk,
   createTransactionThunk,
   createTargetChangeThunk,
   getPortfolioInlineQuantityTransactionType,
+  updateTargetChangeThunk,
 } from "../../../store";
-import { Holding, TransactionType, Strategy, Target } from "../../../types";
+import { Holding, TransactionType, Target, TargetChange } from "../../../types";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 import { getOutletContext } from "../../ui/Content";
@@ -66,14 +68,27 @@ const handleTargetUpdate = (
   dispatch: any,
   token: string,
   target: Target,
-  percent: number
+  percent: number,
+  targetChanges: Record<string, TargetChange>
 ): Promise<any> => {
   const diffPercent = percent - target.percent;
 
-  // XXX: Check if a target change for today exists and if so, just update it.
-  return Promise.all([
-    dispatch(
-      createTargetChangeThunk({
+  const now = new Date();
+  let subset = Object.values(targetChanges).filter(
+    (tc) => tc.strategy === target.strategy && tc.asset === target.asset
+  );
+  let existing = subset.find(
+    (tc) => Math.abs(now.getTime() - tc.timestamp.getTime()) < 60 * 60 * 1000
+  ); // 1 hour
+
+  let tc = existing
+    ? updateTargetChangeThunk({
+        token,
+        pk: existing.pk,
+        change: existing.change + diffPercent,
+        timestamp: new Date(),
+      })
+    : createTargetChangeThunk({
         token,
         input: {
           strategy: target.strategy,
@@ -81,8 +96,10 @@ const handleTargetUpdate = (
           change: diffPercent,
           timestamp: new Date(),
         },
-      })
-    ),
+      });
+
+  return Promise.all([
+    dispatch(tc),
     dispatch(
       updateTargetThunk({
         token,
@@ -103,6 +120,7 @@ export function Row({ id, data, tableMeta }: Props) {
   const session = useSelector(getSession);
   const holdings = useSelector(getHoldings);
   const targets = useSelector(getTargets);
+  const targetChanges = useSelector(getTargetChanges);
   const portfolioInlineQuantityTransactionType = useSelector(
     getPortfolioInlineQuantityTransactionType
   );
@@ -127,7 +145,13 @@ export function Row({ id, data, tableMeta }: Props) {
       case "target": {
         const tid = data.cells.id.value;
         const target = targets[tid];
-        return handleTargetUpdate(dispatch, session.token, target, value);
+        return handleTargetUpdate(
+          dispatch,
+          session.token,
+          target,
+          value,
+          targetChanges
+        );
       }
       default: {
         return Promise.resolve();

@@ -9,7 +9,11 @@ import {
 import { logoutThunk } from "./user";
 import { Strategy, Target, TargetChange } from "../types";
 import { setFetchEntitiesReducer } from "./helpers";
-import { updateTarget, createTargetChange } from "../api/strategy";
+import {
+  updateTarget,
+  createTargetChange,
+  updateTargetChange,
+} from "../api/strategy";
 
 export const updateTargetThunk = createAsyncThunk(
   "strategy/updateTarget",
@@ -19,6 +23,11 @@ export const updateTargetThunk = createAsyncThunk(
 export const createTargetChangeThunk = createAsyncThunk(
   "strategy/createTargetChange",
   createTargetChange
+);
+
+export const updateTargetChangeThunk = createAsyncThunk(
+  "strategy/updateTargetChange",
+  updateTargetChange
 );
 
 interface StrategyState {
@@ -53,7 +62,13 @@ const strategySlice = createSlice({
       state.targets[pk].percent = percent;
     });
     builder.addCase(createTargetChangeThunk.fulfilled, (state, action) => {
-      state.changes[action.payload.pk] = action.payload;
+      let item = action.payload;
+      item.timestamp = new Date(item.timestamp);
+      state.changes[action.payload.pk] = item;
+    });
+    builder.addCase(updateTargetChangeThunk.fulfilled, (state, action) => {
+      state.changes[action.payload.pk].change = action.payload.change;
+      state.changes[action.payload.pk].timestamp = action.payload.timestamp;
     });
   },
 });

@@ -22,6 +22,8 @@ class TargetSerializer(serializers.ModelSerializer):
 
 
 class TargetChangeSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField(format="iso-8601")
+
     class Meta:
         model = TargetChange
         fields = [

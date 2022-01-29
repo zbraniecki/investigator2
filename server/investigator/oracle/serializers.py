@@ -8,7 +8,7 @@ from .dynamic_lists import get_dynamic_assets
 
 class AssetInfoSerializer(serializers.ModelSerializer):
     base = serializers.SerializerMethodField("get_base")
-    last_updated = serializers.SerializerMethodField("get_last_updated")
+    last_updated = serializers.DateTimeField(format="iso-8601")
 
     class Meta:
         model = Asset
@@ -33,9 +33,6 @@ class AssetInfoSerializer(serializers.ModelSerializer):
 
     def get_base(self, obj):
         return obj.base.symbol if obj.base else None
-
-    def get_last_updated(self, obj):
-        return obj.last_updated.isoformat() if obj.last_updated else None
 
 
 class AssetSerializer(serializers.ModelSerializer):

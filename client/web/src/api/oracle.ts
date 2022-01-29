@@ -7,23 +7,28 @@ import { Asset, Watchlist, Tag, Category, Service } from "../types";
 
 const fetchAssets = fetchEntries.bind(
   undefined,
-  "oracle/assets/"
+  "oracle/assets/",
+  undefined
 ) as fetchPublicEntriesType<Asset>;
 const fetchPublicWatchlists = fetchEntries.bind(
   undefined,
-  "oracle/watchlists/"
+  "oracle/watchlists/",
+  undefined
 ) as fetchPublicEntriesType<Watchlist>;
 const fetchTags = fetchEntries.bind(
   undefined,
-  "oracle/tags/"
+  "oracle/tags/",
+  undefined
 ) as fetchPublicEntriesType<Tag>;
 const fetchCategories = fetchEntries.bind(
   undefined,
-  "oracle/categories/"
+  "oracle/categories/",
+  undefined
 ) as fetchPublicEntriesType<Category>;
 const fetchServices = fetchEntries.bind(
   undefined,
-  "oracle/services/"
+  "oracle/services/",
+  undefined
 ) as fetchPublicEntriesType<Service>;
 
 export const fetchAssetsThunk = makeAsyncThunk(

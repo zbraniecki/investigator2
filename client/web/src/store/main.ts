@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 
 import uiReducer from "./ui";
 import userReducer from "./user";
@@ -54,6 +54,10 @@ const store = configureStore({
     oracle: oracleReducer,
     strategy: strategyReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false, // need it to silence Date warning
+    }),
 });
 
 store.subscribe(() => saveToLocalStorage(store.getState()));

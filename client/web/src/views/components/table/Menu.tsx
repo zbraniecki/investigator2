@@ -90,10 +90,7 @@ export function TableMenu({
                 flexDirection: "row-reverse",
               }}
             >
-              <Checkbox
-                checked={visible}
-                disabled={disabled}
-              />
+              <Checkbox checked={visible} disabled={disabled} />
             </ListItemIcon>
           </MenuItem>
         );

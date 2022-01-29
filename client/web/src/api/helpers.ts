@@ -36,6 +36,7 @@ export type fetchPublicEntriesType<E> = (input?: {
 
 export const fetchEntries = async <E>(
   path: string,
+  converters?: Record<string, (input: any) => any>,
   params?: { token?: string; args?: Args }
 ): Promise<E[]> => {
   const headers: Record<string, string> = {
@@ -53,6 +54,16 @@ export const fetchEntries = async <E>(
     headers,
   });
   const resp = await data.json();
+
+  if (converters) {
+    for (const key in converters) {
+      for (const item of resp) {
+        if (item.hasOwnProperty(key)) {
+          item[key] = converters[key](item[key]);
+        }
+      }
+    }
+  }
   return resp;
 };
 

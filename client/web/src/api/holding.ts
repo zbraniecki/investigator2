@@ -10,12 +10,14 @@ import { Holding } from "../types";
 
 const fetchHoldings = fetchEntries.bind(
   undefined,
-  "user/holdings/"
+  "user/holdings/",
+  undefined
 ) as fetchAuthEntriesType<Holding>;
 
 export const createHolding = createEntry.bind(
   undefined,
-  "user/holdings/"
+  "user/holdings/",
+  undefined
 ) as createEntryType<Holding>;
 
 export const fetchHoldingsThunk = makeAsyncThunk(
