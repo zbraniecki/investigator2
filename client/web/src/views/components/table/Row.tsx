@@ -74,14 +74,15 @@ const handleTargetUpdate = (
   const diffPercent = percent - target.percent;
 
   const now = new Date();
-  let subset = Object.values(targetChanges).filter(
+  const subset = Object.values(targetChanges).filter(
     (tc) => tc.strategy === target.strategy && tc.asset === target.asset
   );
-  let existing = subset.find(
-    (tc) => Math.abs(now.getTime() - tc.timestamp.getTime()) < 60 * 60 * 1000
-  ); // 1 hour
+  const existing = subset.find(
+    (tc) =>
+      Math.abs(now.getTime() - tc.timestamp.getTime()) < 5 * 60 * 60 * 1000
+  ); // 5 hours
 
-  let tc = existing
+  const tc = existing
     ? updateTargetChangeThunk({
         token,
         pk: existing.pk,

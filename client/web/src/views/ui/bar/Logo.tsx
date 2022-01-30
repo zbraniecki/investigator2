@@ -12,18 +12,20 @@ export function Logo({ colors }: Props) {
     <>
       <Avatar
         sx={{
-          marginLeft: "10px",
-          marginRight: "10px",
+          marginLeft: "max(1vh, 0.2em)",
+          marginRight: "max(1vh, 0.2em)",
           bgcolor: colors.background,
           border: "1px solid",
           borderColor: colors.primary,
+          height: "max(6vh, 2em)",
+          width: "calc(max(6vh, 2em) - 0.2em)",
         }}
         variant="rounded"
       >
         <SsidChartIcon
-          fontSize="large"
           sx={{
             color: colors.primary,
+            fontSize: "max(5.4vh, 1.8em)",
           }}
         />
       </Avatar>
@@ -35,7 +37,10 @@ export function Logo({ colors }: Props) {
           color: colors.primary,
           borderBottom: "1px solid",
           borderColor: colors.primary,
-          lineHeight: 1.6,
+          fontSize: "max(2.6vh, 1.2em)",
+          "@media (max-width: 20em)": {
+            display: "none",
+          },
         }}
       >
         Istare Alma

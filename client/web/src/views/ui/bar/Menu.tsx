@@ -93,7 +93,7 @@ export function AccountMenu({
   return (
     <>
       <Tooltip title="Account settings">
-        <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
+        <IconButton onClick={handleClick} size="small">
           <Avatar sx={{ width: 32, height: 32, bgcolor: colors.primary }}>
             {accountIcon}
           </Avatar>

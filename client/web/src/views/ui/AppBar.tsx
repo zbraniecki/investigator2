@@ -43,7 +43,9 @@ export function InvestigatorAppBar({ lightModeName, setSettingsOpen }: Props) {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        padding: "0.5rem 0",
+        padding: "1vh 0",
+        height: "8vh",
+        minHeight: "3em",
         zIndex: 10,
       }}
     >

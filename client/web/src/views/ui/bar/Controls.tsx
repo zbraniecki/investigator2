@@ -75,7 +75,6 @@ export function Controls({ lightModeName, setSettingsOpen, colors }: Props) {
         <div>
           <IconButton
             disabled={!session.token || refreshInProgress}
-            sx={{ ml: 2 }}
             onClick={handleRefresh}
           >
             {refreshInProgress ? (

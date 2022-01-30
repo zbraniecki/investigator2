@@ -62,7 +62,7 @@ const strategySlice = createSlice({
       state.targets[pk].percent = percent;
     });
     builder.addCase(createTargetChangeThunk.fulfilled, (state, action) => {
-      let item = action.payload;
+      const item = action.payload;
       item.timestamp = new Date(item.timestamp);
       state.changes[action.payload.pk] = item;
     });
