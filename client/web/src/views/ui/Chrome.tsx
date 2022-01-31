@@ -20,11 +20,12 @@ import {
 
 export function Chrome() {
   const [dialogState, setDialogState] = React.useState({
-    open: false,
+    type: DialogType.None,
   } as DialogState);
 
   const updateDialogState = (state: DialogState) => {
     const newState = mergeDialogState(dialogState, state);
+    console.log(state);
     setDialogState(newState);
   };
 

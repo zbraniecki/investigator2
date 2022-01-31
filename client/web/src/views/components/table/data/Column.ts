@@ -34,6 +34,7 @@ export interface BaseColumnMeta {
   formatter?: Formatter;
   editable?: boolean;
   sensitive?: boolean;
+  modal?: (rowId: string, updateDialogState: any) => void;
 }
 
 export interface ColumnSettings {
@@ -51,6 +52,7 @@ export interface ColumnMeta {
   editable: boolean;
   visible: boolean;
   sensitive: boolean;
+  modal: ((rowId: string, updateDialogState: any) => void) | null;
 }
 
 export interface SortColumn {
@@ -109,5 +111,6 @@ export function buildColumnMeta(
     editable: base.editable !== undefined ? base.editable : false,
     visible: settings?.visible !== undefined ? settings.visible : false,
     sensitive: base.sensitive || false,
+    modal: base.modal || null,
   };
 }

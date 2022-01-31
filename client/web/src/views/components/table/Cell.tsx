@@ -44,7 +44,12 @@ export function Cell({
     sx.color = data.color;
   }
   return (
-    <TableCell key={id} onClick={onClick} align={align} sx={{ width }}>
+    <TableCell
+      key={id}
+      onClick={onClick}
+      align={align}
+      sx={{ width, cursor: onClick ? "pointer" : "auto" }}
+    >
       <Typography sx={sx}>{displayValue}</Typography>
     </TableCell>
   );

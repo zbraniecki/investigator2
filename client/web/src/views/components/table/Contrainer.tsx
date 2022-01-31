@@ -34,7 +34,7 @@ export function TableContainer({
 
   const tableMeta = React.useMemo(
     () => buildTableMeta(baseMeta, tableSettings),
-    [buildTableMeta, baseMeta, tableSettings]
+    [baseMeta, tableSettings]
   );
 
   const setFilter = (query: Record<string, string> | undefined) => {

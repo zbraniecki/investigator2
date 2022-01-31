@@ -67,6 +67,7 @@ export function ModalDialog({ state, updateState }: Props) {
       sx={{ "& .MuiDialog-paper": { width: "80%", maxHeight: 435 } }}
       maxWidth="xs"
       open={resolvedState.type !== DialogType.None}
+      onClose={handleCloseModal}
     >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>{content}</DialogContent>

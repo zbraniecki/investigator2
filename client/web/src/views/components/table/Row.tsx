@@ -221,11 +221,12 @@ export function Row({ id, data, tableMeta }: Props) {
                 />
               );
             }
+            const rowId = data.cells.id?.value as string;
             return (
               <Cell
                 key={key}
                 column={column.key}
-                rowId={data.cells.id?.value as string}
+                rowId={rowId}
                 id={key}
                 data={cell}
                 align={column.align}
@@ -233,10 +234,12 @@ export function Row({ id, data, tableMeta }: Props) {
                 formatter={column.formatter}
                 showValue={!hideValue}
                 onClick={
-                  column.key === "name"
-                    ? handleAssetOpen
-                    : column.key === "account"
-                    ? handleHoldingOpen
+                  column.modal
+                    ? column.modal.bind(
+                        undefined,
+                        rowId,
+                        outletContext.updateDialogState
+                      )
                     : undefined
                 }
               />
