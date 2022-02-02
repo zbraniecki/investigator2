@@ -1,4 +1,4 @@
-// import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PieChartIcon from "@mui/icons-material/PieChart";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
@@ -6,7 +6,7 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 // import { Dashboard } from "../../pages/Dashboard";
 import { Watchlists } from "../pages/Watchlists";
 import { Portfolios } from "../pages/Portfolios";
-// import { Wallets } from "../../pages/Wallets";
+import { Accounts } from "../pages/Accounts";
 import { Strategy } from "../pages/Strategy";
 
 export interface MenuItem {
@@ -42,11 +42,12 @@ const menuItems: Array<MenuItem> = [
     icon: <PieChartIcon />,
     element: <Strategy />,
   },
-  // {
-  //   id: "wallets",
-  //   icon: <AccountBalanceIcon />,
-  //   element: <Wallets />,
-  // },
+  {
+    id: "accounts",
+    paths: [":id"],
+    icon: <AccountBalanceIcon />,
+    element: <Accounts />,
+  },
 ];
 
 export function getMenuItems(): MenuItem[] {

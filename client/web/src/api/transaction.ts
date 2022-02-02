@@ -3,5 +3,5 @@ import { Transaction } from "../types";
 
 export const createTransaction = createEntry.bind(
   undefined,
-  "user/transaction/"
+  "user/transactions/"
 ) as createEntryType<Transaction>;
