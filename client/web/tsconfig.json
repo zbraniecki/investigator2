@@ -12,7 +12,9 @@
     "skipLibCheck": true,
     "strictBindCallApply": true,
     "downlevelIteration": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "target": "es2017",
+    "moduleResolution": "node",
   },
   "include": [
     "src/**/*"

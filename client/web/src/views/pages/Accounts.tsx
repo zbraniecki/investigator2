@@ -4,7 +4,6 @@ import {
   prepareAccountsTableData,
   computeAccountsTableDataStyle,
 } from "../../utils/service";
-import Box from '@mui/material/Box';
 import { Portfolio } from "../../types";
 import {
   getPortfolios,
@@ -29,13 +28,13 @@ const baseTableMeta: BaseTableMeta = {
   nested: true,
   showHeaders: true,
   columns: {
-    "account": {
+    account: {
       label: "Account",
       align: CellAlign.Left,
       sortDirection: SortDirection.Asc,
       width: "15%",
     },
-    "name": {
+    name: {
       label: "Name",
       align: CellAlign.Left,
       sortDirection: SortDirection.Asc,

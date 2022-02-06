@@ -10,6 +10,80 @@ import {
   StyledRowData,
   newCellData,
 } from "../views/components/table/data/Row";
+import { HoldingsPage } from "../views/ui/modal/tutorial/pages/Holdings";
+import { objectTraps } from "../../../../../../../../projects/investigator2/client/web/node_modules/immer/dist/internal";
+
+export function collectPortfolioHoldings(
+  portfolio: Portfolio,
+  portfolios: Record<string, Portfolio>,
+  assets: Record<string, Asset>,
+  accounts: Record<string, Account>,
+  holdings: Record<string, Holding>
+): Set<Holding> {
+  const result: Set<Holding> = new Set(
+    Object.values(portfolio.holdings).map((hid) => holdings[hid])
+  );
+
+  Object.values(portfolio.accounts).map((aid) => {
+    for (const hid of accounts[aid].holdings) {
+      result.add(holdings[hid]);
+    }
+  });
+
+  if (portfolio.tags.length > 0) {
+    Object.values(accounts).forEach((account) => {
+      account.holdings.forEach((hid) => {
+        const holding = holdings[hid];
+        const asset = assets[holding.asset];
+        if (portfolio.tags.includes(asset.asset_class)) {
+          result.add(holding);
+        }
+      });
+    });
+  }
+
+  Object.values(portfolio.portfolios).map((pid) => {
+    for (const hid of collectPortfolioHoldings(
+      portfolios[pid],
+      portfolios,
+      assets,
+      accounts,
+      holdings
+    )) {
+      result.add(hid);
+    }
+  });
+
+  return result;
+}
+
+export interface HoldingsGroup {
+  item: string;
+  children?: Array<HoldingsGroup>;
+}
+
+export function groupHoldings(
+  holdings: Set<Holding>,
+  column: string
+): Array<HoldingsGroup> {
+  const groups: Record<string, Array<Holding>> = {};
+
+  for (const holding of holdings) {
+    const aid = holding.account;
+    assert(aid);
+    if (!groups.hasOwnProperty(aid)) {
+      groups[aid] = [];
+    }
+    groups[aid].push(holding);
+  }
+
+  return Object.entries(groups).map(([aid, holdings]) => ({
+      item: aid,
+      children: holdings.map((holding) => ({
+          item: holding.pk,
+        })),
+    }));
+}
 
 export interface PortfolioTableRow extends RowData {
   cells: {

@@ -1,4 +1,5 @@
 import React from "react";
+import Decimal from "decimal.js-light";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import IconButton from "@mui/material/IconButton";
@@ -34,7 +35,7 @@ const handleQuantityUpdate = (
   quantity: number,
   inlineQuantityTransactionType: TransactionType
 ): Promise<any> => {
-  const diffQuantity = quantity - holding.quantity;
+  const diffQuantity = new Decimal(quantity).minus(holding.quantity).toNumber();
 
   let type = inlineQuantityTransactionType;
   if (type === TransactionType.Buy && diffQuantity < 0) {
@@ -86,7 +87,7 @@ const handleTargetUpdate = (
     ? updateTargetChangeThunk({
         token,
         pk: existing.pk,
-        change: existing.change + diffPercent,
+        change: new Decimal(existing.change).plus(diffPercent).toNumber(),
         timestamp: new Date(),
       })
     : createTargetChangeThunk({

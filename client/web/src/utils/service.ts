@@ -1,5 +1,16 @@
-import { Portfolio, Holding, Asset, Service, ServiceAsset, Account } from "../types";
-import { createPortfolioTableData } from "./portfolio";
+import {
+  Portfolio,
+  Holding,
+  Asset,
+  Service,
+  ServiceAsset,
+  Account,
+} from "../types";
+import {
+  createPortfolioTableData,
+  collectPortfolioHoldings,
+  groupHoldings,
+} from "./portfolio";
 import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
 import { TableMeta } from "../views/components/table/data/Table";
 import { CellAlign } from "../views/components/table/data/Column";
@@ -31,7 +42,7 @@ export function getServiceAsset(
 export interface AccountsTableRow extends RowData {
   cells: {
     id?: string;
-    wallet?: string;
+    account?: string;
     name?: string;
     symbol?: string;
     quantity?: number;
@@ -45,7 +56,7 @@ export interface AccountsTableRow extends RowData {
 export interface StyledAccountsTableRow extends StyledRowData {
   cells: {
     id?: CellData<string>;
-    wallet?: CellData<string>;
+    account?: CellData<string>;
     name?: CellData<string>;
     symbol?: CellData<string>;
     quantity?: CellData<number>;
@@ -58,41 +69,63 @@ export interface StyledAccountsTableRow extends StyledRowData {
 export function prepareAccountsTableData(
   pid: string,
   portfolios: Record<string, Portfolio>,
-  assetInfo: Record<string, Asset>,
+  assets: Record<string, Asset>,
   services: Record<string, Service>,
   accounts: Record<string, Account>,
   holdings: Record<string, Holding>
 ): AccountsTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);
-  if (Object.keys(assetInfo).length === 0) {
+  if (Object.keys(assets).length === 0) {
     return undefined;
   }
 
-  const data = createPortfolioTableData(
+  const ph = collectPortfolioHoldings(
     portfolio,
     portfolios,
-    assetInfo,
-    services,
+    assets,
     accounts,
-    holdings,
-    true
-  ) as AccountsTableRow;
-  console.log(data);
+    holdings
+  );
 
-  // if (data.children !== undefined) {
-  //   data.children = groupTableDataByColumn(
-  //     data.children,
-  //     "account",
-  //     [
-  //       { key: "name", strategy: GroupingStrategy.IfSame },
-  //       { key: "account", strategy: GroupingStrategy.IfSame },
-  //     ],
-  //     true
-  //   ) as AccountsTableRow[];
-  // }
+  const groups = groupHoldings(ph, "account");
 
-  return data;
+  return {
+    cells: {},
+    type: RowType.Asset,
+    children: groups.map((group) => {
+      const account = accounts[group.item];
+      let groupValue = 0;
+
+      const children = group.children?.map((item) => {
+        const holding = holdings[item.item];
+        const asset = assets[holding.asset];
+        const value = holding.quantity * asset.info.value;
+        groupValue += value;
+
+        return {
+          cells: {
+            id: holding.pk,
+            name: asset.name,
+            symbol: asset.symbol,
+            quantity: holding.quantity,
+            value,
+          },
+          type: RowType.Asset,
+        };
+      });
+
+      return {
+        cells: {
+          id: group.item,
+          account: account.name,
+          value: groupValue,
+        },
+        children,
+        type: RowType.Account,
+      };
+    }),
+  };
 }
 
 interface StylingColumnData {
@@ -115,7 +148,7 @@ export function computeAccountsTableDataStyle(
   const result: StyledAccountsTableRow = {
     cells: {
       id: newCellData(data.cells.id),
-      wallet: newCellData(data.cells.wallet),
+      account: newCellData(data.cells.account),
       name: newCellData(data.cells.name),
       quantity: newCellData(data.cells.quantity),
       value: newCellData(data.cells.value),

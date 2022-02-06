@@ -8,6 +8,7 @@ export interface CellData<T> {
 export enum RowType {
   Asset,
   Portfolio,
+  Account,
 }
 
 export interface RowData {
