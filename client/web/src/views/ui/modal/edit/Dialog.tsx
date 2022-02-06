@@ -20,7 +20,6 @@ import {
   getUsers,
   getAccounts,
   getAssets,
-  getTaxonomies,
   getServices,
   getPortfolios,
   getHoldings,
@@ -79,7 +78,6 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
   const session = useSelector(getSession);
   const users = useSelector(getUsers);
   const assets = useSelector(getAssets);
-  const taxonomies = useSelector(getTaxonomies);
   const accounts = useSelector(getAccounts);
   const portfolios = useSelector(getPortfolios);
   const holdings = useSelector(getHoldings);
@@ -98,7 +96,7 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
             account = a;
             holding = holdings[hid];
             asset = assets[holding.asset];
-            assetClass = taxonomies.tags[asset.asset_class];
+            assetClass = "foo";
             quantity = holding.quantity;
             break;
           }
@@ -109,7 +107,7 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
         const info = assets[state.value.asset];
         assert(info);
         asset = info;
-        assetClass = taxonomies.tags[asset.asset_class];
+        assetClass = "foo";
       }
       if (state.value?.account) {
         const info = accounts[state.value.account];
@@ -141,7 +139,6 @@ export function HoldingDialog({ state, updateDialogState }: Props) {
         account: state.editable?.account || false,
       },
       asset,
-      assetClass,
       account,
       holding,
       quantity,

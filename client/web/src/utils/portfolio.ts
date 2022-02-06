@@ -78,11 +78,11 @@ export function groupHoldings(
   }
 
   return Object.entries(groups).map(([aid, holdings]) => ({
-      item: aid,
-      children: holdings.map((holding) => ({
-          item: holding.pk,
-        })),
-    }));
+    item: aid,
+    children: holdings.map((holding) => ({
+      item: holding.pk,
+    })),
+  }));
 }
 
 export interface PortfolioTableRow extends RowData {

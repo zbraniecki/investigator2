@@ -36,15 +36,11 @@ class AssetInfoSerializer(serializers.ModelSerializer):
 
 
 class AssetSerializer(serializers.ModelSerializer):
-    tags = serializers.SerializerMethodField("get_tags")
     info = AssetInfoSerializer(source="*")
 
     class Meta:
         model = Asset
         fields = ["pk", "asset_class", "symbol", "name", "tags", "info"]
-
-    def get_tags(self, obj):
-        return [tag.__str__() for tag in obj.tags.all()]
 
 
 class ServiceSerializer(serializers.ModelSerializer):

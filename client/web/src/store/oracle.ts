@@ -16,20 +16,16 @@ interface OracleState {
   assets: Record<string, Asset>;
   services: Record<string, Service>;
   watchlists: Record<string, Watchlist>;
-  taxonomies: {
-    categories: Record<string, Category>;
-    tags: Record<string, Tag>;
-  };
+  categories: Record<string, Category>;
+  tags: Record<string, Tag>;
 }
 
 const initialState = {
   assets: {},
   services: {},
   watchlists: {},
-  taxonomies: {
-    categories: {},
-    tags: {},
-  },
+  categories: {},
+  tags: {},
 } as OracleState;
 
 const oracleSlice = createSlice({
@@ -62,6 +58,7 @@ export const getAssetUpdated = (state: any): Date =>
   new Date(state.oracle.assetUpdated);
 export const getServices = (state: any) => state.oracle.services;
 export const getPublicWatchlists = (state: any) => state.oracle.watchlists;
-export const getTaxonomies = (state: any) => state.oracle.taxonomies;
+export const getTags = (state: any) => state.oracle.tags;
+export const getCategories = (state: any) => state.oracle.categories;
 
 export default oracleSlice.reducer;

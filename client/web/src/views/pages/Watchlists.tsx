@@ -58,8 +58,8 @@ const baseTableMeta: BaseTableMeta = {
         console.log(rowId);
         updateDialogState({
           type: DialogType.Asset,
-          value: {
-            holding: rowId,
+          meta: {
+            asset: rowId,
           },
         });
       },
