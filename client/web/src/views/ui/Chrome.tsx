@@ -25,7 +25,6 @@ export function Chrome() {
 
   const updateDialogState = (state: DialogState) => {
     const newState = mergeDialogState(dialogState, state);
-    console.log(state);
     setDialogState(newState);
   };
 

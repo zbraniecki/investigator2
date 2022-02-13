@@ -88,6 +88,7 @@ export function groupHoldings(
 export interface PortfolioTableRow extends RowData {
   cells: {
     id?: string;
+    account_id?: string;
     asset?: string;
     name?: string;
     symbol?: string;
@@ -106,6 +107,7 @@ export interface PortfolioTableRow extends RowData {
 export interface StyledPortfolioTableRow extends StyledRowData {
   cells: {
     id?: CellData<string>;
+    account_id?: CellData<string>;
     asset?: CellData<string>;
     name?: CellData<string>;
     symbol?: CellData<string>;
@@ -226,6 +228,7 @@ export function buildPortfolioTableData(
           rows.push({
             cells: {
               id: holding.pk,
+              account_id: account?.pk,
               asset: asset.pk,
               name: asset.name,
               symbol: asset.symbol,
@@ -273,6 +276,7 @@ export function createPortfolioTableData(
     return {
       cells: {
         id: pk,
+        account_id: account?.pk,
         asset: asset.pk,
         name: asset.name,
         symbol: asset.symbol,
@@ -321,6 +325,7 @@ export function createPortfolioTableData(
           rows.push({
             cells: {
               id: holding.pk,
+              account_id: account?.pk,
               asset: asset.pk,
               name: asset.name,
               symbol: asset.symbol,
@@ -416,6 +421,7 @@ export function computePortfolioTableDataStyle(
   const result: StyledPortfolioTableRow = {
     cells: {
       id: newCellData(data.cells.id),
+      account_id: newCellData(data.cells.account_id),
       asset: newCellData(data.cells.asset),
       name: newCellData(data.cells.name),
       symbol: newCellData(data.cells.symbol),

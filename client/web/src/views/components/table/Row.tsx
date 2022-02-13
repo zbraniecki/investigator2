@@ -25,7 +25,6 @@ import { Holding, TransactionType, Target, TargetChange } from "../../../types";
 import { Table } from "./Table";
 import { Cell, EditableCell } from "./Cell";
 import { getOutletContext } from "../../ui/Content";
-import { DialogTab } from "../../ui/modal/edit/Dialog";
 import { assert } from "../../../utils/helpers";
 
 const handleQuantityUpdate = (
@@ -85,20 +84,20 @@ const handleTargetUpdate = (
 
   const tc = existing
     ? updateTargetChangeThunk({
-        token,
-        pk: existing.pk,
-        change: new Decimal(existing.change).plus(diffPercent).toNumber(),
-        timestamp: new Date(),
-      })
+      token,
+      pk: existing.pk,
+      change: new Decimal(existing.change).plus(diffPercent).toNumber(),
+      timestamp: new Date(),
+    })
     : createTargetChangeThunk({
-        token,
-        input: {
-          strategy: target.strategy,
-          asset: target.asset,
-          change: diffPercent,
-          timestamp: new Date(),
-        },
-      });
+      token,
+      input: {
+        strategy: target.strategy,
+        asset: target.asset,
+        change: diffPercent,
+        timestamp: new Date(),
+      },
+    });
 
   return Promise.all([
     dispatch(tc),
@@ -161,31 +160,6 @@ export function Row({ id, data, tableMeta }: Props) {
     }
   };
 
-  const handleAssetOpen = () => {
-    const { value } = data.cells.id;
-    outletContext.updateDialogState({
-      open: true,
-      selectedTab: DialogTab.Asset,
-      value: {
-        holding: value,
-      },
-    });
-  };
-
-  const handleHoldingOpen = () => {
-    const { value } = data.cells.id;
-    outletContext.updateDialogState({
-      open: true,
-      selectedTab: DialogTab.Holding,
-      value: {
-        holding: value,
-      },
-      editable: {
-        quantity: true,
-      },
-    });
-  };
-
   return (
     <>
       <TableRow key={id}>
@@ -223,10 +197,10 @@ export function Row({ id, data, tableMeta }: Props) {
                   onClick={
                     column.modal && rowId !== undefined
                       ? column.modal.bind(
-                          undefined,
-                          rowId,
-                          outletContext.updateDialogState
-                        )
+                        undefined,
+                        data.cells,
+                        outletContext.updateDialogState
+                      )
                       : undefined
                   }
                 />
@@ -246,10 +220,10 @@ export function Row({ id, data, tableMeta }: Props) {
                 onClick={
                   column.modal && rowId !== undefined
                     ? column.modal.bind(
-                        undefined,
-                        rowId,
-                        outletContext.updateDialogState
-                      )
+                      undefined,
+                      data.cells,
+                      outletContext.updateDialogState
+                    )
                     : undefined
                 }
               />

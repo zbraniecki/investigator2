@@ -11,7 +11,6 @@ import ShowChartIcon from "@mui/icons-material/ShowChart";
 import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import { useMatch, NavLink } from "react-router-dom";
 import { MenuItem } from "./Menu";
-import { DialogTab } from "./modal/edit/Dialog";
 
 interface Props {
   menuItems: Array<MenuItem>;
@@ -35,15 +34,15 @@ export default function InvestigatorDrawer({
   }
 
   const handleHoldingOpen = () => {
-    updateDialogState({
-      open: true,
-      editable: {
-        quantity: true,
-        asset: true,
-        account: true,
-      },
-      selectedTab: DialogTab.Holding,
-    });
+    // updateDialogState({
+    //   open: true,
+    //   editable: {
+    //     quantity: true,
+    //     asset: true,
+    //     account: true,
+    //   },
+    //   selectedTab: DialogTab.Holding,
+    // });
   };
 
   const actions = [

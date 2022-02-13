@@ -34,7 +34,7 @@ export interface BaseColumnMeta {
   formatter?: Formatter;
   editable?: boolean;
   sensitive?: boolean;
-  modal?: (rowId: string, updateDialogState: any) => void;
+  modal?: (cells: Record<string, any>, updateDialogState: any) => void;
 }
 
 export interface ColumnSettings {
@@ -52,7 +52,7 @@ export interface ColumnMeta {
   editable: boolean;
   visible: boolean;
   sensitive: boolean;
-  modal: ((rowId: string, updateDialogState: any) => void) | null;
+  modal: ((cells: Record<string, any>, updateDialogState: any) => void) | null;
 }
 
 export interface SortColumn {

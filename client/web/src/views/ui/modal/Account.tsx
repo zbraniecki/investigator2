@@ -1,119 +1,102 @@
 import React from "react";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
+import { orange } from "@mui/material/colors";
+import Chip from "@mui/material/Chip";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableHead from "@mui/material/TableHead";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import Stack from "@mui/material/Stack";
-import Chip from "@mui/material/Chip";
-import Slider from "@mui/material/Slider";
-import LinearProgress from "@mui/material/LinearProgress";
-import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
-import { orange } from "@mui/material/colors";
 import Link from "@mui/material/Link";
 import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
-import { Asset } from "../../../../../types";
-import { ResolvedDialogState } from "../Dialog";
+import Slider from "@mui/material/Slider";
+import LinearProgress from "@mui/material/LinearProgress";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Tooltip from "@mui/material/Tooltip";
+import {
+  Asset,
+  Tag,
+  Account,
+  Holding,
+  Service,
+  ServiceAsset,
+} from "../../../types";
+import { assert } from "../../../utils/helpers";
+import { currency, percent } from "../../../utils/formatters";
+import { DialogType } from "./Dialog";
 
-interface HeaderProps {
-  state: ResolvedDialogState;
+interface TitleProps {
+  account: Account;
+  onClose: any;
 }
 
-export function AssetHeader({ state }: HeaderProps) {
+export function AccountDialogTitle({ account, onClose }: TitleProps) {
   return (
-    <>
-      <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>
-        {state.asset?.symbol[0].toUpperCase()}
-      </Avatar>
-      <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Typography>{state.asset?.symbol.toUpperCase()}</Typography>
-        <Typography>{state.asset?.name}</Typography>
-        <Typography />
-      </Box>
+    <Stack direction="row">
+      <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>A</Avatar>
+      <Stack>
+        <Typography>{account.name}</Typography>
+      </Stack>
       <Box sx={{ flex: 1 }} />
-      <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Chip
-          avatar={<Avatar>#1</Avatar>}
-          label="crypto"
-          variant="outlined"
-          size="small"
-        />
-        <Stack>
-          <Typography sx={{ fontSize: "0.6em" }}>Owned: 0.4</Typography>
-          <Typography sx={{ fontSize: "0.6em" }}>Value: $26431.01</Typography>
-        </Stack>
-      </Box>
-    </>
+      <IconButton onClick={onClose}>
+        <CloseIcon />
+      </IconButton>
+    </Stack>
   );
 }
-interface Props {
-  handleHoldingClick: any;
-  handleAccountClick: any;
+
+interface ContentProps {
+  asset: Asset;
+  tags: Array<Tag>;
+  holdings: Array<Holding>;
+  accounts: Record<string, Account>;
+  services: Record<string, Service>;
+  updateState: any;
 }
 
-export function AssetContent({
-  handleHoldingClick,
-  handleAccountClick,
-}: Props) {
+export function AccountDialogContent({
+  asset,
+  tags,
+  holdings,
+  accounts,
+  services,
+  updateState,
+}: ContentProps) {
   const [notesContent, setNotesContent] = React.useState("");
-  const data = [
-    // {
-    //   label: "Price", value: {
-    //     current: 44301,
-    //     range: {
-    //       low: 43201,
-    //       high: 45921,
-    //     },
-    //     change: {
-    //       "1h": 0.1,
-    //       "24h": 0.1,
-    //       "7d": 0.1,
-    //       "30d": 0.1,
-    //     }
-    //   },
-    // },
-    // {
-    //   label: "Market Cap", value: {
-    //     current: 321231,
-    //     change: {
-    //       "24h": 0.2,
-    //     },
-    //   },
-    // },
-    // {
-    //   label: "Supply",
-    //   value: {
-    //     circulating: 10,
-    //     total: 10,
-    //     max: 10,
-    //   },
-    // },
-    // { label: "Inflation", value: 10 },
-    // { label: "Last Updated", value: 0.1 },
-    // { label: "Owned Value", value: [25400] },
-    // {
-    //   label: "Holdings", value: [
-    //     {
-    //       account: "Hodlnout",
-    //       value: 0.1,
-    //       apy: 0.072,
-    //     },
-    //     {
-    //       account: "BlockFi",
-    //       value: 0.02,
-    //       apy: 0.062,
-    //     },
-    //     {
-    //       account: "Celsius",
-    //       apy: 0.062,
-    //     }
-    //   ],
-    // },
-  ];
+
+  const handleAccountClick = () => {};
+  const handleHoldingClick = (holding: string) => {
+    updateState({
+      type: DialogType.Holding,
+      meta: {
+        holding,
+      },
+    });
+  };
+
+  const highLowPerc = Math.round(
+    ((asset.info.value - asset.info.low_24h) /
+      (asset.info.high_24h - asset.info.low_24h)) *
+      100
+  );
+
+  const supply =
+    asset.info.circulating_supply && asset.info.max_supply
+      ? Math.round(
+          (asset.info.circulating_supply / asset.info.max_supply) * 100
+        )
+      : undefined;
+
+  const inflation = undefined;
+
+  const lastUpdated = new Date(asset.info.last_updated);
 
   return (
     <>
@@ -131,7 +114,7 @@ export function AssetContent({
               variant="h4"
               sx={{ marginTop: "10px", textAlign: "center" }}
             >
-              $46520.21
+              {currency(asset.info.value)}
             </Typography>
             <Stack
               direction="row"
@@ -155,11 +138,11 @@ export function AssetContent({
                   color: "#666666",
                 }}
               >
-                $41000.00
+                {currency(asset.info.low_24h)}
               </Typography>
               <Slider
                 size="small"
-                value={33}
+                value={highLowPerc}
                 track={false}
                 disabled
                 sx={{ opacity: "0.8" }}
@@ -167,7 +150,7 @@ export function AssetContent({
               <Typography
                 sx={{ marginLeft: "10px", fontSize: "0.7em", color: "#666666" }}
               >
-                $47000.00
+                {currency(asset.info.high_24h)}
               </Typography>
             </Stack>
             <Stack
@@ -181,19 +164,19 @@ export function AssetContent({
               {[
                 {
                   label: "1h",
-                  value: "3.43%",
+                  value: percent(asset.info.price_change_percentage_1h),
                 },
                 {
                   label: "24h",
-                  value: "3.43%",
+                  value: percent(asset.info.price_change_percentage_24h),
                 },
                 {
                   label: "7d",
-                  value: "3.43%",
+                  value: percent(asset.info.price_change_percentage_7d),
                 },
                 {
                   label: "30d",
-                  value: "3.43%",
+                  value: percent(asset.info.price_change_percentage_30d),
                 },
               ].map((chip) => (
                 <Chip
@@ -223,25 +206,42 @@ export function AssetContent({
             >
               <TableRow>
                 <TableCell>Market Cap Δ %</TableCell>
-                <TableCell>3.4%</TableCell>
+                <TableCell>
+                  {percent(asset.info.market_cap_change_percentage_24h)}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Market Cap</TableCell>
-                <TableCell sx={{ color: "#999999" }}>23131</TableCell>
+                <TableCell sx={{ color: "#999999" }}>
+                  {currency(asset.info.market_cap)}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Inflation</TableCell>
-                <TableCell>6.9%</TableCell>
+                <TableCell>{inflation}</TableCell>
               </TableRow>
-              <TableRow>
+              <TableRow
+                sx={{
+                  "&:hover > td > span ": {
+                    color: "inherit",
+                  },
+                }}
+              >
                 <TableCell>Supply</TableCell>
                 <TableCell>
-                  <LinearProgress
-                    variant="determinate"
-                    value={33}
-                    color="inherit"
-                    sx={{ marginTop: "5px" }}
-                  />
+                  {supply !== undefined && (
+                    <Tooltip title={percent(supply / 100)}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={supply}
+                        color="inherit"
+                        sx={{
+                          marginTop: "5px",
+                          color: "#999999",
+                        }}
+                      />
+                    </Tooltip>
+                  )}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -252,7 +252,11 @@ export function AssetContent({
       <Table>
         <TableBody>
           <TableRow>
-            <TableCell sx={{ width: "40%", fontSize: "0.8em" }}>Tags</TableCell>
+            <TableCell
+              sx={{ width: "40%", fontSize: "0.8em", color: "#999999" }}
+            >
+              Tags
+            </TableCell>
             <TableCell
               sx={{ width: "60%", fontSize: "0.8em" }}
               align="right"
@@ -263,14 +267,16 @@ export function AssetContent({
                 spacing={1}
                 sx={{ justifyContent: "flex-end" }}
               >
-                <Chip label="defi" variant="outlined" size="small" />
-                <Chip label="cosmos" variant="outlined" size="small" />
-                <Chip label="L1" variant="outlined" size="small" />
+                {tags.map((tag) => (
+                  <Chip label={tag.name} variant="outlined" size="small" />
+                ))}
               </Stack>
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ width: "40%", fontSize: "0.8em" }}>
+            <TableCell
+              sx={{ width: "40%", fontSize: "0.8em", color: "#999999" }}
+            >
               Competitors
             </TableCell>
             <TableCell
@@ -292,12 +298,17 @@ export function AssetContent({
                 onChange={(event: any) => setNotesContent(event.target.value)}
                 maxRows={4}
                 variant="standard"
-                sx={{ "& textarea": { fontSize: "0.8em" } }}
+                sx={{
+                  "& label": { color: "#999999" },
+                  "& textarea": { fontSize: "0.8em" },
+                }}
               />
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ width: "40%", fontSize: "0.8em" }}>
+            <TableCell
+              sx={{ width: "40%", fontSize: "0.8em", color: "#999999" }}
+            >
               Reminder
             </TableCell>
             <TableCell
@@ -341,44 +352,36 @@ export function AssetContent({
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow>
-              <TableCell>
-                <Link href="#" onClick={handleAccountClick}>
-                  Hodlnout Wallet
-                </Link>
-              </TableCell>
-              <TableCell>7.25%</TableCell>
-              <TableCell>
-                <Link href="javascript:;" onClick={handleHoldingClick}>
-                  0.1
-                </Link>
-              </TableCell>
-              <TableCell>$10341.12</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <Link href="javascript:;" onClick={handleAccountClick}>
-                  Celsius Wallet
-                </Link>
-              </TableCell>
-              <TableCell>6.25%</TableCell>
-              <TableCell>
-                <Link href="javascript:;" onClick={handleHoldingClick}>
-                  0.01
-                </Link>
-              </TableCell>
-              <TableCell>$1341.12</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <Link href="javascript:;" onClick={handleAccountClick}>
-                  BlockFi Wallet
-                </Link>
-              </TableCell>
-              <TableCell>3.25%</TableCell>
-              <TableCell />
-              <TableCell />
-            </TableRow>
+            {holdings.map((holding) => {
+              assert(holding.account);
+              const account = accounts[holding.account];
+              const accountName = account.name;
+              const service = services[account.service];
+              const serviceAsset: ServiceAsset | undefined =
+                service.assets.find((a) => a.asset_pk === asset.pk);
+              const apy = serviceAsset ? percent(serviceAsset.apy) : "";
+              return (
+                <TableRow>
+                  <TableCell>
+                    <Link href="#" onClick={handleAccountClick}>
+                      {accountName}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{apy}</TableCell>
+                  <TableCell>
+                    <Link
+                      href="#"
+                      onClick={() => handleHoldingClick(holding.pk)}
+                    >
+                      {holding.quantity}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    {currency(holding.quantity * asset.info.value)}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </Paper>
@@ -399,9 +402,33 @@ export function AssetContent({
           display="inline"
           sx={{ paddingLeft: "5px", fontSize: "0.8em" }}
         >
-          2021-09-12 21:23 PDT
+          {lastUpdated.toLocaleString(undefined, {
+            dateStyle: "long",
+            timeStyle: "long",
+          })}
         </Typography>
       </Stack>
+    </>
+  );
+}
+
+interface ActionProps {
+  handleCloseModal: any;
+}
+
+export function AccountDialogActions({ handleCloseModal }: ActionProps) {
+  const handleCancel = () => {
+    handleCloseModal();
+  };
+
+  const handleOk = () => {};
+
+  return (
+    <>
+      <Button autoFocus onClick={handleCancel}>
+        Cancel
+      </Button>
+      <Button onClick={handleOk}>Ok</Button>
     </>
   );
 }

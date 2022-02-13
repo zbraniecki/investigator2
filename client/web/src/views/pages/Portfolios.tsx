@@ -54,6 +54,14 @@ const baseTableMeta: BaseTableMeta = {
       align: CellAlign.Right,
       sortDirection: SortDirection.Asc,
       width: "20%",
+      modal: (cells: Record<string, any>, updateDialogState: any) => {
+        updateDialogState({
+          type: DialogType.Account,
+          meta: {
+            account: cells.account_id.value,
+          },
+        });
+      },
     },
     quantity: {
       label: "Quantity",
@@ -63,11 +71,11 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Number,
       editable: true,
       sensitive: true,
-      modal: (rowId: string, updateDialogState: any) => {
+      modal: (cells: Record<string, any>, updateDialogState: any) => {
         updateDialogState({
           type: DialogType.Holding,
           meta: {
-            holding: rowId,
+            holding: cells.id.value,
           },
         });
       },

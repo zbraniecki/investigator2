@@ -54,11 +54,12 @@ const baseTableMeta: BaseTableMeta = {
       sortDirection: SortDirection.Asc,
       formatter: Formatter.Symbol,
       width: "10%",
-      modal: (rowId: string, updateDialogState: any) => {
+      modal: (cells: Record<string, any>, updateDialogState: any) => {
+        console.log(cells);
         updateDialogState({
           type: DialogType.Asset,
           meta: {
-            asset: rowId,
+            asset: cells.id.value,
           },
         });
       },

@@ -20,6 +20,11 @@ import {
   HoldingDialogActions,
 } from "./Holding";
 import {
+  AccountDialogTitle,
+  AccountDialogContent,
+  AccountDialogActions,
+} from "./Account";
+import {
   getAssets,
   getTags,
   getHoldings,
@@ -34,6 +39,7 @@ export enum DialogType {
   Settings,
   Asset,
   Holding,
+  Account,
 }
 
 export interface DialogState {
@@ -144,6 +150,25 @@ export function ModalDialog({ state, updateState }: Props) {
           services={services}
         />
       );
+      break;
+    }
+    case DialogType.Account: {
+      const aid = state.meta?.account;
+      assert(aid);
+      const account = accounts[aid];
+      title = (
+        <AccountDialogTitle account={account} onClose={handleCloseModal} />
+      );
+      // content = (
+      //   <HoldingDialogContent
+      //     holding={holding}
+      //     tags={assetTags}
+      //     assets={assets}
+      //     holdings={assetHoldings}
+      //     accounts={accounts}
+      //     services={services}
+      //   />
+      // );
       break;
     }
   }
