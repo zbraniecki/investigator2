@@ -17,6 +17,8 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Slider from "@mui/material/Slider";
 import LinearProgress from "@mui/material/LinearProgress";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 import Tooltip from "@mui/material/Tooltip";
 import {
   Asset,
@@ -28,12 +30,14 @@ import {
 } from "../../../types";
 import { assert } from "../../../utils/helpers";
 import { currency, percent } from "../../../utils/formatters";
+import { DialogType } from "./Dialog";
 
 interface TitleProps {
   asset: Asset;
+  onClose: any;
 }
 
-export function AssetDialogTitle({ asset }: TitleProps) {
+export function AssetDialogTitle({ asset, onClose }: TitleProps) {
   return (
     <Stack direction="row">
       <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>
@@ -44,7 +48,7 @@ export function AssetDialogTitle({ asset }: TitleProps) {
         <Typography>{asset.name}</Typography>
       </Stack>
       <Box sx={{ flex: 1 }} />
-      <Box sx={{ display: "flex", flexDirection: "column" }}>
+      {/* <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Chip
           avatar={<Avatar>#1</Avatar>}
           label="crypto"
@@ -55,7 +59,10 @@ export function AssetDialogTitle({ asset }: TitleProps) {
           <Typography sx={{ fontSize: "0.6em" }}>Owned: 0.4</Typography>
           <Typography sx={{ fontSize: "0.6em" }}>Value: $26431.01</Typography>
         </Stack>
-      </Box>
+      </Box> */}
+      <IconButton onClick={onClose}>
+        <CloseIcon />
+      </IconButton>
     </Stack>
   );
 }
@@ -66,6 +73,7 @@ interface ContentProps {
   holdings: Array<Holding>;
   accounts: Record<string, Account>;
   services: Record<string, Service>;
+  updateState: any;
 }
 
 export function AssetDialogContent({
@@ -74,11 +82,19 @@ export function AssetDialogContent({
   holdings,
   accounts,
   services,
+  updateState,
 }: ContentProps) {
   const [notesContent, setNotesContent] = React.useState("");
 
   const handleAccountClick = () => {};
-  const handleHoldingClick = () => {};
+  const handleHoldingClick = (holding: string) => {
+    updateState({
+      type: DialogType.Holding,
+      meta: {
+        holding,
+      },
+    });
+  };
 
   const highLowPerc = Math.round(
     ((asset.info.value - asset.info.low_24h) /
@@ -219,7 +235,13 @@ export function AssetDialogContent({
                 <TableCell>Inflation</TableCell>
                 <TableCell>{inflation}</TableCell>
               </TableRow>
-              <TableRow>
+              <TableRow
+                sx={{
+                  "&:hover > td > span ": {
+                    color: "inherit",
+                  },
+                }}
+              >
                 <TableCell>Supply</TableCell>
                 <TableCell>
                   {supply !== undefined && (
@@ -228,7 +250,10 @@ export function AssetDialogContent({
                         variant="determinate"
                         value={supply}
                         color="inherit"
-                        sx={{ marginTop: "5px" }}
+                        sx={{
+                          marginTop: "5px",
+                          color: "#999999",
+                        }}
                       />
                     </Tooltip>
                   )}
@@ -242,7 +267,11 @@ export function AssetDialogContent({
       <Table>
         <TableBody>
           <TableRow>
-            <TableCell sx={{ width: "40%", fontSize: "0.8em" }}>Tags</TableCell>
+            <TableCell
+              sx={{ width: "40%", fontSize: "0.8em", color: "#999999" }}
+            >
+              Tags
+            </TableCell>
             <TableCell
               sx={{ width: "60%", fontSize: "0.8em" }}
               align="right"
@@ -254,13 +283,15 @@ export function AssetDialogContent({
                 sx={{ justifyContent: "flex-end" }}
               >
                 {tags.map((tag) => (
-                    <Chip label={tag.name} variant="outlined" size="small" />
-                  ))}
+                  <Chip label={tag.name} variant="outlined" size="small" />
+                ))}
               </Stack>
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ width: "40%", fontSize: "0.8em" }}>
+            <TableCell
+              sx={{ width: "40%", fontSize: "0.8em", color: "#999999" }}
+            >
               Competitors
             </TableCell>
             <TableCell
@@ -282,12 +313,17 @@ export function AssetDialogContent({
                 onChange={(event: any) => setNotesContent(event.target.value)}
                 maxRows={4}
                 variant="standard"
-                sx={{ "& textarea": { fontSize: "0.8em" } }}
+                sx={{
+                  "& label": { color: "#999999" },
+                  "& textarea": { fontSize: "0.8em" },
+                }}
               />
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell sx={{ width: "40%", fontSize: "0.8em" }}>
+            <TableCell
+              sx={{ width: "40%", fontSize: "0.8em", color: "#999999" }}
+            >
               Reminder
             </TableCell>
             <TableCell
@@ -336,9 +372,8 @@ export function AssetDialogContent({
               const account = accounts[holding.account];
               const accountName = account.name;
               const service = services[account.service];
-              const serviceAsset: ServiceAsset | undefined = service.assets.find(
-                (a) => a.asset_pk === asset.pk
-              );
+              const serviceAsset: ServiceAsset | undefined =
+                service.assets.find((a) => a.asset_pk === asset.pk);
               const apy = serviceAsset ? percent(serviceAsset.apy) : "";
               return (
                 <TableRow>
@@ -349,7 +384,10 @@ export function AssetDialogContent({
                   </TableCell>
                   <TableCell>{apy}</TableCell>
                   <TableCell>
-                    <Link href="javascript:;" onClick={handleHoldingClick}>
+                    <Link
+                      href="#"
+                      onClick={() => handleHoldingClick(holding.pk)}
+                    >
                       {holding.quantity}
                     </Link>
                   </TableCell>

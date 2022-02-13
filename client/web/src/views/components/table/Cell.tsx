@@ -8,7 +8,7 @@ import { CellData, CellValue } from "./data/Row";
 interface CellProps {
   id: string;
   column: string;
-  rowId: string;
+  rowId: string | undefined;
   data?: CellData<CellValue>;
   align: CellAlign;
   width: string;

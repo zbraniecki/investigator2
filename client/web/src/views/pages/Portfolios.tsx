@@ -22,6 +22,7 @@ import {
   getServices,
 } from "../../store";
 import { TabInfo } from "../components/Tabs";
+import { DialogType } from "../ui/modal/Dialog";
 
 const baseTableMeta: BaseTableMeta = {
   name: "portfolios",
@@ -62,6 +63,14 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Number,
       editable: true,
       sensitive: true,
+      modal: (rowId: string, updateDialogState: any) => {
+        updateDialogState({
+          type: DialogType.Holding,
+          meta: {
+            holding: rowId,
+          },
+        });
+      },
     },
     yield: {
       label: "Yield",

@@ -24,6 +24,7 @@ import {
   Holding,
   User,
   AuthenticateState,
+  Transaction,
 } from "../types";
 import { getFromLocalStorage } from "./main";
 import { setFetchEntitiesReducer } from "./helpers";
@@ -103,7 +104,16 @@ const userSlice = createSlice({
     setFetchEntitiesReducer(builder, fetchPortfoliosThunk, "portfolios");
     setFetchEntitiesReducer(builder, fetchHoldingsThunk, "holdings");
     setFetchEntitiesReducer(builder, fetchWatchlistsThunk, "watchlists");
-    setFetchEntitiesReducer(builder, fetchAccountsThunk, "accounts");
+    setFetchEntitiesReducer(
+      builder,
+      fetchAccountsThunk,
+      "accounts",
+      (account: Account) => {
+        account.transactions.forEach((transaction: Transaction) => {
+          transaction.timestamp = new Date(transaction.timestamp);
+        });
+      }
+    );
     setFetchEntitiesReducer(builder, fetchUsersThunk, "users");
 
     builder.addCase(authenticateThunk.fulfilled, (state, action) => {

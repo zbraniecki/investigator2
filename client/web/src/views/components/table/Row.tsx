@@ -208,6 +208,7 @@ export function Row({ id, data, tableMeta }: Props) {
             const key = `${id}-${column.key}`;
             const cell = data.cells[column.key];
             const hideValue = column.sensitive && tableMeta.hideSensitive;
+            const rowId = data.cells.id?.value as string | undefined;
             if (column.editable && !hideValue && cell && data.cells.id) {
               return (
                 <EditableCell
@@ -219,10 +220,18 @@ export function Row({ id, data, tableMeta }: Props) {
                   width={column.width}
                   formatter={column.formatter}
                   onCellUpdate={handleCellUpdate}
+                  onClick={
+                    column.modal && rowId !== undefined
+                      ? column.modal.bind(
+                          undefined,
+                          rowId,
+                          outletContext.updateDialogState
+                        )
+                      : undefined
+                  }
                 />
               );
             }
-            const rowId = data.cells.id?.value as string;
             return (
               <Cell
                 key={key}
@@ -235,7 +244,7 @@ export function Row({ id, data, tableMeta }: Props) {
                 formatter={column.formatter}
                 showValue={!hideValue}
                 onClick={
-                  column.modal
+                  column.modal && rowId !== undefined
                     ? column.modal.bind(
                         undefined,
                         rowId,

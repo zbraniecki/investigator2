@@ -1,3 +1,4 @@
+import React from "react";
 import { useSelector } from "react-redux";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -14,6 +15,11 @@ import {
   AssetDialogActions,
 } from "./Asset";
 import {
+  HoldingDialogTitle,
+  HoldingDialogContent,
+  HoldingDialogActions,
+} from "./Holding";
+import {
   getAssets,
   getTags,
   getHoldings,
@@ -27,6 +33,7 @@ export enum DialogType {
   None,
   Settings,
   Asset,
+  Holding,
 }
 
 export interface DialogState {
@@ -94,7 +101,7 @@ export function ModalDialog({ state, updateState }: Props) {
       const assetHoldings = Object.values<Holding>(holdings).filter(
         (holding: Holding) => holding.asset === asset.pk
       );
-      title = <AssetDialogTitle asset={asset} />;
+      title = <AssetDialogTitle asset={asset} onClose={handleCloseModal} />;
       content = (
         <AssetDialogContent
           asset={asset}
@@ -102,12 +109,49 @@ export function ModalDialog({ state, updateState }: Props) {
           holdings={assetHoldings}
           accounts={accounts}
           services={services}
+          updateState={updateState}
         />
       );
-      actions = <AssetDialogActions handleCloseModal={handleCloseModal} />;
+      // actions = <AssetDialogActions handleCloseModal={handleCloseModal} />;
+      break;
+    }
+    case DialogType.Holding: {
+      const hid = state.meta?.holding;
+      assert(hid);
+      const holding = holdings[hid];
+      const asset = assets[holding.asset];
+      const account = accounts[holding.account];
+      const assetTags = asset.tags.map((tid: string) => tags[tid]);
+      const assetHoldings = Object.values<Holding>(holdings).filter(
+        (holding: Holding) => holding.asset === asset.pk
+      );
+      title = (
+        <HoldingDialogTitle
+          account={account}
+          asset={asset}
+          holding={holding}
+          onClose={handleCloseModal}
+          updateState={updateState}
+        />
+      );
+      content = (
+        <HoldingDialogContent
+          holding={holding}
+          tags={assetTags}
+          assets={assets}
+          holdings={assetHoldings}
+          accounts={accounts}
+          services={services}
+        />
+      );
       break;
     }
   }
+
+  const dialogContent = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    dialogContent.current?.scrollTo(0, 0);
+  });
 
   return (
     <Dialog
@@ -123,8 +167,10 @@ export function ModalDialog({ state, updateState }: Props) {
       onClose={handleCloseModal}
     >
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent dividers>{content}</DialogContent>
-      <DialogActions>{actions}</DialogActions>
+      <DialogContent dividers ref={dialogContent}>
+        {content}
+      </DialogContent>
+      {actions && <DialogActions>{actions}</DialogActions>}
     </Dialog>
   );
 }

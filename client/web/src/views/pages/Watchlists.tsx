@@ -55,7 +55,6 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Symbol,
       width: "10%",
       modal: (rowId: string, updateDialogState: any) => {
-        console.log(rowId);
         updateDialogState({
           type: DialogType.Asset,
           meta: {

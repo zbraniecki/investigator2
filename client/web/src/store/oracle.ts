@@ -33,19 +33,25 @@ const oracleSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    setFetchEntitiesReducer(builder, fetchAssetsThunk, "assets", (state) => {
-      let lastUpdated = null;
-      for (const asset of Object.values<Asset>(state.assets)) {
-        if (asset.info.last_updated) {
-          if (lastUpdated === null || lastUpdated < asset.info.last_updated) {
-            lastUpdated = asset.info.last_updated;
+    setFetchEntitiesReducer(
+      builder,
+      fetchAssetsThunk,
+      "assets",
+      undefined,
+      (state) => {
+        let lastUpdated = null;
+        for (const asset of Object.values<Asset>(state.assets)) {
+          if (asset.info.last_updated) {
+            if (lastUpdated === null || lastUpdated < asset.info.last_updated) {
+              lastUpdated = asset.info.last_updated;
+            }
           }
         }
+        if (lastUpdated !== null) {
+          state.assetUpdated = lastUpdated;
+        }
       }
-      if (lastUpdated !== null) {
-        state.assetUpdated = lastUpdated;
-      }
-    });
+    );
     setFetchEntitiesReducer(builder, fetchServicesThunk, "services");
     setFetchEntitiesReducer(builder, fetchPublicWatchlistsThunk, "watchlists");
     setFetchEntitiesReducer(builder, fetchTagsThunk, "tags");

@@ -6,6 +6,26 @@ export enum TransactionType {
   Interest = "IN",
 }
 
+export function getTransactionTypeLabel(input: TransactionType): string {
+  switch (input) {
+    case TransactionType.Buy: {
+      return "Buy";
+    }
+    case TransactionType.Sell: {
+      return "Sell";
+    }
+    case TransactionType.Withdraw: {
+      return "Widthdraw";
+    }
+    case TransactionType.Deposit: {
+      return "Deposit";
+    }
+    case TransactionType.Interest: {
+      return "Interest";
+    }
+  }
+}
+
 export interface Transaction {
   pk: string;
   account: string;

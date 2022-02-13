@@ -17,6 +17,8 @@ from rest_framework.authtoken.models import Token
 
 
 class TransactionSerializer(serializers.ModelSerializer):
+    timestamp = serializers.DateTimeField(format="iso-8601")
+
     class Meta:
         model = Transaction
         fields = [

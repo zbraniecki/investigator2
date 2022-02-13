@@ -32,7 +32,7 @@ const baseTableMeta: BaseTableMeta = {
       label: "Account",
       align: CellAlign.Left,
       sortDirection: SortDirection.Asc,
-      width: "15%",
+      width: "20%",
     },
     name: {
       label: "Name",
