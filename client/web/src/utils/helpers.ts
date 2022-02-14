@@ -8,6 +8,10 @@ export function assert(condition: any, msg?: string): asserts condition {
   }
 }
 
+export function assertUnreachable(value: never): never {
+  throw new Error(`This should never happen: ${value}.`);
+}
+
 export enum GroupingStrategy {
   Always,
   IfSame,

@@ -7,8 +7,6 @@ import { CellData, CellValue } from "./data/Row";
 
 interface CellProps {
   id: string;
-  column: string;
-  rowId: string | undefined;
   data?: CellData<CellValue>;
   align: CellAlign;
   width: string;
@@ -20,12 +18,11 @@ interface CellProps {
 Cell.defaultProps = {
   formatter: undefined,
   data: undefined,
+  onClick: undefined,
 };
 
 export function Cell({
   id,
-  column,
-  rowId,
   data,
   align,
   width,
@@ -63,7 +60,6 @@ interface EditableCellProps {
   width: string;
   formatter?: Formatter;
   onCellUpdate: any;
-  onClick?: any;
 }
 
 EditableCell.defaultProps = {
@@ -78,10 +74,7 @@ function tryParseNumber(input: string): number | undefined {
   if (input === "-") {
     return -0;
   }
-  if (input.endsWith(".")) {
-    input += "0";
-  }
-  const parsed = parseFloat(input);
+  const parsed = parseFloat(input.endsWith(".") ? `$[input}0` : input);
   if (Number.isNaN(parsed)) {
     return undefined;
   }
@@ -96,7 +89,6 @@ export function EditableCell({
   width,
   formatter,
   onCellUpdate,
-  onClick,
 }: EditableCellProps) {
   const [tempValue, setTempValue] = React.useState(null as string | null);
   const [editing, setEditing] = React.useState(false);
@@ -124,7 +116,7 @@ export function EditableCell({
   };
 
   const tryCommitChange = () => {
-    if (tempValue === null || tempValue === data.value) {
+    if (tempValue === null || tempValue === data.value.toString()) {
       return;
     }
 
@@ -132,14 +124,10 @@ export function EditableCell({
 
     if (result !== undefined) {
       setUpdateInProgress(true);
-      onCellUpdate(column, result).then(
-        ({ payload }: { payload: { error: string | null } }) => {
-          if (payload?.error) {
-          }
-          setTempValue(null);
-          setUpdateInProgress(false);
-        }
-      );
+      onCellUpdate(column, result).then(() => {
+        setTempValue(null);
+        setUpdateInProgress(false);
+      });
     }
   };
 
@@ -191,7 +179,6 @@ export function EditableCell({
       key={id}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDblClick}
-      onClick={onClick}
       align={align}
       sx={{ color: updateInProgress ? "action.disabled" : "inherit", width }}
     >

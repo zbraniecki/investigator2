@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography";
 export function SummaryPage() {
   return (
     <>
-      <Typography>That's it!</Typography>
+      <Typography>That&apos;s it!</Typography>
       <Typography>
         You want to <strong>accumulate wealth</strong> using an{" "}
         <strong>investment strategy</strong> based on your{" "}

@@ -131,7 +131,6 @@ const userSlice = createSlice({
     });
     builder.addCase(updateHoldingThunk.fulfilled, (state, action) => {
       if (action.payload.error !== null) {
-        console.log(`action failed`);
         return;
       }
       const { pk, quantity } = action.payload;

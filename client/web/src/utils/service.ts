@@ -6,14 +6,8 @@ import {
   ServiceAsset,
   Account,
 } from "../types";
-import {
-  createPortfolioTableData,
-  collectPortfolioHoldings,
-  groupHoldings,
-} from "./portfolio";
-import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
-import { TableMeta } from "../views/components/table/data/Table";
-import { CellAlign } from "../views/components/table/data/Column";
+import { collectPortfolioHoldings, groupHoldings } from "./portfolio";
+import { assert } from "./helpers";
 import {
   RowData,
   RowType,

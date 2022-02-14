@@ -9,9 +9,9 @@ export function AccumulatingPage() {
         <strong>wealth</strong>.
       </Typography>
       <Typography>
-        The value doesn't matter - $10, $1000, or $10,000. The intervals don't
-        matter either - weekly, monthly, quarterly - what matters is that you
-        can set aside some money at some interval.
+        The value doesn&apos;t matter - $10, $1000, or $10,000. The intervals
+        don&apos;t matter either - weekly, monthly, quarterly - what matters is
+        that you can set aside some money at some interval.
       </Typography>
       <Typography>
         In the simplest model, you could just put that money aside at each

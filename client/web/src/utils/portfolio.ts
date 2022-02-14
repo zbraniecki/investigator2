@@ -10,8 +10,6 @@ import {
   StyledRowData,
   newCellData,
 } from "../views/components/table/data/Row";
-import { HoldingsPage } from "../views/ui/modal/tutorial/pages/Holdings";
-import { objectTraps } from "../../../../../../../../projects/investigator2/client/web/node_modules/immer/dist/internal";
 
 export function collectPortfolioHoldings(
   portfolio: Portfolio,
@@ -24,7 +22,7 @@ export function collectPortfolioHoldings(
     Object.values(portfolio.holdings).map((hid) => holdings[hid])
   );
 
-  Object.values(portfolio.accounts).map((aid) => {
+  Object.values(portfolio.accounts).forEach((aid) => {
     for (const hid of accounts[aid].holdings) {
       result.add(holdings[hid]);
     }
@@ -42,7 +40,7 @@ export function collectPortfolioHoldings(
     });
   }
 
-  Object.values(portfolio.portfolios).map((pid) => {
+  Object.values(portfolio.portfolios).forEach((pid) => {
     for (const hid of collectPortfolioHoldings(
       portfolios[pid],
       portfolios,
@@ -69,18 +67,18 @@ export function groupHoldings(
   const groups: Record<string, Array<Holding>> = {};
 
   for (const holding of holdings) {
-    const aid = holding.account;
-    assert(aid);
-    if (!groups.hasOwnProperty(aid)) {
-      groups[aid] = [];
+    const key = holding[column];
+    assert(key);
+    if (!Object.prototype.hasOwnProperty.call(groups, key)) {
+      groups[key] = [];
     }
-    groups[aid].push(holding);
+    groups[key].push(holding);
   }
 
-  return Object.entries(groups).map(([aid, holdings]) => ({
-    item: aid,
-    children: holdings.map((holding) => ({
-      item: holding.pk,
+  return Object.entries(groups).map(([key, values]) => ({
+    item: key,
+    children: values.map((value) => ({
+      item: value.pk,
     })),
   }));
 }

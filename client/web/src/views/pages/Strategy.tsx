@@ -1,9 +1,5 @@
 import React from "react";
-import Box from "@mui/material/Box";
 import { useSelector } from "react-redux";
-import Typography from "@mui/material/Typography";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import { TableContainer } from "../components/table/Contrainer";
 import {
   CellAlign,
@@ -14,7 +10,6 @@ import { BaseTableMeta, TableSettings } from "../components/table/data/Table";
 import { StyledRowData } from "../components/table/data/Row";
 import {
   getPortfolios,
-  getWatchlists as getUserWatchlists,
   getUsers,
   getSession,
   getHoldings,
@@ -25,12 +20,10 @@ import {
   getTargets,
   getTargetChanges,
 } from "../../store";
-import { Watchlist } from "../../types";
 import {
   prepareStrategyTableData,
   computeStrategyTableDataStyle,
 } from "../../utils/strategy";
-import { currency, percent } from "../../utils/formatters";
 import { TabInfo } from "../components/Tabs";
 
 const baseTableMeta: BaseTableMeta = {

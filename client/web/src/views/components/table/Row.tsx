@@ -8,6 +8,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
 import { useSelector, useDispatch } from "react-redux";
 import { TableMeta } from "./data/Table";
+import { ColumnMeta } from "./data/Column";
 import { StyledRowData } from "./data/Row";
 import {
   getSession,
@@ -130,7 +131,6 @@ export function Row({ id, data, tableMeta }: Props) {
   const dispatch = useDispatch();
 
   const handleCellUpdate = async (cid: string, value: number) => {
-    console.log(`handling cell update: ${cid}`);
     switch (cid) {
       case "quantity": {
         const hid = data.cells.id.value;
@@ -160,6 +160,11 @@ export function Row({ id, data, tableMeta }: Props) {
     }
   };
 
+  const handleClick = (column: ColumnMeta) => {
+    if (column.modal) {
+      column.modal(data.cells, outletContext.updateDialogState);
+    }
+  };
   return (
     <>
       <TableRow key={id}>
@@ -182,7 +187,6 @@ export function Row({ id, data, tableMeta }: Props) {
             const key = `${id}-${column.key}`;
             const cell = data.cells[column.key];
             const hideValue = column.sensitive && tableMeta.hideSensitive;
-            const rowId = data.cells.id?.value as string | undefined;
             if (column.editable && !hideValue && cell && data.cells.id) {
               return (
                 <EditableCell
@@ -194,23 +198,12 @@ export function Row({ id, data, tableMeta }: Props) {
                   width={column.width}
                   formatter={column.formatter}
                   onCellUpdate={handleCellUpdate}
-                  onClick={
-                    column.modal && rowId !== undefined
-                      ? column.modal.bind(
-                          undefined,
-                          data.cells,
-                          outletContext.updateDialogState
-                        )
-                      : undefined
-                  }
                 />
               );
             }
             return (
               <Cell
                 key={key}
-                column={column.key}
-                rowId={rowId}
                 id={key}
                 data={cell}
                 align={column.align}
@@ -218,12 +211,8 @@ export function Row({ id, data, tableMeta }: Props) {
                 formatter={column.formatter}
                 showValue={!hideValue}
                 onClick={
-                  column.modal && rowId !== undefined
-                    ? column.modal.bind(
-                        undefined,
-                        data.cells,
-                        outletContext.updateDialogState
-                      )
+                  column.modal && data.cells.id
+                    ? () => handleClick(column)
                     : undefined
                 }
               />

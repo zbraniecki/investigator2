@@ -41,6 +41,14 @@ const baseTableMeta: BaseTableMeta = {
       sortDirection: SortDirection.Asc,
       width: "15%",
       formatter: Formatter.Symbol,
+      modal: (cells: Record<string, any>, updateDialogState: any) => {
+        updateDialogState({
+          type: DialogType.Holding,
+          meta: {
+            holding: cells.id.value,
+          },
+        });
+      },
     },
     price: {
       label: "Price",
@@ -71,14 +79,6 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Number,
       editable: true,
       sensitive: true,
-      modal: (cells: Record<string, any>, updateDialogState: any) => {
-        updateDialogState({
-          type: DialogType.Holding,
-          meta: {
-            holding: cells.id.value,
-          },
-        });
-      },
     },
     yield: {
       label: "Yield",

@@ -18,7 +18,6 @@ import Typography from "@mui/material/Typography";
 import { LightMode } from "../../../components/settings";
 import { AppBarColors } from "../AppBar";
 import { LoginModal } from "../Login";
-import { AuthenticateState } from "../../../types";
 import { getUsers, logoutThunk } from "../../../store/user";
 import { setLightMode } from "../../../store/ui";
 
@@ -73,7 +72,7 @@ export function AccountMenu({
     return false;
   };
 
-  const handleSettings = (event: any) => {
+  const handleSettings = () => {
     setSettingsOpen(true);
   };
 

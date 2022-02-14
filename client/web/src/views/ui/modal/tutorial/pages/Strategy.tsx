@@ -8,11 +8,12 @@ export function StrategyPage() {
         <strong>strategy</strong> that will use to invest your income.
       </Typography>
       <Typography>
-        If you could <strong>see the future</strong>, you wouldn't need risk
-        profile - you would know what assets will increase in value and provide
-        passive income! In the absence of this skill, if you had infinite amount
-        of <strong>time</strong>, you could accumulate all knowledge and use it
-        to optimally time when the asset is cheap, and buy it then.
+        If you could <strong>see the future</strong>, you wouldn&apos;t need
+        risk profile - you would know what assets will increase in value and
+        provide passive income! In the absence of this skill, if you had
+        infinite amount of <strong>time</strong>, you could accumulate all
+        knowledge and use it to optimally time when the asset is cheap, and buy
+        it then.
       </Typography>
       <Typography>
         This app is designed to follow a combination of two investment

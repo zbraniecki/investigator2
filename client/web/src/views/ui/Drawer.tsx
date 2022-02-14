@@ -19,8 +19,8 @@ interface Props {
 
 export default function InvestigatorDrawer({
   menuItems,
-  updateDialogState,
-}: Props) {
+}: // updateDialogState,
+Props) {
   const index = Boolean(useMatch(`/`));
 
   function isSelected(item: MenuItem): boolean {

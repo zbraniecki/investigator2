@@ -13,8 +13,8 @@ export function IntroPage() {
         <i>investement</i>, <i>DCA</i>, and <i>MPT</i>.
       </Typography>
       <Typography sx={{ p: 1 }}>
-        If you're familiar with the concepts, feel free to jump to Step 2 - "Add
-        Holdings".
+        If you&apos;re familiar with the concepts, feel free to jump to Step 2 -
+        &quot;Add Holdings&quot;.
       </Typography>
     </>
   );

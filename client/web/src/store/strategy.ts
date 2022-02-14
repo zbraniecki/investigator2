@@ -55,7 +55,6 @@ const strategySlice = createSlice({
     });
     builder.addCase(updateTargetThunk.fulfilled, (state, action) => {
       if (action.payload.error !== null) {
-        console.log(`action failed`);
         return;
       }
       const { pk, percent } = action.payload;

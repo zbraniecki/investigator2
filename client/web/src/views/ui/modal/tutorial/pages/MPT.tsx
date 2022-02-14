@@ -12,17 +12,17 @@ export function MPTPage() {
         to know which assets to invest in at a given moment.
       </Typography>
       <Typography>
-        What's worse, you do accumulate <i>some</i> selective information from
-        media. An asset goes up by 1000% and everyone talks about it. This
+        What&apos;s worse, you do accumulate <i>some</i> selective information
+        from media. An asset goes up by 1000% and everyone talks about it. This
         triggers an emotion of <strong>Fear Of Missing Out</strong> and pushes
         you to <strong>follow</strong> the trend and buy at the highest price
         point.
       </Typography>
       <Typography>
         To counter that, <i>MPT</i> focuses on building targets for each asset
-        or class (say <i>"10% in Tech Stock and 10% in Crypto"</i>). When an
-        asset goes <strong>down</strong> it shows as below your target and you
-        can buy it.
+        or class (say <i>&quot;10% in Tech Stock and 10% in Crypto&quot;</i>).
+        When an asset goes <strong>down</strong> it shows as below your target
+        and you can buy it.
       </Typography>
       <Typography>
         In result you continously <strong>rebalancing</strong> your portfolio

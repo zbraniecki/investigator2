@@ -67,7 +67,7 @@ function computeHeaderData(
   const deviation = data.reduce(
     (total, curr) =>
       total +
-      (curr.cells.deviation && isFinite(curr.cells.deviation)
+      (curr.cells.deviation && Number.isFinite(curr.cells.deviation)
         ? curr.cells.deviation
         : 0),
     0
@@ -108,10 +108,10 @@ export function createStrategyTableData(
       let currentValue = computedData?.value || 0;
 
       for (const a of target.contains) {
-        const asset = assetInfo[a];
-        assert(asset);
-        const computedData = computedTableData[asset.pk];
-        currentValue += computedData?.value || 0;
+        const containsAsset = assetInfo[a];
+        assert(containsAsset);
+        const subComputedData = computedTableData[containsAsset.pk];
+        currentValue += subComputedData?.value || 0;
       }
       const targetValue = totalPortfolioValue * target.percent;
       const currentPercent = currentValue / totalPortfolioValue;

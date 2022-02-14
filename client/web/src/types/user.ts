@@ -1,3 +1,5 @@
+import { assertUnreachable } from "../utils/helpers";
+
 export enum TransactionType {
   Buy = "BY",
   Sell = "SL",
@@ -23,6 +25,9 @@ export function getTransactionTypeLabel(input: TransactionType): string {
     case TransactionType.Interest: {
       return "Interest";
     }
+    default: {
+      return assertUnreachable(input);
+    }
   }
 }
 
@@ -36,6 +41,7 @@ export interface Transaction {
 }
 
 export interface Holding {
+  [key: string]: any;
   pk: string;
   asset: string;
   quantity: number;

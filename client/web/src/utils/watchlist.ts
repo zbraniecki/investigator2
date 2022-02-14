@@ -1,5 +1,4 @@
 import { Asset, Watchlist, Portfolio, Holding, Account } from "../types";
-import { getServiceAsset } from "./service";
 import { assert } from "./helpers";
 import {
   RowData,
