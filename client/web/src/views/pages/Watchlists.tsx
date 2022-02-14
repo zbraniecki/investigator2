@@ -23,7 +23,7 @@ import {
   getAccounts,
 } from "../../store";
 import { TabInfo } from "../components/Tabs";
-import { DialogType } from "../ui/modal/Dialog";
+import { DialogType } from "../ui/modal/dialog";
 
 const baseTableMeta: BaseTableMeta = {
   name: "watchlists",
@@ -55,7 +55,6 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Symbol,
       width: "10%",
       modal: (cells: Record<string, any>, updateDialogState: any) => {
-        console.log(cells);
         updateDialogState({
           type: DialogType.Asset,
           meta: {

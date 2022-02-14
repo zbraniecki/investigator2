@@ -84,20 +84,20 @@ const handleTargetUpdate = (
 
   const tc = existing
     ? updateTargetChangeThunk({
-      token,
-      pk: existing.pk,
-      change: new Decimal(existing.change).plus(diffPercent).toNumber(),
-      timestamp: new Date(),
-    })
-    : createTargetChangeThunk({
-      token,
-      input: {
-        strategy: target.strategy,
-        asset: target.asset,
-        change: diffPercent,
+        token,
+        pk: existing.pk,
+        change: new Decimal(existing.change).plus(diffPercent).toNumber(),
         timestamp: new Date(),
-      },
-    });
+      })
+    : createTargetChangeThunk({
+        token,
+        input: {
+          strategy: target.strategy,
+          asset: target.asset,
+          change: diffPercent,
+          timestamp: new Date(),
+        },
+      });
 
   return Promise.all([
     dispatch(tc),
@@ -197,10 +197,10 @@ export function Row({ id, data, tableMeta }: Props) {
                   onClick={
                     column.modal && rowId !== undefined
                       ? column.modal.bind(
-                        undefined,
-                        data.cells,
-                        outletContext.updateDialogState
-                      )
+                          undefined,
+                          data.cells,
+                          outletContext.updateDialogState
+                        )
                       : undefined
                   }
                 />
@@ -220,10 +220,10 @@ export function Row({ id, data, tableMeta }: Props) {
                 onClick={
                   column.modal && rowId !== undefined
                     ? column.modal.bind(
-                      undefined,
-                      data.cells,
-                      outletContext.updateDialogState
-                    )
+                        undefined,
+                        data.cells,
+                        outletContext.updateDialogState
+                      )
                     : undefined
                 }
               />

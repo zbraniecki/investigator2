@@ -1,4 +1,3 @@
-import React from "react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -14,24 +13,19 @@ import TableRow from "@mui/material/TableRow";
 import Link from "@mui/material/Link";
 import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
-import TextField from "@mui/material/TextField";
-import Slider from "@mui/material/Slider";
-import LinearProgress from "@mui/material/LinearProgress";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import Tooltip from "@mui/material/Tooltip";
 import {
   Asset,
   Tag,
   Account,
   Holding,
   Service,
-  ServiceAsset,
   getTransactionTypeLabel,
-} from "../../../types";
-import { assert } from "../../../utils/helpers";
-import { currency, percent, datetime } from "../../../utils/formatters";
-import { DialogType } from "./Dialog";
+} from "../../../../../types";
+import { assert } from "../../../../../utils/helpers";
+import { currency, percent, datetime } from "../../../../../utils/formatters";
+import { DialogType } from "../Dialog";
 
 interface TitleProps {
   holding: Holding;
@@ -103,6 +97,7 @@ export function HoldingDialogContent({
   const transactions = account.transactions
     .filter((transaction) => transaction.asset === asset.pk)
     .map((transaction) => ({
+      pk: transaction.pk,
       timestamp: transaction.timestamp,
       type: transaction.type,
       quantity: transaction.quantity,
@@ -287,7 +282,7 @@ export function HoldingDialogContent({
           </TableHead>
           <TableBody>
             {transactions.map((transaction) => (
-              <TableRow>
+              <TableRow key={transaction.pk}>
                 <TableCell>{datetime(transaction.timestamp)}</TableCell>
                 <TableCell>
                   {getTransactionTypeLabel(transaction.type)}

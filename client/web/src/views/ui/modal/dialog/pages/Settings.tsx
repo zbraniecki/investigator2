@@ -5,7 +5,11 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-import { getSession, getUsers, updateUserInfoThunk } from "../../../store/user";
+import {
+  getSession,
+  getUsers,
+  updateUserInfoThunk,
+} from "../../../../../store/user";
 
 export function SettingsDialogTitle() {
   return <Typography>Settings</Typography>;

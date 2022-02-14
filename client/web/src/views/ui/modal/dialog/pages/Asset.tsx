@@ -27,10 +27,10 @@ import {
   Holding,
   Service,
   ServiceAsset,
-} from "../../../types";
-import { assert } from "../../../utils/helpers";
-import { currency, percent } from "../../../utils/formatters";
-import { DialogType } from "./Dialog";
+} from "../../../../../types";
+import { assert } from "../../../../../utils/helpers";
+import { currency, percent } from "../../../../../utils/formatters";
+import { DialogType } from "../Dialog";
 
 interface TitleProps {
   asset: Asset;
@@ -376,7 +376,7 @@ export function AssetDialogContent({
                 service.assets.find((a) => a.asset_pk === asset.pk);
               const apy = serviceAsset ? percent(serviceAsset.apy) : "";
               return (
-                <TableRow>
+                <TableRow key={holding.pk}>
                   <TableCell>
                     <Link href="#" onClick={handleAccountClick}>
                       {accountName}

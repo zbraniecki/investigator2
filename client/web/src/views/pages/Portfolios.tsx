@@ -22,7 +22,7 @@ import {
   getServices,
 } from "../../store";
 import { TabInfo } from "../components/Tabs";
-import { DialogType } from "../ui/modal/Dialog";
+import { DialogType } from "../ui/modal/dialog";
 
 const baseTableMeta: BaseTableMeta = {
   name: "portfolios",

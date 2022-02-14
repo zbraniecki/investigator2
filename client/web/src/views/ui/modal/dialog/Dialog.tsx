@@ -8,31 +8,31 @@ import {
   SettingsDialogTitle,
   SettingsDialogContent,
   SettingsDialogActions,
-} from "./Settings";
+} from "./pages/Settings";
 import {
   AssetDialogTitle,
   AssetDialogContent,
   AssetDialogActions,
-} from "./Asset";
+} from "./pages/Asset";
 import {
   HoldingDialogTitle,
   HoldingDialogContent,
   HoldingDialogActions,
-} from "./Holding";
+} from "./pages/Holding";
 import {
   AccountDialogTitle,
   AccountDialogContent,
   AccountDialogActions,
-} from "./Account";
+} from "./pages/Account";
 import {
   getAssets,
   getTags,
   getHoldings,
   getAccounts,
   getServices,
-} from "../../../store";
-import { Holding } from "../../../types";
-import { assert } from "../../../utils/helpers";
+} from "../../../../store";
+import { Holding } from "../../../../types";
+import { assert } from "../../../../utils/helpers";
 
 export enum DialogType {
   None,
@@ -159,16 +159,14 @@ export function ModalDialog({ state, updateState }: Props) {
       title = (
         <AccountDialogTitle account={account} onClose={handleCloseModal} />
       );
-      // content = (
-      //   <HoldingDialogContent
-      //     holding={holding}
-      //     tags={assetTags}
-      //     assets={assets}
-      //     holdings={assetHoldings}
-      //     accounts={accounts}
-      //     services={services}
-      //   />
-      // );
+      content = (
+        <AccountDialogContent
+          account={account}
+          assets={assets}
+          holdings={holdings}
+          services={services}
+        />
+      );
       break;
     }
   }
