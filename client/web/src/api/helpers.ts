@@ -56,13 +56,13 @@ export const fetchEntries = async <E>(
   const resp = await data.json();
 
   if (converters) {
-    for (const key in converters) {
+    Object.entries(converters).forEach(([key, converter]) => {
       for (const item of resp) {
-        if (item.hasOwnProperty(key)) {
-          item[key] = converters[key](item[key]);
+        if (Object.prototype.hasOwnProperty.call(item, key)) {
+          item[key] = converter(item[key]);
         }
       }
-    }
+    });
   }
   return resp;
 };

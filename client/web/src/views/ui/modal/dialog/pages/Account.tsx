@@ -86,65 +86,63 @@ export function AccountDialogContent({
   transactions.sort((a, b) => (a.timestamp > b.timestamp ? -1 : 1));
   return (
     <Stack>
-        <Paper sx={{ marginTop: "20px" }}>
-          <Table sx={{ opacity: "0.8" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Symbol</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Value</TableCell>
-                <TableCell>APY</TableCell>
+      <Paper sx={{ marginTop: "20px" }}>
+        <Table sx={{ opacity: "0.8" }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Symbol</TableCell>
+              <TableCell>Quantity</TableCell>
+              <TableCell>Value</TableCell>
+              <TableCell>APY</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {accountHoldings.map((holding) => (
+              <TableRow key={holding.pk}>
+                <TableCell>{holding.symbol}</TableCell>
+                <TableCell>{holding.quantity}</TableCell>
+                <TableCell>{currency(holding.value)}</TableCell>
+                <TableCell>{percent(holding.apy)}</TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {accountHoldings.map((holding) => (
-                <TableRow key={holding.pk}>
-                  <TableCell>{holding.symbol}</TableCell>
-                  <TableCell>{holding.quantity}</TableCell>
-                  <TableCell>{currency(holding.value)}</TableCell>
-                  <TableCell>{percent(holding.apy)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
-        <Divider />
-        <Paper sx={{ marginTop: "20px" }}>
-          <Typography
-            sx={{ paddingLeft: "15px", paddingTop: "5px", fontSize: "0.9em" }}
-          >
-            Transactions
-          </Typography>
-          <Table sx={{ opacity: "0.8" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: "30%" }}>Date</TableCell>
-                <TableCell sx={{ width: "20%" }}>Type</TableCell>
-                <TableCell>Symbol</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Value</TableCell>
-                <TableCell>Source</TableCell>
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
+      <Divider />
+      <Paper sx={{ marginTop: "20px" }}>
+        <Typography
+          sx={{ paddingLeft: "15px", paddingTop: "5px", fontSize: "0.9em" }}
+        >
+          Transactions
+        </Typography>
+        <Table sx={{ opacity: "0.8" }}>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ width: "30%" }}>Date</TableCell>
+              <TableCell sx={{ width: "20%" }}>Type</TableCell>
+              <TableCell>Symbol</TableCell>
+              <TableCell>Quantity</TableCell>
+              <TableCell>Value</TableCell>
+              <TableCell>Source</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {transactions.map((transaction) => (
+              <TableRow key={transaction.pk}>
+                <TableCell>{datetime(transaction.timestamp)}</TableCell>
+                <TableCell>
+                  {getTransactionTypeLabel(transaction.type)}
+                </TableCell>
+                <TableCell>{transaction.asset.symbol.toUpperCase()}</TableCell>
+                <TableCell>{transaction.quantity}</TableCell>
+                <TableCell>{currency(transaction.value)}</TableCell>
+                <TableCell>{transaction.source}</TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {transactions.map((transaction) => (
-                <TableRow key={transaction.pk}>
-                  <TableCell>{datetime(transaction.timestamp)}</TableCell>
-                  <TableCell>
-                    {getTransactionTypeLabel(transaction.type)}
-                  </TableCell>
-                  <TableCell>
-                    {transaction.asset.symbol.toUpperCase()}
-                  </TableCell>
-                  <TableCell>{transaction.quantity}</TableCell>
-                  <TableCell>{currency(transaction.value)}</TableCell>
-                  <TableCell>{transaction.source}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
-      </Stack>
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
+    </Stack>
   );
 }
 
