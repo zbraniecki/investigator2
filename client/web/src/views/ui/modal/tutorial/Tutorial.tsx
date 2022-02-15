@@ -64,49 +64,49 @@ export function TutorialDialog({ open, setOpen }: Props) {
 
   const subSteps = steps[0].children.length + 1;
 
-  const totalSteps = () => steps.length;
+  // const totalSteps = () => steps.length;
 
-  const completedSteps = () => Object.keys(completed).length;
+  // const completedSteps = () => Object.keys(completed).length;
 
-  const isLastStep = () => activeStep === totalSteps() - 1;
+  // const isLastStep = () => activeStep === totalSteps() - 1;
 
-  const allStepsCompleted = () => completedSteps() === totalSteps();
+  // const allStepsCompleted = () => completedSteps() === totalSteps();
 
   const handleNext = () => {
     let lastSubStep = false;
     if (activeStep === 0 && subStep < subSteps) {
       const newSubStep = subStep + 1;
       setSubStep(newSubStep);
-      if (newSubStep == subSteps) {
+      if (newSubStep === subSteps) {
         lastSubStep = true;
       }
     }
-    if (subStep == subSteps || lastSubStep) {
+    if (subStep === subSteps || lastSubStep) {
       const newActiveStep = activeStep + 1;
       setActiveStep(newActiveStep);
     }
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  // const handleBack = () => {
+  //   setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  // };
 
   const handleStep = (step: number) => () => {
     setSubStep(0);
     setActiveStep(step);
   };
 
-  const handleComplete = () => {
-    const newCompleted: Record<string, boolean> = completed;
-    newCompleted[activeStep] = true;
-    setCompleted(newCompleted);
-    handleNext();
-  };
+  // const handleComplete = () => {
+  //   const newCompleted: Record<string, boolean> = completed;
+  //   newCompleted[activeStep] = true;
+  //   setCompleted(newCompleted);
+  //   handleNext();
+  // };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
-  };
+  // const handleReset = () => {
+  //   setActiveStep(0);
+  //   setCompleted({});
+  // };
 
   const handleCancel = () => {
     setOpen(false);
@@ -125,6 +125,7 @@ export function TutorialDialog({ open, setOpen }: Props) {
       break;
     }
     default: {
+      break;
     }
   }
 
@@ -139,7 +140,7 @@ export function TutorialDialog({ open, setOpen }: Props) {
     },
   };
 
-  for (let i = 1; i < activeStep; i++) {
+  for (let i = 1; i < activeStep; i += 1) {
     sx[`& > div.MuiStepConnector-root:nth-child(${2 * (i + 1)}) > span`] = {
       backgroundColor: "#00bcd4",
       height: "1px",
