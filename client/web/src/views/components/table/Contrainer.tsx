@@ -186,7 +186,7 @@ export function TableContainer({
         setFilter={handleSetFilter}
         handleMenuOpen={handleMenuOpen}
       />
-      <MUITableContainer
+      {/* <MUITableContainer
         component={Paper}
         sx={{ height: showPager ? "97%" : "100%", overflowY: "auto" }}
       >
@@ -214,7 +214,7 @@ export function TableContainer({
         baseMeta={baseMeta}
         tableMeta={tableMeta}
         handleColumnVisibilityChange={handleColumnVisibilityChange}
-      />
+      /> */}
     </>
   );
 }

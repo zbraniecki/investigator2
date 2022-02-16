@@ -365,7 +365,10 @@ export function preparePortfolioTableData(
 ): PortfolioTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);
-  if (Object.keys(assetInfo).length === 0) {
+  if (
+    Object.keys(assetInfo).length === 0 ||
+    Object.keys(holdings).length === 0
+  ) {
     return undefined;
   }
 

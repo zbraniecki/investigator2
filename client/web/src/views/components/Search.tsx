@@ -31,7 +31,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export function SearchInput({ handleChange }: { handleChange: any }) {
   return (
     <Search
-      sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        maxWidth: "100px",
+        width: "auto",
+        flex: 1,
+        flexShrink: 2,
+      }}
     >
       <SearchIcon
         fontSize="small"

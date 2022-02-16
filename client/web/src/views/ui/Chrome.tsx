@@ -5,6 +5,7 @@ import cyan from "@mui/material/colors/cyan";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useSelector } from "react-redux";
 import { useRoutes } from "react-router-dom";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { LightMode, getLightModeName } from "../../components/settings";
 import { InvestigatorAppBar } from "./AppBar";
 import InvestigatorDrawer from "./Drawer";
@@ -42,6 +43,8 @@ export function Chrome() {
       }),
     [lightModeName]
   );
+  const smallScreen = useMediaQuery(theme.breakpoints.up("sm"));
+
   const menuItems = getMenuItems();
 
   const children = [];
@@ -85,10 +88,12 @@ export function Chrome() {
         setSettingsOpen={setSettingsOpen}
       />
       <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
-        <InvestigatorDrawer
-          menuItems={menuItems}
-          updateDialogState={updateDialogState}
-        />
+        {smallScreen && (
+          <InvestigatorDrawer
+            menuItems={menuItems}
+            updateDialogState={updateDialogState}
+          />
+        )}
         {routes}
       </Box>
       <ModalDialog state={dialogState} updateState={updateDialogState} />
