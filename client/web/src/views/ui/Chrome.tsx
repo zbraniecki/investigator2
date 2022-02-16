@@ -43,7 +43,7 @@ export function Chrome() {
       }),
     [lightModeName]
   );
-  const smallScreen = useMediaQuery(theme.breakpoints.up("sm"));
+  const smallScreen = !useMediaQuery(theme.breakpoints.up("sm"));
 
   const menuItems = getMenuItems();
 
@@ -69,7 +69,7 @@ export function Chrome() {
   const routes = useRoutes([
     {
       path: "/",
-      element: <Content updateDialogState={updateDialogState} />,
+      element: <Content updateDialogState={updateDialogState} smallScreen={smallScreen} />,
       children,
     },
   ]);
@@ -88,7 +88,7 @@ export function Chrome() {
         setSettingsOpen={setSettingsOpen}
       />
       <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
-        {smallScreen && (
+        {!smallScreen && (
           <InvestigatorDrawer
             menuItems={menuItems}
             updateDialogState={updateDialogState}

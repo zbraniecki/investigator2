@@ -91,7 +91,7 @@ export function Table({ meta, summary, rows, slice }: Props) {
 
   return (
     <MUITable>
-      {meta.showHeaders && meta.columns.length > 0 && (
+      {/* {meta.showHeaders && meta.columns.length > 0 && (
         <TableHead
           sx={{
             position: "sticky",
@@ -108,13 +108,13 @@ export function Table({ meta, summary, rows, slice }: Props) {
             setCustomSortOrder={setCustomSortOrder}
           />
         </TableHead>
-      )}
-      <TableBody>
+      )} */}
+      {/* <TableBody>
         {visibleRows?.map((row, idx) => {
           const id = `${meta.name}-row-${idx}`;
           return <Row id={id} key={id} data={row} tableMeta={meta} />;
         })}
-      </TableBody>
+      </TableBody> */}
     </MUITable>
   );
 }

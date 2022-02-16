@@ -6,15 +6,16 @@ type ContextType = { updateDialogState: any };
 
 export interface Props {
   updateDialogState: any;
+  smallScreen: boolean;
 }
 
-export default function Content({ updateDialogState }: Props) {
+export default function Content({ updateDialogState, smallScreen }: Props) {
   return (
     <Box
       component="main"
       sx={{
         flex: 1,
-        p: 3,
+        p: smallScreen ? 0 : 3,
         paddingTop: 0,
         height: "calc(100vh - 130px)",
       }}
