@@ -9,7 +9,6 @@ interface CellProps {
   id: string;
   data?: CellData<CellValue>;
   align: CellAlign;
-  width: string;
   formatter?: Formatter;
   showValue: boolean;
   onClick?: any;
@@ -25,7 +24,6 @@ export function Cell({
   id,
   data,
   align,
-  width,
   formatter,
   showValue,
   onClick,
@@ -45,7 +43,7 @@ export function Cell({
       key={id}
       onClick={onClick}
       align={align}
-      sx={{ width, cursor: onClick ? "pointer" : "auto" }}
+      sx={{ cursor: onClick ? "pointer" : "auto" }}
     >
       <Typography sx={sx}>{displayValue}</Typography>
     </TableCell>
@@ -57,7 +55,6 @@ interface EditableCellProps {
   column: string;
   data: CellData<CellValue>;
   align: CellAlign;
-  width: string;
   formatter?: Formatter;
   onCellUpdate: any;
 }
@@ -86,7 +83,6 @@ export function EditableCell({
   column,
   data,
   align,
-  width,
   formatter,
   onCellUpdate,
 }: EditableCellProps) {
@@ -180,7 +176,7 @@ export function EditableCell({
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDblClick}
       align={align}
-      sx={{ color: updateInProgress ? "action.disabled" : "inherit", width }}
+      sx={{ color: updateInProgress ? "action.disabled" : "inherit" }}
     >
       {editing ? (
         <InputBase

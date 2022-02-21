@@ -16,7 +16,6 @@ import { SubHeaderRow } from "./SubHeader";
 interface CellProps {
   id: string;
   columnName: string;
-  width: string;
   value?: CellValue;
   align: CellAlign;
   defaultSortDirection: SortDirection;
@@ -44,7 +43,6 @@ function getSortDirection(
 function Cell({
   id,
   columnName,
-  width,
   value,
   align,
   defaultSortDirection,
@@ -90,7 +88,7 @@ function Cell({
       key={id}
       align={align}
       sortDirection={sortDirection}
-      sx={{ width, ...sx }}
+      sx={{ ...sx }}
     >
       <TableSortLabel
         direction={getSortDirection(sort, defaultSortDirection)}
@@ -108,6 +106,7 @@ export interface Props {
   summary?: TableSummaryRow;
   sortOrder: SortColumn[];
   setCustomSortOrder: any;
+  minWidths: Record<string, number>;
 }
 
 export function HeaderRow({
@@ -115,6 +114,7 @@ export function HeaderRow({
   summary,
   sortOrder,
   setCustomSortOrder,
+  minWidths,
 }: Props) {
   const sort = sortOrder.length > 0 ? sortOrder[0] : undefined;
 
@@ -122,8 +122,8 @@ export function HeaderRow({
 
   const cellSx = subHeader
     ? {
-        paddingBottom: 0,
-      }
+      paddingBottom: 0,
+    }
     : {};
 
   return (
@@ -142,18 +142,29 @@ export function HeaderRow({
           .filter((column: ColumnMeta) => column.visible)
           .map((column: ColumnMeta) => {
             const id = `${tableMeta.name}-header-${column.key}`;
+            const sx: {
+              [key: string]: any;
+            } = {
+              minWidth: column.minWidth,
+              width: column.width,
+            };
+            if (minWidths[column.key]) {
+              sx["display"] = "none";
+              sx[`@media (min-width: ${minWidths[column.key]}px)`] = {
+                display: "table-cell",
+              };
+            }
             return (
               <Cell
                 key={id}
                 id={id}
                 columnName={column.key}
-                width={column.width}
                 value={column.label}
                 align={column.align}
                 defaultSortDirection={column.sortDirection}
                 sort={sort?.column === column.key ? sort?.direction : undefined}
                 setCustomSortOrder={setCustomSortOrder}
-                sx={cellSx}
+                sx={sx}
               />
             );
           })}

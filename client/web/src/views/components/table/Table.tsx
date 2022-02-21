@@ -89,9 +89,25 @@ export function Table({ meta, summary, rows, slice }: Props) {
 
   const visibleRows = slice && rows ? rows.slice(slice[0], slice[1]) : rows;
 
+  const columnKeys = meta.columns
+    .filter((column: ColumnMeta) => column.visible)
+    .sort((a: ColumnMeta, b: ColumnMeta) => a.priority - b.priority);
+
+  const minWidths: Record<string, number> = {};
+
+  let minWidth = 0;
+  for (let col of columnKeys) {
+    if (col.minWidth) {
+      minWidth += col.minWidth;
+    }
+    if (col.priority > 0) {
+      minWidths[col.key] = minWidth + (col.minWidth || 0);
+    }
+  }
+
   return (
     <MUITable>
-      {/* {meta.showHeaders && meta.columns.length > 0 && (
+      {meta.showHeaders && meta.columns.length > 0 && (
         <TableHead
           sx={{
             position: "sticky",
@@ -106,15 +122,16 @@ export function Table({ meta, summary, rows, slice }: Props) {
             summary={summary}
             sortOrder={sortOrder}
             setCustomSortOrder={setCustomSortOrder}
+            minWidths={minWidths}
           />
         </TableHead>
-      )} */}
-      {/* <TableBody>
+      )}
+      <TableBody>
         {visibleRows?.map((row, idx) => {
           const id = `${meta.name}-row-${idx}`;
           return <Row id={id} key={id} data={row} tableMeta={meta} />;
         })}
-      </TableBody> */}
+      </TableBody>
     </MUITable>
   );
 }

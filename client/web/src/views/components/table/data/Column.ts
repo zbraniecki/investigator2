@@ -28,30 +28,34 @@ export type ColumnsMeta = ColumnMeta[];
 
 export interface BaseColumnMeta {
   label: string;
-  width: string;
   align: CellAlign;
   sortDirection: SortDirection;
   formatter?: Formatter;
   editable?: boolean;
   sensitive?: boolean;
+  priority?: number;
   modal?: (cells: Record<string, any>, updateDialogState: any) => void;
 }
 
 export interface ColumnSettings {
   key: string;
+  minWidth?: number;
+  width?: number | "auto";
   visible?: boolean;
 }
 
 export interface ColumnMeta {
   key: string;
   label: string;
-  width: string;
+  width?: number | "auto";
+  minWidth?: number;
   align: CellAlign;
   sortDirection: SortDirection;
   formatter?: Formatter;
   editable: boolean;
   visible: boolean;
   sensitive: boolean;
+  priority: number;
   modal: ((cells: Record<string, any>, updateDialogState: any) => void) | null;
 }
 
@@ -104,13 +108,15 @@ export function buildColumnMeta(
   return {
     key: settings.key,
     label: base.label,
-    width: base.width,
+    width: settings.width,
+    minWidth: settings.minWidth,
     align: base.align,
     sortDirection: base.sortDirection,
     formatter: base.formatter,
     editable: base.editable !== undefined ? base.editable : false,
     visible: settings?.visible !== undefined ? settings.visible : false,
     sensitive: base.sensitive || false,
+    priority: base.priority ?? Infinity,
     modal: base.modal || null,
   };
 }

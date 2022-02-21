@@ -85,20 +85,20 @@ const handleTargetUpdate = (
 
   const tc = existing
     ? updateTargetChangeThunk({
-        token,
-        pk: existing.pk,
-        change: new Decimal(existing.change).plus(diffPercent).toNumber(),
-        timestamp: new Date(),
-      })
+      token,
+      pk: existing.pk,
+      change: new Decimal(existing.change).plus(diffPercent).toNumber(),
+      timestamp: new Date(),
+    })
     : createTargetChangeThunk({
-        token,
-        input: {
-          strategy: target.strategy,
-          asset: target.asset,
-          change: diffPercent,
-          timestamp: new Date(),
-        },
-      });
+      token,
+      input: {
+        strategy: target.strategy,
+        asset: target.asset,
+        change: diffPercent,
+        timestamp: new Date(),
+      },
+    });
 
   return Promise.all([
     dispatch(tc),
@@ -195,7 +195,6 @@ export function Row({ id, data, tableMeta }: Props) {
                   id={key}
                   data={cell}
                   align={column.align}
-                  width={column.width}
                   formatter={column.formatter}
                   onCellUpdate={handleCellUpdate}
                 />
@@ -207,7 +206,6 @@ export function Row({ id, data, tableMeta }: Props) {
                 id={key}
                 data={cell}
                 align={column.align}
-                width={column.width}
                 formatter={column.formatter}
                 showValue={!hideValue}
                 onClick={
