@@ -9,6 +9,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { LightMode, getLightModeName } from "../../components/settings";
 import { InvestigatorAppBar } from "./AppBar";
 import InvestigatorDrawer from "./Drawer";
+import BottomDrawer from "./BottomDrawer";
 import { getMenuItems } from "./Menu";
 import Content from "./Content";
 import { getLightMode } from "../../store/ui";
@@ -100,6 +101,11 @@ export function Chrome() {
           />
         )}
         {routes}
+        {/* {smallScreen && (
+          <BottomDrawer
+            menuItems={menuItems}
+          />
+        )} */}
       </Box>
       <ModalDialog state={dialogState} updateState={updateDialogState} />
     </ThemeProvider>

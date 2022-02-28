@@ -95,10 +95,11 @@ export function Table({ meta, summary, rows, slice }: Props) {
   const columnKeys = meta.columns
     .filter((column: ColumnMeta) => column.visible)
     .sort((a: ColumnMeta, b: ColumnMeta) => a.priority - b.priority);
+  console.log(columnKeys);
 
   const minWidths: Record<string, number> = {};
 
-  let minWidth = 0;
+  let minWidth = 66;
   for (const col of columnKeys) {
     if (col.minWidth) {
       minWidth += col.minWidth;
@@ -107,6 +108,7 @@ export function Table({ meta, summary, rows, slice }: Props) {
       minWidths[col.key] = minWidth;
     }
   }
+  console.log(minWidths);
 
   return (
     <MUITable size={outletContext.smallScreen ? "small" : "medium"}>

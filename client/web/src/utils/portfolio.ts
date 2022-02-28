@@ -176,7 +176,7 @@ export function buildPortfolioTableData(
       cells: {
         id: pk,
         asset: asset.pk,
-        name: asset.name,
+        name: asset.symbol.toUpperCase(),
         symbol: asset.symbol,
         price: asset.info.value,
         quantity,
@@ -215,25 +215,23 @@ export function buildPortfolioTableData(
         const asset = assetInfo[holding.asset];
         assert(asset);
         if (portfolio.tags.includes(asset.asset_class)) {
-          let serviceAsset;
-          if (account) {
-            serviceAsset = getServiceAsset(account.service, asset.pk, services);
-          }
+          let serviceAsset = getServiceAsset(account.service, asset.pk, services);
           const mcap_share = asset.info.circulating_supply
             ? holding.quantity / asset.info.circulating_supply
             : undefined;
+          const service = services[account.service];
 
           rows.push({
             cells: {
               id: holding.pk,
               account_id: account?.pk,
               asset: asset.pk,
-              name: asset.name,
+              name: asset.symbol.toUpperCase(),
               symbol: asset.symbol,
               price: asset.info.value,
               quantity: holding.quantity,
               value: asset.info.value * holding.quantity,
-              account: account?.name,
+              account: service?.provider_name,
               yield: serviceAsset?.apy,
               mcap: asset.info.market_cap,
               mcap_share,
@@ -264,24 +262,27 @@ export function createPortfolioTableData(
     assert(asset, `Missing asset: ${assetId}`);
     const account = accountId ? accounts[accountId] : undefined;
     let serviceAsset;
+    let service;
     if (account) {
       serviceAsset = getServiceAsset(account.service, asset.pk, services);
+      service = services[account?.service];
     }
     const mcap_share = asset.info.circulating_supply
       ? quantity / asset.info.circulating_supply
       : undefined;
+
 
     return {
       cells: {
         id: pk,
         account_id: account?.pk,
         asset: asset.pk,
-        name: asset.name,
+        name: asset.symbol.toUpperCase(),
         symbol: asset.symbol,
         price: asset.info.value,
         quantity,
         value: asset.info.value * quantity,
-        account: account?.name,
+        account: service?.provider_name,
         yield: serviceAsset?.apy,
         mcap: asset.info.market_cap,
         mcap_share,
@@ -319,18 +320,19 @@ export function createPortfolioTableData(
           const mcap_share = asset.info.circulating_supply
             ? holding.quantity / asset.info.circulating_supply
             : undefined;
+          const service = services[account.service];
 
           rows.push({
             cells: {
               id: holding.pk,
               account_id: account?.pk,
               asset: asset.pk,
-              name: asset.name,
+              name: asset.symbol.toUpperCase(),
               symbol: asset.symbol,
               price: asset.info.value,
               quantity: holding.quantity,
               value: asset.info.value * holding.quantity,
-              account: account?.name,
+              account: service?.provider_name,
               yield: serviceAsset?.apy,
               mcap: asset.info.market_cap,
               mcap_share,

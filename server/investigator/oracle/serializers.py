@@ -46,10 +46,11 @@ class AssetSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField("get_name")
     assets = serializers.SerializerMethodField("get_assets")
+    provider_name = serializers.SerializerMethodField("get_provider_name")
 
     class Meta:
         model = Service
-        fields = ["pk", "name", "assets", "type"]
+        fields = ["pk", "name", "assets", "type", "provider_name"]
 
     def get_name(self, obj):
         return obj.__str__()
@@ -83,6 +84,9 @@ class ServiceSerializer(serializers.ModelSerializer):
             )
 
         return result
+
+    def get_provider_name(self, obj):
+        return obj.provider.name
 
 
 class PublicWatchlistSerializer(serializers.ModelSerializer):

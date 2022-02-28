@@ -85,20 +85,20 @@ const handleTargetUpdate = (
 
   const tc = existing
     ? updateTargetChangeThunk({
-        token,
-        pk: existing.pk,
-        change: new Decimal(existing.change).plus(diffPercent).toNumber(),
-        timestamp: new Date(),
-      })
+      token,
+      pk: existing.pk,
+      change: new Decimal(existing.change).plus(diffPercent).toNumber(),
+      timestamp: new Date(),
+    })
     : createTargetChangeThunk({
-        token,
-        input: {
-          strategy: target.strategy,
-          asset: target.asset,
-          change: diffPercent,
-          timestamp: new Date(),
-        },
-      });
+      token,
+      input: {
+        strategy: target.strategy,
+        asset: target.asset,
+        change: diffPercent,
+        timestamp: new Date(),
+      },
+    });
 
   return Promise.all([
     dispatch(tc),
@@ -200,7 +200,7 @@ export function Row({ id, data, tableMeta, minWidths }: Props) {
             }
             const cell = data.cells[column.key];
             const hideValue = column.sensitive && tableMeta.hideSensitive;
-            if (column.editable && !hideValue && cell && data.cells.id) {
+            if (column.editable && !hideValue && cell && data.cells.id && !outletContext.smallScreen) {
               return (
                 <EditableCell
                   key={key}

@@ -44,6 +44,7 @@ export interface Service {
   name: string;
   assets: ServiceAsset[];
   type: "WALT" | "CHAC" | "SAAC" | "INAC" | "REAC" | "CRAC" | "LOAN";
+  provider_name: string;
 }
 
 export interface Category {
