@@ -121,7 +121,7 @@ export function createStrategyTableData(
       return {
         cells: {
           id: target.pk,
-          name: asset.name,
+          name: asset.symbol.toUpperCase(),
           target: target.percent,
           current: currentPercent,
           deviation,

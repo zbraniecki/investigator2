@@ -99,7 +99,7 @@ export function Table({ meta, summary, rows, slice }: Props) {
 
   const minWidths: Record<string, number> = {};
 
-  let minWidth = 66;
+  let minWidth = meta.nested ? 66 : 0;
   for (const col of columnKeys) {
     if (col.minWidth) {
       minWidth += col.minWidth;
@@ -108,7 +108,6 @@ export function Table({ meta, summary, rows, slice }: Props) {
       minWidths[col.key] = minWidth;
     }
   }
-  console.log(minWidths);
 
   return (
     <MUITable size={outletContext.smallScreen ? "small" : "medium"}>
