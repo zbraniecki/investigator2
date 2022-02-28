@@ -89,6 +89,7 @@ export function prepareAccountsTableData(
     type: RowType.Asset,
     children: groups.map((group) => {
       const account = accounts[group.item];
+      const service = services[account.service];
       let groupValue = 0;
 
       const children = group.children?.map((item) => {
@@ -112,7 +113,7 @@ export function prepareAccountsTableData(
       return {
         cells: {
           id: group.item,
-          account: account.name,
+          account: service.provider_name,
           value: groupValue,
         },
         children,
