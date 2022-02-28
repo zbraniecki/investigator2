@@ -2,7 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { useOutletContext, Outlet } from "react-router-dom";
 
-type ContextType = { updateDialogState: any };
+type ContextType = { updateDialogState: any; smallScreen: boolean };
 
 export interface Props {
   updateDialogState: any;
@@ -20,7 +20,7 @@ export default function Content({ updateDialogState, smallScreen }: Props) {
         height: "calc(100vh - 130px)",
       }}
     >
-      <Outlet context={{ updateDialogState }} />
+      <Outlet context={{ updateDialogState, smallScreen }} />
     </Box>
   );
 }

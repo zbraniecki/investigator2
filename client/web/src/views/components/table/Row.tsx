@@ -162,7 +162,7 @@ export function Row({ id, data, tableMeta, minWidths }: Props) {
   };
 
   const handleClick = (column: ColumnMeta) => {
-    if (column.modal) {
+    if (column.modal && !outletContext.smallScreen) {
       column.modal(data.cells, outletContext.updateDialogState);
     }
   };

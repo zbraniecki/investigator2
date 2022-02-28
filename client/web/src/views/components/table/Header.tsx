@@ -88,7 +88,7 @@ function Cell({
       key={id}
       align={align}
       sortDirection={sortDirection}
-      sx={{ ...sx }}
+      sx={{ border: 0, ...sx }}
     >
       <TableSortLabel
         direction={getSortDirection(sort, defaultSortDirection)}

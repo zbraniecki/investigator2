@@ -41,6 +41,7 @@ function SubHeaderCell({
         fontSize: "small",
         paddingTop: 0,
         paddingBottom: 0,
+        border: 0,
         ...sx,
       }}
     >

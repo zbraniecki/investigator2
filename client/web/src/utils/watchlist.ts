@@ -166,7 +166,7 @@ export function createWatchlistTableData(
     };
   });
 
-  const cells = computeHeaderData(watchlist, rows);
+  const cells = rows.length ? computeHeaderData(watchlist, rows) : {};
 
   return {
     cells,
@@ -195,11 +195,7 @@ export function prepareWatchlistTableData(
     return undefined;
   }
 
-  if (
-    Object.keys(assetInfo).length === 0 ||
-    Object.keys(holdings).length === 0 ||
-    Object.keys(accounts).length === 0
-  ) {
+  if (Object.keys(assetInfo).length === 0) {
     return undefined;
   }
 
@@ -273,7 +269,7 @@ export function computeWatchlistTableDataStyle(
     if (info === undefined) {
       continue;
     }
-    if (cell.value === null) {
+    if (cell === undefined || cell.value === null) {
       continue;
     }
     assert(typeof cell.value === "number");

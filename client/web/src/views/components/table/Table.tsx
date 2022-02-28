@@ -13,6 +13,7 @@ import {
 import { TableMeta, TableSummaryRow } from "./data/Table";
 import { StyledRowsData } from "./data/Row";
 import { assert } from "../../../utils/helpers";
+import { getOutletContext } from "../../ui/Content";
 
 function sortFunc(sortColumns: SortColumn[], a: any, b: any): number {
   const sortColumn = sortColumns[0];
@@ -67,6 +68,8 @@ export function Table({ meta, summary, rows, slice }: Props) {
     undefined as undefined | SortColumn
   );
 
+  const outletContext = getOutletContext();
+
   const sortOrder: SortColumn[] = [];
 
   for (const column of meta.sortColumns) {
@@ -106,7 +109,7 @@ export function Table({ meta, summary, rows, slice }: Props) {
   }
 
   return (
-    <MUITable size="small">
+    <MUITable size={outletContext.smallScreen ? "small" : "medium"}>
       {meta.showHeaders && meta.columns.length > 0 && (
         <TableHead
           sx={{
