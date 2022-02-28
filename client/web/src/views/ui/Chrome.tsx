@@ -69,7 +69,12 @@ export function Chrome() {
   const routes = useRoutes([
     {
       path: "/",
-      element: <Content updateDialogState={updateDialogState} smallScreen={smallScreen} />,
+      element: (
+        <Content
+          updateDialogState={updateDialogState}
+          smallScreen={smallScreen}
+        />
+      ),
       children,
     },
   ]);

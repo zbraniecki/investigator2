@@ -22,7 +22,6 @@ PROVIDER_MAP = {
 }
 
 SYMBOL_MAP = {
-    "avax": "AVAX",
 }
 
 

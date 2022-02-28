@@ -96,17 +96,17 @@ export function Table({ meta, summary, rows, slice }: Props) {
   const minWidths: Record<string, number> = {};
 
   let minWidth = 0;
-  for (let col of columnKeys) {
+  for (const col of columnKeys) {
     if (col.minWidth) {
       minWidth += col.minWidth;
     }
     if (col.priority > 0) {
-      minWidths[col.key] = minWidth + (col.minWidth || 0);
+      minWidths[col.key] = minWidth;
     }
   }
 
   return (
-    <MUITable>
+    <MUITable size="small">
       {meta.showHeaders && meta.columns.length > 0 && (
         <TableHead
           sx={{
@@ -129,7 +129,15 @@ export function Table({ meta, summary, rows, slice }: Props) {
       <TableBody>
         {visibleRows?.map((row, idx) => {
           const id = `${meta.name}-row-${idx}`;
-          return <Row id={id} key={id} data={row} tableMeta={meta} />;
+          return (
+            <Row
+              id={id}
+              key={id}
+              data={row}
+              tableMeta={meta}
+              minWidths={minWidths}
+            />
+          );
         })}
       </TableBody>
     </MUITable>

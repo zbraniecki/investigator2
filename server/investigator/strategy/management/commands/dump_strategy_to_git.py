@@ -16,7 +16,6 @@ import toml
 getcontext().prec = 2
 
 SYMBOL_MAP = {
-    "avax": "AVAX",
 }
 
 

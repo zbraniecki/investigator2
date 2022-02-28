@@ -85,20 +85,20 @@ const handleTargetUpdate = (
 
   const tc = existing
     ? updateTargetChangeThunk({
-      token,
-      pk: existing.pk,
-      change: new Decimal(existing.change).plus(diffPercent).toNumber(),
-      timestamp: new Date(),
-    })
-    : createTargetChangeThunk({
-      token,
-      input: {
-        strategy: target.strategy,
-        asset: target.asset,
-        change: diffPercent,
+        token,
+        pk: existing.pk,
+        change: new Decimal(existing.change).plus(diffPercent).toNumber(),
         timestamp: new Date(),
-      },
-    });
+      })
+    : createTargetChangeThunk({
+        token,
+        input: {
+          strategy: target.strategy,
+          asset: target.asset,
+          change: diffPercent,
+          timestamp: new Date(),
+        },
+      });
 
   return Promise.all([
     dispatch(tc),
@@ -116,8 +116,9 @@ export interface Props {
   id: string;
   data: StyledRowData;
   tableMeta: TableMeta;
+  minWidths: Record<string, number>;
 }
-export function Row({ id, data, tableMeta }: Props) {
+export function Row({ id, data, tableMeta, minWidths }: Props) {
   const [open, setOpen] = React.useState(false);
   const session = useSelector(getSession);
   const holdings = useSelector(getHoldings);
@@ -183,8 +184,20 @@ export function Row({ id, data, tableMeta }: Props) {
         )}
         {tableMeta.columns
           .filter((columns) => columns.visible)
-          .map((column) => {
+          .map((column: ColumnMeta) => {
             const key = `${id}-${column.key}`;
+            const sx: {
+              [key: string]: any;
+            } = {
+              minWidth: column.minWidth,
+              width: column.width,
+            };
+            if (minWidths[column.key]) {
+              sx.display = "none";
+              sx[`@media (min-width: ${minWidths[column.key]}px)`] = {
+                display: "table-cell",
+              };
+            }
             const cell = data.cells[column.key];
             const hideValue = column.sensitive && tableMeta.hideSensitive;
             if (column.editable && !hideValue && cell && data.cells.id) {
@@ -197,6 +210,7 @@ export function Row({ id, data, tableMeta }: Props) {
                   align={column.align}
                   formatter={column.formatter}
                   onCellUpdate={handleCellUpdate}
+                  sx={sx}
                 />
               );
             }
@@ -213,6 +227,7 @@ export function Row({ id, data, tableMeta }: Props) {
                     ? () => handleClick(column)
                     : undefined
                 }
+                sx={sx}
               />
             );
           })}

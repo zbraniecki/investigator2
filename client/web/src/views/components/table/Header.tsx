@@ -122,8 +122,8 @@ export function HeaderRow({
 
   const cellSx = subHeader
     ? {
-      paddingBottom: 0,
-    }
+        paddingBottom: 0,
+      }
     : {};
 
   return (
@@ -149,7 +149,7 @@ export function HeaderRow({
               width: column.width,
             };
             if (minWidths[column.key]) {
-              sx["display"] = "none";
+              sx.display = "none";
               sx[`@media (min-width: ${minWidths[column.key]}px)`] = {
                 display: "table-cell",
               };
@@ -169,7 +169,13 @@ export function HeaderRow({
             );
           })}
       </TableRow>
-      {subHeader && <SubHeaderRow summary={summary} tableMeta={tableMeta} />}
+      {subHeader && (
+        <SubHeaderRow
+          summary={summary}
+          tableMeta={tableMeta}
+          minWidths={minWidths}
+        />
+      )}
     </>
   );
 }

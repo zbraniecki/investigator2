@@ -12,6 +12,7 @@ interface CellProps {
   formatter?: Formatter;
   showValue: boolean;
   onClick?: any;
+  sx: any;
 }
 
 Cell.defaultProps = {
@@ -27,6 +28,7 @@ export function Cell({
   formatter,
   showValue,
   onClick,
+  sx,
 }: CellProps) {
   const displayValue = data?.value
     ? showValue
@@ -34,18 +36,17 @@ export function Cell({
       : "*"
     : "";
 
-  const sx: Record<string, any> = {};
+  const tSx: Record<string, any> = {};
   if (showValue && data?.color) {
-    sx.color = data.color;
+    tSx.color = data.color;
+  }
+  const cSx: Record<string, any> = { ...sx };
+  if (showValue && data?.color) {
+    cSx.cursor = onClick ? "pointer" : "auto";
   }
   return (
-    <TableCell
-      key={id}
-      onClick={onClick}
-      align={align}
-      sx={{ cursor: onClick ? "pointer" : "auto" }}
-    >
-      <Typography sx={sx}>{displayValue}</Typography>
+    <TableCell key={id} onClick={onClick} align={align} sx={cSx}>
+      <Typography sx={tSx}>{displayValue}</Typography>
     </TableCell>
   );
 }
@@ -57,6 +58,7 @@ interface EditableCellProps {
   align: CellAlign;
   formatter?: Formatter;
   onCellUpdate: any;
+  sx: any;
 }
 
 EditableCell.defaultProps = {
@@ -85,6 +87,7 @@ export function EditableCell({
   align,
   formatter,
   onCellUpdate,
+  sx,
 }: EditableCellProps) {
   const [tempValue, setTempValue] = React.useState(null as string | null);
   const [editing, setEditing] = React.useState(false);
@@ -176,7 +179,7 @@ export function EditableCell({
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDblClick}
       align={align}
-      sx={{ color: updateInProgress ? "action.disabled" : "inherit" }}
+      sx={{ color: updateInProgress ? "action.disabled" : "inherit", ...sx }}
     >
       {editing ? (
         <InputBase

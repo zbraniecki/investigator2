@@ -154,7 +154,7 @@ export function createWatchlistTableData(
         id: asset.pk,
         market_cap_rank: asset.info.market_cap_rank,
         market_cap: asset.info.market_cap,
-        name: asset.name,
+        name: asset.symbol.toUpperCase(),
         symbol: asset.symbol,
         price: asset.info.value,
         price_change_percentage_1h: asset.info.price_change_percentage_1h,
@@ -195,7 +195,11 @@ export function prepareWatchlistTableData(
     return undefined;
   }
 
-  if (Object.keys(assetInfo).length === 0) {
+  if (
+    Object.keys(assetInfo).length === 0 ||
+    Object.keys(holdings).length === 0 ||
+    Object.keys(accounts).length === 0
+  ) {
     return undefined;
   }
 
