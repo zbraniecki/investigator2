@@ -93,20 +93,21 @@ export function Chrome() {
         lightModeName={lightModeName}
         setSettingsOpen={setSettingsOpen}
       />
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
-        {!smallScreen && (
+      {smallScreen && (
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {routes}
+          <BottomDrawer menuItems={menuItems} />
+        </Box>
+      )}
+      {!smallScreen && (
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
           <InvestigatorDrawer
             menuItems={menuItems}
             updateDialogState={updateDialogState}
           />
-        )}
-        {routes}
-        {/* {smallScreen && (
-          <BottomDrawer
-            menuItems={menuItems}
-          />
-        )} */}
-      </Box>
+          {routes}
+        </Box>
+      )}
       <ModalDialog state={dialogState} updateState={updateDialogState} />
     </ThemeProvider>
   );

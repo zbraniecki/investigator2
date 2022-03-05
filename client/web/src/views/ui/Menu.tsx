@@ -11,6 +11,7 @@ import { Strategy } from "../pages/Strategy";
 
 export interface MenuItem {
   id: string;
+  label: string;
   paths: string[];
   icon: React.ReactNode;
   element: React.ReactElement;
@@ -25,6 +26,7 @@ const menuItems: Array<MenuItem> = [
   // },
   {
     id: "watchlists",
+    label: "Watchlists",
     paths: [":id"],
     icon: <TrendingUpIcon />,
     element: <Watchlists />,
@@ -32,18 +34,21 @@ const menuItems: Array<MenuItem> = [
   },
   {
     id: "portfolios",
+    label: "Portfolios",
     paths: [":id"],
     icon: <MonetizationOnIcon />,
     element: <Portfolios />,
   },
   {
     id: "strategies",
+    label: "Strategies",
     paths: [":id"],
     icon: <PieChartIcon />,
     element: <Strategy />,
   },
   {
     id: "accounts",
+    label: "Accounts",
     paths: [":id"],
     icon: <AccountBalanceIcon />,
     element: <Accounts />,

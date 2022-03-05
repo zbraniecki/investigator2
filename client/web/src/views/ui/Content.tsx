@@ -17,7 +17,9 @@ export default function Content({ updateDialogState, smallScreen }: Props) {
         flex: 1,
         p: smallScreen ? 0 : 3,
         paddingTop: 0,
-        height: "calc(100vh - 130px)",
+        backgoundColor: "white",
+        overflow: "hidden",
+        // height: "calc(100vh - 103px)",
       }}
     >
       <Outlet context={{ updateDialogState, smallScreen }} />

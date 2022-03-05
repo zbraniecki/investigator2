@@ -215,7 +215,11 @@ export function buildPortfolioTableData(
         const asset = assetInfo[holding.asset];
         assert(asset);
         if (portfolio.tags.includes(asset.asset_class)) {
-          let serviceAsset = getServiceAsset(account.service, asset.pk, services);
+          const serviceAsset = getServiceAsset(
+            account.service,
+            asset.pk,
+            services
+          );
           const mcap_share = asset.info.circulating_supply
             ? holding.quantity / asset.info.circulating_supply
             : undefined;
@@ -270,7 +274,6 @@ export function createPortfolioTableData(
     const mcap_share = asset.info.circulating_supply
       ? quantity / asset.info.circulating_supply
       : undefined;
-
 
     return {
       cells: {

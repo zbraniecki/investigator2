@@ -1,4 +1,5 @@
 import React from "react";
+import Box from "@mui/material/Box";
 import { useSelector, useDispatch } from "react-redux";
 import MUITableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
@@ -186,17 +187,18 @@ export function TableContainer({
         setFilter={handleSetFilter}
         handleMenuOpen={handleMenuOpen}
       />
-      <MUITableContainer
-        component={Paper}
-        sx={{ height: showPager ? "97%" : "100%", overflowY: "auto" }}
+      <Box
+        sx={{ height: "calc(100vh - 220px)", width: "100%", overflow: "auto" }}
       >
-        <Table
-          meta={tableMeta}
-          rows={visibleRows}
-          slice={slice}
-          summary={summary}
-        />
-      </MUITableContainer>
+        <MUITableContainer component={Paper}>
+          <Table
+            meta={tableMeta}
+            rows={visibleRows}
+            slice={slice}
+            summary={summary}
+          />
+        </MUITableContainer>
+      </Box>
       {showPager && visibleRowsCount > 0 && (
         <TablePagination
           rowsPerPageOptions={[5, 10, 30, 50, { label: "All", value: -1 }]}
@@ -204,6 +206,7 @@ export function TableContainer({
           count={visibleRowsCount}
           rowsPerPage={rpp}
           page={page}
+          sx={{ overflow: "hidden" }}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />

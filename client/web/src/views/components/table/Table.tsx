@@ -95,7 +95,6 @@ export function Table({ meta, summary, rows, slice }: Props) {
   const columnKeys = meta.columns
     .filter((column: ColumnMeta) => column.visible)
     .sort((a: ColumnMeta, b: ColumnMeta) => a.priority - b.priority);
-  console.log(columnKeys);
 
   const minWidths: Record<string, number> = {};
 
