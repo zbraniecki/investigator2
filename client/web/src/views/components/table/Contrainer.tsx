@@ -17,6 +17,7 @@ import {
 } from "../../../store/ui";
 import { TableMenu } from "./Menu";
 import { InfoDisplayMode } from "../../../components/settings";
+import { getOutletContext } from "../../ui/Content";
 
 export interface Props {
   baseMeta: BaseTableMeta;
@@ -32,6 +33,7 @@ export function TableContainer({
   getTableData,
 }: Props) {
   const [tableSettings, setTableSettings] = React.useState(settings);
+  const outletContext = getOutletContext();
 
   const tableMeta = React.useMemo(
     () => buildTableMeta(baseMeta, tableSettings),
@@ -188,7 +190,7 @@ export function TableContainer({
         handleMenuOpen={handleMenuOpen}
       />
       <Box
-        sx={{ height: "calc(100vh - 220px)", width: "100%", overflow: "auto" }}
+        sx={{ height: outletContext.smallScreen ? "calc(100vh - 220px)" : "calc(100vh - 180px)", width: "100%", overflow: "auto" }}
       >
         <MUITableContainer component={Paper}>
           <Table
