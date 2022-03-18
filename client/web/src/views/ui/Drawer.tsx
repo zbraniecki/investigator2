@@ -19,8 +19,8 @@ interface Props {
 
 export default function InvestigatorDrawer({
   menuItems,
-  // updateDialogState,
-}: Props) {
+}: // updateDialogState,
+Props) {
   const index = Boolean(useMatch(`/`));
 
   function isSelected(item: MenuItem): boolean {
@@ -65,11 +65,13 @@ export default function InvestigatorDrawer({
         },
       }}
     >
-      <List sx={{
-        "& .MuiListItemIcon-root": {
-          minWidth: "",
-        }
-      }}>
+      <List
+        sx={{
+          "& .MuiListItemIcon-root": {
+            minWidth: "",
+          },
+        }}
+      >
         {menuItems.map((item) => (
           <ListItemButton
             selected={isSelected(item)}

@@ -196,10 +196,12 @@ export function TableContainer({
           minHeight: "0px",
         }}
       >
-        <Box sx={{
-          width: "100%",
-          overflow: "auto",
-        }}>
+        <Box
+          sx={{
+            width: "100%",
+            overflow: "auto",
+          }}
+        >
           <MUITableContainer component={Paper}>
             <Table
               meta={tableMeta}

@@ -17,12 +17,11 @@ export default function Content({ updateDialogState, smallScreen }: Props) {
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        // p: smallScreen ? 0 : 3,
-        // paddingTop: 0,
+        minHeight: 0,
       }}
     >
       <Outlet context={{ updateDialogState, smallScreen }} />
-    </Box >
+    </Box>
   );
 }
 

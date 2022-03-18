@@ -95,7 +95,7 @@ export function Chrome() {
         setSettingsOpen={setSettingsOpen}
       />
       {!smallScreen && (
-        <Box sx={{ display: "flex", flexDirection: "row", height: "92vh", }}>
+        <Box sx={{ display: "flex", flexDirection: "row", height: "92vh" }}>
           <InvestigatorDrawer
             menuItems={menuItems}
             updateDialogState={updateDialogState}
