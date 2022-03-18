@@ -13,7 +13,7 @@
     "strictBindCallApply": true,
     "downlevelIteration": true,
     "jsx": "react-jsx",
-    "target": "es2017",
+    "target": "es2022",
     "moduleResolution": "node",
   },
   "include": [

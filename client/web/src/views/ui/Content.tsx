@@ -15,14 +15,14 @@ export default function Content({ updateDialogState, smallScreen }: Props) {
       component="main"
       sx={{
         flex: 1,
-        p: smallScreen ? 0 : 3,
-        paddingTop: 0,
-        backgoundColor: "white",
-        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        // p: smallScreen ? 0 : 3,
+        // paddingTop: 0,
       }}
     >
       <Outlet context={{ updateDialogState, smallScreen }} />
-    </Box>
+    </Box >
   );
 }
 

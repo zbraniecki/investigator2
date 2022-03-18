@@ -38,7 +38,7 @@ export function Logo({ colors }: Props) {
           borderBottom: "1px solid",
           borderColor: colors.primary,
           fontSize: "max(2.6vh, 1.2em)",
-          "@media (max-width: 20em)": {
+          "@media (max-width: 24em)": {
             display: "none",
           },
         }}

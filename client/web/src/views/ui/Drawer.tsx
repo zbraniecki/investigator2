@@ -2,9 +2,9 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Drawer from "@mui/material/Drawer";
-import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import SpeedDialAction from "@mui/material/SpeedDialAction";
+// import SpeedDial from "@mui/material/SpeedDial";
+// import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+// import SpeedDialAction from "@mui/material/SpeedDialAction";
 import ListIcon from "@mui/icons-material/List";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
@@ -19,7 +19,7 @@ interface Props {
 
 export default function InvestigatorDrawer({
   menuItems,
-  updateDialogState,
+  // updateDialogState,
 }: Props) {
   const index = Boolean(useMatch(`/`));
 
@@ -60,12 +60,16 @@ export default function InvestigatorDrawer({
     <Drawer
       variant="permanent"
       sx={{
-        "& .MuiPaper-root": {
+        "& .MuiDrawer-paper": {
           position: "inherit",
         },
       }}
     >
-      <List sx={{ overflow: "hidden" }}>
+      <List sx={{
+        "& .MuiListItemIcon-root": {
+          minWidth: "",
+        }
+      }}>
         {menuItems.map((item) => (
           <ListItemButton
             selected={isSelected(item)}
@@ -73,17 +77,11 @@ export default function InvestigatorDrawer({
             to={`/${item.id}`}
             key={`drawer-list-item-${item.id}`}
           >
-            <ListItemIcon
-              sx={{
-                minWidth: "",
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
+            <ListItemIcon>{item.icon}</ListItemIcon>
           </ListItemButton>
         ))}
       </List>
-      <SpeedDial
+      {/* <SpeedDial
         id="main-speed-dial"
         ariaLabel="SpeedDial basic example"
         sx={{ position: "absolute", bottom: 28, left: 0, zIndex: 100 }}
@@ -99,7 +97,7 @@ export default function InvestigatorDrawer({
             onClick={action.action}
           />
         ))}
-      </SpeedDial>
+      </SpeedDial> */}
     </Drawer>
   );
 }

@@ -4,7 +4,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import cyan from "@mui/material/colors/cyan";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useSelector } from "react-redux";
-import { useRoutes } from "react-router-dom";
+import { useRoutes, RouteObject } from "react-router-dom";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { LightMode, getLightModeName } from "../../components/settings";
 import { InvestigatorAppBar } from "./AppBar";
@@ -44,20 +44,19 @@ export function Chrome() {
       }),
     [lightModeName]
   );
-  const smallScreen = !useMediaQuery(theme.breakpoints.up("sm"));
+  const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const menuItems = getMenuItems();
 
-  const children = [];
-
-  for (const item of menuItems) {
+  const children: RouteObject[] = menuItems.flatMap((item) => {
+    const result = [];
     if (item.default) {
-      children.push({
+      result.push({
         index: true,
         element: item.element,
       });
     }
-    children.push({
+    result.push({
       path: item.id,
       element: item.element,
       children: item.paths.map((path) => ({
@@ -65,7 +64,9 @@ export function Chrome() {
         element: item.element,
       })),
     });
-  }
+
+    return result;
+  });
 
   const routes = useRoutes([
     {
@@ -93,20 +94,20 @@ export function Chrome() {
         lightModeName={lightModeName}
         setSettingsOpen={setSettingsOpen}
       />
-      {smallScreen && (
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          {routes}
-          <BottomDrawer menuItems={menuItems} />
-        </Box>
-      )}
       {!smallScreen && (
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
+        <Box sx={{ display: "flex", flexDirection: "row", height: "92vh", }}>
           <InvestigatorDrawer
             menuItems={menuItems}
             updateDialogState={updateDialogState}
           />
           {routes}
         </Box>
+      )}
+      {smallScreen && (
+        <>
+          {routes}
+          <BottomDrawer menuItems={menuItems} />
+        </>
       )}
       <ModalDialog state={dialogState} updateState={updateDialogState} />
     </ThemeProvider>

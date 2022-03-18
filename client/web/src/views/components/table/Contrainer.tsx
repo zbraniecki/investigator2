@@ -190,16 +190,25 @@ export function TableContainer({
         handleMenuOpen={handleMenuOpen}
       />
       <Box
-        sx={{ height: outletContext.smallScreen ? "calc(100vh - 220px)" : "calc(100vh - 180px)", width: "100%", overflow: "auto" }}
+        sx={{
+          display: "flex",
+          flex: 1,
+          minHeight: "0px",
+        }}
       >
-        <MUITableContainer component={Paper}>
-          <Table
-            meta={tableMeta}
-            rows={visibleRows}
-            slice={slice}
-            summary={summary}
-          />
-        </MUITableContainer>
+        <Box sx={{
+          width: "100%",
+          overflow: "auto",
+        }}>
+          <MUITableContainer component={Paper}>
+            <Table
+              meta={tableMeta}
+              rows={visibleRows}
+              slice={slice}
+              summary={summary}
+            />
+          </MUITableContainer>
+        </Box>
       </Box>
       {showPager && visibleRowsCount > 0 && (
         <TablePagination
@@ -208,7 +217,7 @@ export function TableContainer({
           count={visibleRowsCount}
           rowsPerPage={rpp}
           page={page}
-          sx={{ overflow: "hidden" }}
+          sx={{ position: "", height: "52px" }}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />

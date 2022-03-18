@@ -38,7 +38,6 @@ export function InvestigatorAppBar({ lightModeName, setSettingsOpen }: Props) {
 
   return (
     <AppBar
-      position="static"
       sx={{
         display: "flex",
         flexDirection: "row",
@@ -46,7 +45,7 @@ export function InvestigatorAppBar({ lightModeName, setSettingsOpen }: Props) {
         padding: "1vh 0",
         height: "8vh",
         minHeight: "3em",
-        zIndex: 10,
+        position: "inherit",
       }}
     >
       <Logo colors={colors} />

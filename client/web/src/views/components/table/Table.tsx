@@ -109,25 +109,18 @@ export function Table({ meta, summary, rows, slice }: Props) {
   }
 
   return (
-    <MUITable size={outletContext.smallScreen ? "small" : "medium"}>
-      {meta.showHeaders && meta.columns.length > 0 && (
-        <TableHead
-          sx={{
-            position: "sticky",
-            top: 0,
-            bgcolor: "background.paper",
-            backgroundImage:
-              "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
-          }}
-        >
-          <HeaderRow
-            tableMeta={meta}
-            summary={summary}
-            sortOrder={sortOrder}
-            setCustomSortOrder={setCustomSortOrder}
-            minWidths={minWidths}
-          />
-        </TableHead>
+    <MUITable
+      size={outletContext.smallScreen ? "small" : "medium"}
+      sx={{ minHeight: 0 }}
+    >
+      {meta.showHeaders && meta.columns.length > 0 && (<TableHead sx={{ position: "sticky", top: 0, bgcolor: "background.paper", backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))", }} > <HeaderRow
+        tableMeta={meta}
+        summary={summary}
+        sortOrder={sortOrder}
+        setCustomSortOrder={setCustomSortOrder}
+        minWidths={minWidths}
+      />
+      </TableHead>
       )}
       <TableBody>
         {visibleRows?.map((row, idx) => {
