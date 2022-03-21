@@ -123,7 +123,6 @@ export function Table({ meta, summary, rows, slice }: Props) {
               "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
           }}
         >
-          {" "}
           <HeaderRow
             tableMeta={meta}
             summary={summary}
