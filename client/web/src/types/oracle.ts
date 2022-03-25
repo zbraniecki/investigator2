@@ -1,7 +1,14 @@
+export enum WatchlistType {
+  Assets = "AS",
+  Portfolio = "PL",
+  Tag = "TG",
+  Dynamic = "DN",
+}
+
 export interface Watchlist {
   pk: string;
   name: string;
-  type: "dynamic";
+  type: WatchlistType;
   assets: string[];
   portfolio?: string;
   dynamic?: string;

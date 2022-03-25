@@ -7,6 +7,9 @@ import {
   StyledRowData,
   newCellData,
 } from "../views/components/table/data/Row";
+import {
+  CollectionType, CollectionItemType, Collection, collectWatchlistHoldings
+} from "./collections";
 
 export interface WatchlistTableRow extends RowData {
   cells: {
@@ -42,7 +45,6 @@ export interface StyledWatchlistTableRow extends StyledRowData {
 }
 
 function computeHeaderData(
-  watchlist: Watchlist,
   data: WatchlistTableRow[]
 ): WatchlistTableRow["cells"] {
   const cells = {
@@ -166,7 +168,49 @@ export function createWatchlistTableData(
     };
   });
 
-  const cells = rows.length ? computeHeaderData(watchlist, rows) : {};
+  const cells = rows.length ? computeHeaderData(rows) : {};
+
+  return {
+    cells,
+    children: rows.length > 0 ? rows : undefined,
+    type: RowType.Asset,
+  };
+}
+
+function convertCollectionToTableRows(
+  collection: Collection,
+  assets: Record<string, Asset>,
+): WatchlistTableRow {
+
+  const symbols: Set<string> = new Set();
+
+  collection.items.forEach((item) => {
+    assert(item.type === CollectionItemType.Holding);
+    symbols.add(item.value.asset);
+  });
+
+  const rows: WatchlistTableRow[] = Array.from(symbols).map((symbol) => {
+    const asset = assets[symbol];
+    assert(asset, `Missing asset: ${symbol}`);
+
+    return {
+      cells: {
+        id: asset.pk,
+        market_cap_rank: asset.info.market_cap_rank,
+        market_cap: asset.info.market_cap,
+        name: asset.symbol.toUpperCase(),
+        symbol: asset.symbol,
+        price: asset.info.value,
+        price_change_percentage_1h: asset.info.price_change_percentage_1h,
+        price_change_percentage_24h: asset.info.price_change_percentage_24h,
+        price_change_percentage_7d: asset.info.price_change_percentage_7d,
+        price_change_percentage_30d: asset.info.price_change_percentage_30d,
+      },
+      type: RowType.Asset,
+    };
+  });
+
+  const cells = rows.length ? computeHeaderData(rows) : {};
 
   return {
     cells,
@@ -178,7 +222,7 @@ export function createWatchlistTableData(
 export function prepareWatchlistTableData(
   wid: string,
   watchlists: Record<string, Watchlist>,
-  assetInfo: Record<string, Asset>,
+  assets: Record<string, Asset>,
   portfolios: Record<string, Portfolio>,
   holdings: Record<string, Holding>,
   accounts: Record<string, Account>
@@ -195,18 +239,31 @@ export function prepareWatchlistTableData(
     return undefined;
   }
 
-  if (Object.keys(assetInfo).length === 0) {
+  if (
+    Object.keys(assets).length === 0 ||
+    Object.keys(accounts).length === 0 ||
+    Object.keys(portfolios).length === 0 ||
+    Object.keys(holdings).length === 0) {
     return undefined;
   }
 
-  const data = createWatchlistTableData(
+  assert(watchlist.portfolio);
+  const collection = collectWatchlistHoldings(
     watchlist,
     watchlists,
-    assetInfo,
     portfolios,
+    assets,
+    accounts,
     holdings,
-    accounts
+    [],
+    null,
   );
+
+  const data = convertCollectionToTableRows(
+    collection,
+    assets
+  );
+
   return data;
 }
 
