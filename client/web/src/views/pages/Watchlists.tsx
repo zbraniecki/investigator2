@@ -169,8 +169,10 @@ export function Watchlists() {
   const accounts = useSelector(getAccounts);
 
   const watchlists: Record<string, Watchlist> = {};
-  for (const list of Object.values(publicWatchlists)) {
-    watchlists[list.pk] = list;
+  if (publicWatchlists) {
+    for (const list of Object.values(publicWatchlists)) {
+      watchlists[list.pk] = list;
+    }
   }
   if (userWatchlists !== undefined) {
     for (const list of Object.values(userWatchlists)) {

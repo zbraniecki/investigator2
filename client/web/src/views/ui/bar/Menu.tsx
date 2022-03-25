@@ -76,7 +76,7 @@ export function AccountMenu({
     setSettingsOpen(true);
   };
 
-  const currentUser = users[session.user_pk];
+  const currentUser = users && users[session.user_pk];
 
   let accountIcon;
   if (currentUser) {

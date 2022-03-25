@@ -10,9 +10,7 @@ import {
   StyledRowData,
   newCellData,
 } from "../views/components/table/data/Row";
-import {
-  collectPortfolioHoldings as collectPortfolioHoldings2,
-} from "./collections";
+import { collectPortfolioHoldings as collectPortfolioHoldings2 } from "./collections";
 
 export function collectPortfolioHoldings(
   portfolio: Portfolio,
@@ -373,10 +371,7 @@ export function preparePortfolioTableData(
 ): PortfolioTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);
-  if (
-    Object.keys(assets).length === 0 ||
-    Object.keys(holdings).length === 0
-  ) {
+  if (Object.keys(assets).length === 0 || Object.keys(holdings).length === 0) {
     return undefined;
   }
 

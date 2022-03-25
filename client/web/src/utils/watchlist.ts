@@ -8,7 +8,10 @@ import {
   newCellData,
 } from "../views/components/table/data/Row";
 import {
-  CollectionType, CollectionItemType, Collection, collectWatchlistHoldings
+  CollectionType,
+  CollectionItemType,
+  Collection,
+  collectWatchlistHoldings,
 } from "./collections";
 
 export interface WatchlistTableRow extends RowData {
@@ -179,9 +182,8 @@ export function createWatchlistTableData(
 
 function convertCollectionToTableRows(
   collection: Collection,
-  assets: Record<string, Asset>,
+  assets: Record<string, Asset>
 ): WatchlistTableRow {
-
   const symbols: Set<string> = new Set();
 
   collection.items.forEach((item) => {
@@ -227,23 +229,18 @@ export function prepareWatchlistTableData(
   holdings: Record<string, Holding>,
   accounts: Record<string, Account>
 ): WatchlistTableRow | undefined {
-  if (Object.keys(watchlists).length === 0) {
+  if (
+    watchlists === undefined ||
+    assets === undefined ||
+    accounts === undefined ||
+    portfolios === undefined ||
+    holdings === undefined
+  ) {
     return undefined;
   }
 
   const watchlist = watchlists[wid];
   if (watchlist === undefined) {
-    return undefined;
-  }
-  if (watchlist.portfolio && portfolios[watchlist.portfolio] === undefined) {
-    return undefined;
-  }
-
-  if (
-    Object.keys(assets).length === 0 ||
-    Object.keys(accounts).length === 0 ||
-    Object.keys(portfolios).length === 0 ||
-    Object.keys(holdings).length === 0) {
     return undefined;
   }
 
@@ -256,13 +253,10 @@ export function prepareWatchlistTableData(
     accounts,
     holdings,
     [],
-    null,
+    null
   );
 
-  const data = convertCollectionToTableRows(
-    collection,
-    assets
-  );
+  const data = convertCollectionToTableRows(collection, assets);
 
   return data;
 }

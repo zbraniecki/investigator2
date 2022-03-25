@@ -1,4 +1,12 @@
-import { Watchlist, WatchlistType, Portfolio, Account, Holding, Asset, Service } from "../types";
+import {
+  Watchlist,
+  WatchlistType,
+  Portfolio,
+  Account,
+  Holding,
+  Asset,
+  Service,
+} from "../types";
 import { assert } from "./helpers";
 
 export enum CollectionType {
@@ -17,19 +25,19 @@ export enum CollectionItemType {
 }
 
 type CollectionItemHolding = {
-  type: CollectionItemType.Holding,
-  value: Holding
-}
+  type: CollectionItemType.Holding;
+  value: Holding;
+};
 
 type CollectionItemCollection = {
-  type: CollectionItemType.Collection,
-  value: Collection
-}
+  type: CollectionItemType.Collection;
+  value: Collection;
+};
 
 export type CollectionItem = CollectionItemHolding | CollectionItemCollection;
 
 export interface Collection {
-  items: Set<CollectionItem>,
+  items: Set<CollectionItem>;
   type: CollectionType;
 }
 
@@ -40,13 +48,11 @@ export function collectPortfolioHoldings(
   accounts: Record<string, Account>,
   holdings: Record<string, Holding>,
   preserve: CollectionType[],
-  maxDepth: number | null,
+  maxDepth: number | null
 ): Collection {
-  const items: Set<CollectionItem> = new Set(Object.values(portfolio.holdings).map(
-    (hid) => {
-	return {type: CollectionItemType.Holding, value: holdings[hid]};
-    },
-  ));
+  const items: Set<CollectionItem> = new Set(
+    Object.values(portfolio.holdings).map((hid) => ({ type: CollectionItemType.Holding, value: holdings[hid] }))
+  );
 
   Object.values(portfolio.portfolios).forEach((pid) => {
     const subCollection = collectPortfolioHoldings(
@@ -56,16 +62,16 @@ export function collectPortfolioHoldings(
       accounts,
       holdings,
       preserve,
-      maxDepth === null ? null : maxDepth - 1,
+      maxDepth === null ? null : maxDepth - 1
     );
     if (preserve.includes(CollectionType.Portfolio)) {
       items.add({
-	type: CollectionItemType.Collection,
-	value: subCollection
+        type: CollectionItemType.Collection,
+        value: subCollection,
       });
     } else {
-      for (let item of subCollection.items) {
-	items.add(item);
+      for (const item of subCollection.items) {
+        items.add(item);
       }
     }
   });
@@ -78,16 +84,16 @@ export function collectPortfolioHoldings(
       accounts,
       holdings,
       preserve,
-      maxDepth === null ? null : maxDepth - 1,
+      maxDepth === null ? null : maxDepth - 1
     );
     if (preserve.includes(CollectionType.Account)) {
       items.add({
-	type: CollectionItemType.Collection,
-	value: subCollection
+        type: CollectionItemType.Collection,
+        value: subCollection,
       });
     } else {
-      for (let item of subCollection.items) {
-	items.add(item);
+      for (const item of subCollection.items) {
+        items.add(item);
       }
     }
   });
@@ -105,13 +111,11 @@ export function collectAccountHoldings(
   accounts: Record<string, Account>,
   holdings: Record<string, Holding>,
   preserve: CollectionType[],
-  maxDepth: number | null,
+  maxDepth: number | null
 ): Collection {
-  const items: Set<CollectionItem> = new Set(Object.values(account.holdings).map(
-    (hid) => {
-	return {type: CollectionItemType.Holding, value: holdings[hid]};
-    },
-  ));
+  const items: Set<CollectionItem> = new Set(
+    Object.values(account.holdings).map((hid) => ({ type: CollectionItemType.Holding, value: holdings[hid] }))
+  );
 
   return {
     items,
@@ -127,7 +131,7 @@ export function collectWatchlistHoldings(
   accounts: Record<string, Account>,
   holdings: Record<string, Holding>,
   preserve: CollectionType[],
-  maxDepth: number | null,
+  maxDepth: number | null
 ): Collection {
   const items: Set<CollectionItem> = new Set();
 
@@ -140,16 +144,16 @@ export function collectWatchlistHoldings(
       accounts,
       holdings,
       preserve,
-      maxDepth === null ? null : maxDepth - 1,
+      maxDepth === null ? null : maxDepth - 1
     );
     if (preserve.includes(CollectionType.Portfolio)) {
       items.add({
-	type: CollectionItemType.Collection,
-	value: subCollection
+        type: CollectionItemType.Collection,
+        value: subCollection,
       });
     } else {
-      for (let item of subCollection.items) {
-	items.add(item);
+      for (const item of subCollection.items) {
+        items.add(item);
       }
     }
   }

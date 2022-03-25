@@ -28,6 +28,7 @@ import {
 } from "../types";
 import { getFromLocalStorage } from "./main";
 import { setFetchEntitiesReducer } from "./helpers";
+import { assert } from "../utils/helpers";
 
 export const authenticateThunk = createAsyncThunk(
   "user/authenticate",
@@ -58,11 +59,11 @@ export const createTransactionThunk = createAsyncThunk(
 
 interface AccountState {
   session: Session;
-  portfolios: Record<string, Portfolio>;
-  watchlists: Record<string, Watchlist>;
-  accounts: Record<string, Account>;
-  holdings: Record<string, Holding>;
-  users: Record<string, User>;
+  portfolios: Record<string, Portfolio> | undefined;
+  watchlists: Record<string, Watchlist> | undefined;
+  accounts: Record<string, Account> | undefined;
+  holdings: Record<string, Holding> | undefined;
+  users: Record<string, User> | undefined;
 }
 
 const initialState = {
@@ -71,22 +72,22 @@ const initialState = {
     token: getFromLocalStorage("token", "string", undefined),
     user_pk: getFromLocalStorage("user_pk", "string", undefined),
   },
-  portfolios: {},
-  watchlists: {},
-  accounts: {},
-  holdings: {},
-  users: {},
+  portfolios: undefined,
+  watchlists: undefined,
+  accounts: undefined,
+  holdings: undefined,
+  users: undefined,
 } as AccountState;
 
 function cleanSlice(state: any) {
   state.session.authenticateState = AuthenticateState.None;
   state.session.user_pk = undefined;
   state.session.token = undefined;
-  state.portfolios = {};
-  state.watchlists = {};
-  state.accounts = {};
-  state.holdings = {};
-  state.users = {};
+  state.portfolios = undefined;
+  state.watchlists = undefined; // XXX: Keep public watchlists
+  state.accounts = undefined;
+  state.holdings = undefined;
+  state.users = undefined;
 }
 
 const userSlice = createSlice({
@@ -134,24 +135,34 @@ const userSlice = createSlice({
         return;
       }
       const { pk, quantity } = action.payload;
-      state.holdings[pk].quantity = quantity;
+      if (state.holdings) {
+        state.holdings[pk].quantity = quantity;
+      }
     });
     builder.addCase(createHoldingThunk.fulfilled, (state, action) => {
       const account = action.payload.account as string;
-      state.holdings[action.payload.pk] = {
-        pk: action.payload.pk,
-        asset: action.payload.asset,
-        quantity: action.payload.quantity,
-        account,
-      };
-      state.accounts[account].holdings.push(action.payload.pk);
+      if (state.holdings) {
+        state.holdings[action.payload.pk] = {
+          pk: action.payload.pk,
+          asset: action.payload.asset,
+          quantity: action.payload.quantity,
+          account,
+        };
+      }
+      if (state.accounts) {
+        state.accounts[account].holdings.push(action.payload.pk);
+      }
     });
     builder.addCase(createTransactionThunk.fulfilled, (state, action) => {
       const account = action.payload.account as string;
-      state.accounts[account].transactions.push(action.payload);
+      if (state.accounts) {
+        state.accounts[account].transactions.push(action.payload);
+      }
     });
     builder.addCase(updateUserInfoThunk.fulfilled, (state, action) => {
-      state.users[action.payload.pk] = action.payload;
+      if (state.users) {
+        state.users[action.payload.pk] = action.payload;
+      }
     });
   },
 });

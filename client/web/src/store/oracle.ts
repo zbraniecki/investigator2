@@ -13,19 +13,19 @@ import { setFetchEntitiesReducer } from "./helpers";
 
 interface OracleState {
   assetUpdated?: string;
-  assets: Record<string, Asset>;
-  services: Record<string, Service>;
-  watchlists: Record<string, Watchlist>;
-  categories: Record<string, Category>;
-  tags: Record<string, Tag>;
+  assets: Record<string, Asset> | undefined;
+  services: Record<string, Service> | undefined;
+  watchlists: Record<string, Watchlist> | undefined;
+  categories: Record<string, Category> | undefined;
+  tags: Record<string, Tag> | undefined;
 }
 
 const initialState = {
-  assets: {},
-  services: {},
-  watchlists: {},
-  categories: {},
-  tags: {},
+  assets: undefined,
+  services: undefined,
+  watchlists: undefined,
+  categories: undefined,
+  tags: undefined,
 } as OracleState;
 
 const oracleSlice = createSlice({
