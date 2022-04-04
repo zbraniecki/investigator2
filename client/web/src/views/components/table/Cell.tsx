@@ -73,7 +73,8 @@ function tryParseNumber(input: string): number | undefined {
   if (input === "-") {
     return -0;
   }
-  const parsed = parseFloat(input.endsWith(".") ? `${input}0` : input);
+  const i = input.replace(",", "");
+  const parsed = parseFloat(i.endsWith(".") ? `${i}0` : i);
   if (Number.isNaN(parsed)) {
     return undefined;
   }

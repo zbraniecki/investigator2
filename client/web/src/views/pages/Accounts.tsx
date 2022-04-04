@@ -105,7 +105,7 @@ export function Accounts() {
 
   let tabs: TabInfo[] = [];
 
-  if (Object.keys(portfolios).length > 0) {
+  if (portfolios !== undefined) {
     const currentUser = session.user_pk ? users[session.user_pk] : undefined;
     const plists: string[] = currentUser?.visible_lists.portfolios || [];
 
