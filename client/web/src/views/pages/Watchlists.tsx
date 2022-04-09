@@ -27,7 +27,7 @@ import { DialogType } from "../ui/modal/dialog";
 
 const baseTableMeta: BaseTableMeta = {
   name: "watchlists",
-  nested: false,
+  nested: true,
   showHeaders: true,
   columns: {
     id: {

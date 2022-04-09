@@ -70,7 +70,11 @@ export function prepareAccountsTableData(
 ): AccountsTableRow | undefined {
   const portfolio = portfolios[pid];
   assert(portfolio);
-  if (assets === undefined || holdings === undefined || accounts === undefined) {
+  if (
+    assets === undefined ||
+    holdings === undefined ||
+    accounts === undefined
+  ) {
     return undefined;
   }
 

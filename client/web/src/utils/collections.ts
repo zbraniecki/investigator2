@@ -20,8 +20,8 @@ export enum CollectionType {
 }
 
 export enum CollectionItemType {
-  Holding,
-  Collection,
+  Holding = "Holding",
+  Collection = "Collection",
 }
 
 type CollectionItemHolding = {
@@ -39,6 +39,9 @@ export type CollectionItem = CollectionItemHolding | CollectionItemCollection;
 export interface Collection {
   items: Set<CollectionItem>;
   type: CollectionType;
+  meta: {
+    pk: string;
+  };
 }
 
 export function collectPortfolioHoldings(
@@ -48,10 +51,14 @@ export function collectPortfolioHoldings(
   accounts: Record<string, Account>,
   holdings: Record<string, Holding>,
   preserve: CollectionType[],
-  maxDepth: number | null
+  maxDepth: number | null,
+  depth: number = 0
 ): Collection {
   const items: Set<CollectionItem> = new Set(
-    Object.values(portfolio.holdings).map((hid) => ({ type: CollectionItemType.Holding, value: holdings[hid] }))
+    Object.values(portfolio.holdings).map((hid) => ({
+      type: CollectionItemType.Holding,
+      value: holdings[hid],
+    }))
   );
 
   Object.values(portfolio.portfolios).forEach((pid) => {
@@ -62,9 +69,10 @@ export function collectPortfolioHoldings(
       accounts,
       holdings,
       preserve,
-      maxDepth === null ? null : maxDepth - 1
+      maxDepth === null ? null : maxDepth - 1,
+      depth + 1
     );
-    if (preserve.includes(CollectionType.Portfolio)) {
+    if (preserve.includes(CollectionType.Portfolio) && depth > 0) {
       items.add({
         type: CollectionItemType.Collection,
         value: subCollection,
@@ -98,9 +106,32 @@ export function collectPortfolioHoldings(
     }
   });
 
+  if (portfolio.tags.length > 0) {
+    const result: Set<string> = new Set();
+    Object.values(accounts).forEach((account) => {
+      account.holdings.forEach((hid) => {
+        const holding = holdings[hid];
+        const asset = assets[holding.asset];
+        if (portfolio.tags.includes(asset.asset_class)) {
+          result.add(hid);
+        }
+      });
+    });
+    Array.from(result).forEach((hid) => {
+      const holding = holdings[hid];
+      items.add({
+        value: holding,
+        type: CollectionItemType.Holding,
+      });
+    });
+  }
+
   return {
     items,
     type: CollectionType.Portfolio,
+    meta: {
+      pk: portfolio.pk,
+    },
   };
 }
 
@@ -114,12 +145,18 @@ export function collectAccountHoldings(
   maxDepth: number | null
 ): Collection {
   const items: Set<CollectionItem> = new Set(
-    Object.values(account.holdings).map((hid) => ({ type: CollectionItemType.Holding, value: holdings[hid] }))
+    Object.values(account.holdings).map((hid) => ({
+      type: CollectionItemType.Holding,
+      value: holdings[hid],
+    }))
   );
 
   return {
     items,
     type: CollectionType.Account,
+    meta: {
+      pk: account.pk,
+    },
   };
 }
 
@@ -131,7 +168,8 @@ export function collectWatchlistHoldings(
   accounts: Record<string, Account>,
   holdings: Record<string, Holding>,
   preserve: CollectionType[],
-  maxDepth: number | null
+  maxDepth: number | null,
+  depth: number = 0
 ): Collection {
   const items: Set<CollectionItem> = new Set();
 
@@ -144,9 +182,10 @@ export function collectWatchlistHoldings(
       accounts,
       holdings,
       preserve,
-      maxDepth === null ? null : maxDepth - 1
+      maxDepth === null ? null : maxDepth - 1,
+      depth
     );
-    if (preserve.includes(CollectionType.Portfolio)) {
+    if (preserve.includes(CollectionType.Portfolio) && depth > 0) {
       items.add({
         type: CollectionItemType.Collection,
         value: subCollection,
@@ -161,5 +200,8 @@ export function collectWatchlistHoldings(
   return {
     items,
     type: CollectionType.Watchlist,
+    meta: {
+      pk: watchlist.pk,
+    },
   };
 }

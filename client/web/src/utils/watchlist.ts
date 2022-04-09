@@ -11,6 +11,7 @@ import {
   CollectionType,
   CollectionItemType,
   Collection,
+  CollectionItem,
   collectWatchlistHoldings,
 } from "./collections";
 
@@ -180,37 +181,83 @@ export function createWatchlistTableData(
   };
 }
 
+function convertCollectionItemToTableRow(
+  item: CollectionItem,
+  assets: Record<string, Asset>,
+  accounts: Record<string, Account>,
+  seenAssets: Set<string>
+): WatchlistTableRow | null {
+  switch (item.type) {
+    case CollectionItemType.Holding: {
+      const apk = item.value.asset;
+      const asset = assets[apk];
+      if (seenAssets.has(asset.pk)) {
+        return null;
+      }
+      seenAssets.add(asset.pk);
+      return {
+        cells: {
+          id: asset.pk,
+          market_cap_rank: asset.info.market_cap_rank,
+          market_cap: asset.info.market_cap,
+          name: asset.symbol.toUpperCase(),
+          symbol: asset.symbol,
+          price: asset.info.value,
+          price_change_percentage_1h: asset.info.price_change_percentage_1h,
+          price_change_percentage_24h: asset.info.price_change_percentage_24h,
+          price_change_percentage_7d: asset.info.price_change_percentage_7d,
+          price_change_percentage_30d: asset.info.price_change_percentage_30d,
+        },
+        type: RowType.Asset,
+      };
+    }
+    case CollectionItemType.Collection: {
+      switch (item.value.type) {
+        case CollectionType.Account: {
+          const account = accounts[item.value.meta.pk];
+          const seenAssets: Set<string> = new Set();
+
+          const children: WatchlistTableRow[] = Array.from(item.value.items)
+            .map((item) =>
+              convertCollectionItemToTableRow(
+                item,
+                assets,
+                accounts,
+                seenAssets
+              )
+            )
+            .filter((i): i is WatchlistTableRow => i != null);
+
+          return {
+            cells: {
+              name: account.name,
+            },
+            children,
+            type: RowType.Account,
+          };
+        }
+        default: {
+          assert(false);
+        }
+      }
+    }
+    default: {
+      assert(false);
+    }
+  }
+}
+
 function convertCollectionToTableRows(
   collection: Collection,
-  assets: Record<string, Asset>
+  assets: Record<string, Asset>,
+  accounts: Record<string, Account>
 ): WatchlistTableRow {
-  const symbols: Set<string> = new Set();
-
-  collection.items.forEach((item) => {
-    assert(item.type === CollectionItemType.Holding);
-    symbols.add(item.value.asset);
-  });
-
-  const rows: WatchlistTableRow[] = Array.from(symbols).map((symbol) => {
-    const asset = assets[symbol];
-    assert(asset, `Missing asset: ${symbol}`);
-
-    return {
-      cells: {
-        id: asset.pk,
-        market_cap_rank: asset.info.market_cap_rank,
-        market_cap: asset.info.market_cap,
-        name: asset.symbol.toUpperCase(),
-        symbol: asset.symbol,
-        price: asset.info.value,
-        price_change_percentage_1h: asset.info.price_change_percentage_1h,
-        price_change_percentage_24h: asset.info.price_change_percentage_24h,
-        price_change_percentage_7d: asset.info.price_change_percentage_7d,
-        price_change_percentage_30d: asset.info.price_change_percentage_30d,
-      },
-      type: RowType.Asset,
-    };
-  });
+  const seenAssets: Set<string> = new Set();
+  const rows: WatchlistTableRow[] = Array.from(collection.items)
+    .map((item) =>
+      convertCollectionItemToTableRow(item, assets, accounts, seenAssets)
+    )
+    .filter((i): i is WatchlistTableRow => i !== null);
 
   const cells = rows.length ? computeHeaderData(rows) : {};
 
@@ -255,8 +302,10 @@ export function prepareWatchlistTableData(
     [],
     null
   );
+  console.log(collection);
 
-  const data = convertCollectionToTableRows(collection, assets);
+  const data = convertCollectionToTableRows(collection, assets, accounts);
+  console.log(data);
 
   return data;
 }
