@@ -6,6 +6,7 @@ export interface CellData<T> {
 }
 
 export enum RowType {
+  Watchlist,
   Asset,
   Portfolio,
   Account,

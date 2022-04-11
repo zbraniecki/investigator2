@@ -19,29 +19,10 @@ export enum CollectionType {
   Tag,
 }
 
-export enum CollectionItemType {
-  Holding = "Holding",
-  Collection = "Collection",
-}
-
-type CollectionItemHolding = {
-  type: CollectionItemType.Holding;
-  value: Holding;
-};
-
-type CollectionItemCollection = {
-  type: CollectionItemType.Collection;
-  value: Collection;
-};
-
-export type CollectionItem = CollectionItemHolding | CollectionItemCollection;
-
 export interface Collection {
-  items: Set<CollectionItem>;
   type: CollectionType;
-  meta: {
-    pk: string;
-  };
+  pk?: string;
+  items?: Set<Collection>;
 }
 
 export function collectPortfolioHoldings(
@@ -54,36 +35,36 @@ export function collectPortfolioHoldings(
   maxDepth: number | null,
   depth: number = 0
 ): Collection {
-  const items: Set<CollectionItem> = new Set(
+  const items: Set<Collection> = new Set(
     Object.values(portfolio.holdings).map((hid) => ({
-      type: CollectionItemType.Holding,
-      value: holdings[hid],
+      type: CollectionType.Holding,
+      pk: hid,
     }))
   );
 
-  Object.values(portfolio.portfolios).forEach((pid) => {
-    const subCollection = collectPortfolioHoldings(
-      portfolios[pid],
-      portfolios,
-      assets,
-      accounts,
-      holdings,
-      preserve,
-      maxDepth === null ? null : maxDepth - 1,
-      depth + 1
-    );
-    if (preserve.includes(CollectionType.Portfolio) && depth > 0) {
-      items.add({
-        type: CollectionItemType.Collection,
-        value: subCollection,
-      });
-    } else {
-      for (const item of subCollection.items) {
-        items.add(item);
-      }
-    }
-  });
-
+  // Object.values(portfolio.portfolios).forEach((pid) => {
+  //   const subCollection = collectPortfolioHoldings(
+  //     portfolios[pid],
+  //     portfolios,
+  //     assets,
+  //     accounts,
+  //     holdings,
+  //     preserve,
+  //     maxDepth === null ? null : maxDepth - 1,
+  //     depth + 1
+  //   );
+  //   if (preserve.includes(CollectionType.Portfolio) && depth > 0) {
+  //     items.add({
+  //       type: CollectionItemType.Collection,
+  //       value: subCollection,
+  //     });
+  //   } else {
+  //     for (const item of subCollection.items) {
+  //       items.add(item);
+  //     }
+  //   }
+  // });
+  //
   Object.values(portfolio.accounts).forEach((aid) => {
     const subCollection = collectAccountHoldings(
       accounts[aid],
@@ -95,15 +76,12 @@ export function collectPortfolioHoldings(
       maxDepth === null ? null : maxDepth - 1
     );
     if (preserve.includes(CollectionType.Account)) {
-      items.add({
-        type: CollectionItemType.Collection,
-        value: subCollection,
-      });
-    } else {
-      for (const item of subCollection.items) {
-        items.add(item);
+      items.add(subCollection);
+    } else if (subCollection.items) {
+        for (const item of subCollection.items) {
+          items.add(item);
+        }
       }
-    }
   });
 
   if (portfolio.tags.length > 0) {
@@ -118,10 +96,9 @@ export function collectPortfolioHoldings(
       });
     });
     Array.from(result).forEach((hid) => {
-      const holding = holdings[hid];
       items.add({
-        value: holding,
-        type: CollectionItemType.Holding,
+        type: CollectionType.Holding,
+        pk: hid,
       });
     });
   }
@@ -129,9 +106,7 @@ export function collectPortfolioHoldings(
   return {
     items,
     type: CollectionType.Portfolio,
-    meta: {
-      pk: portfolio.pk,
-    },
+    pk: portfolio.pk,
   };
 }
 
@@ -144,19 +119,17 @@ export function collectAccountHoldings(
   preserve: CollectionType[],
   maxDepth: number | null
 ): Collection {
-  const items: Set<CollectionItem> = new Set(
+  const items: Set<Collection> = new Set(
     Object.values(account.holdings).map((hid) => ({
-      type: CollectionItemType.Holding,
-      value: holdings[hid],
+      type: CollectionType.Holding,
+      pk: hid,
     }))
   );
 
   return {
     items,
     type: CollectionType.Account,
-    meta: {
-      pk: account.pk,
-    },
+    pk: account.pk,
   };
 }
 
@@ -171,7 +144,7 @@ export function collectWatchlistHoldings(
   maxDepth: number | null,
   depth: number = 0
 ): Collection {
-  const items: Set<CollectionItem> = new Set();
+  const items: Set<Collection> = new Set();
 
   if (watchlist.type === WatchlistType.Portfolio) {
     assert(watchlist.portfolio);
@@ -186,22 +159,55 @@ export function collectWatchlistHoldings(
       depth
     );
     if (preserve.includes(CollectionType.Portfolio) && depth > 0) {
-      items.add({
-        type: CollectionItemType.Collection,
-        value: subCollection,
-      });
-    } else {
-      for (const item of subCollection.items) {
-        items.add(item);
+      items.add(subCollection);
+    } else if (subCollection.items) {
+        for (const item of subCollection.items) {
+          items.add(item);
+        }
       }
-    }
   }
 
   return {
     items,
     type: CollectionType.Watchlist,
-    meta: {
-      pk: watchlist.pk,
-    },
+    pk: watchlist.pk,
+  };
+}
+
+export enum CollectionGroupKey {
+  Asset,
+}
+
+export function groupCollectionItems(
+  input: Collection,
+  key: CollectionGroupKey,
+  holdings: Record<string, Holding>
+): Collection {
+  if (!input.items) {
+    return input;
+  }
+  const newItems: Set<Collection> = new Set();
+  const assets: Set<string> = new Set();
+  Array.from(input.items).forEach((item) => {
+    if (item.type == CollectionType.Holding) {
+      assert(item.pk);
+      const holding = holdings[item.pk];
+      assets.add(holding.asset);
+    } else if (!item.items) {
+        newItems.add(item);
+      } else {
+        newItems.add(groupCollectionItems(item, key, holdings));
+      }
+  });
+  Array.from(assets).forEach((aid) => {
+    newItems.add({
+      type: CollectionType.Asset,
+      pk: aid,
+    });
+  });
+  return {
+    type: input.type,
+    pk: input.pk,
+    items: newItems,
   };
 }

@@ -9,10 +9,10 @@ import {
 } from "../views/components/table/data/Row";
 import {
   CollectionType,
-  CollectionItemType,
   Collection,
-  CollectionItem,
   collectWatchlistHoldings,
+  groupCollectionItems,
+  CollectionGroupKey,
 } from "./collections";
 
 export interface WatchlistTableRow extends RowData {
@@ -181,20 +181,31 @@ export function createWatchlistTableData(
   };
 }
 
-function convertCollectionItemToTableRow(
-  item: CollectionItem,
+function convertCollectionToTableRow(
+  item: Collection,
+  holdings: Record<string, Holding>,
   assets: Record<string, Asset>,
-  accounts: Record<string, Account>,
-  seenAssets: Set<string>
+  accounts: Record<string, Account>
 ): WatchlistTableRow | null {
   switch (item.type) {
-    case CollectionItemType.Holding: {
-      const apk = item.value.asset;
-      const asset = assets[apk];
-      if (seenAssets.has(asset.pk)) {
-        return null;
-      }
-      seenAssets.add(asset.pk);
+    case CollectionType.Watchlist: {
+      assert(item.items);
+      const children: WatchlistTableRow[] = Array.from(item.items)
+        .map((item) =>
+          convertCollectionToTableRow(item, holdings, assets, accounts)
+        )
+        .filter((i): i is WatchlistTableRow => i != null);
+
+      const cells = children.length ? computeHeaderData(children) : {};
+      return {
+        cells,
+        children,
+        type: RowType.Watchlist,
+      };
+    }
+    case CollectionType.Asset: {
+      assert(item.pk);
+      const asset = assets[item.pk];
       return {
         cells: {
           id: asset.pk,
@@ -211,61 +222,30 @@ function convertCollectionItemToTableRow(
         type: RowType.Asset,
       };
     }
-    case CollectionItemType.Collection: {
-      switch (item.value.type) {
-        case CollectionType.Account: {
-          const account = accounts[item.value.meta.pk];
-          const seenAssets: Set<string> = new Set();
+    case CollectionType.Account: {
+      assert(item.pk);
+      assert(item.items);
+      const account = accounts[item.pk];
 
-          const children: WatchlistTableRow[] = Array.from(item.value.items)
-            .map((item) =>
-              convertCollectionItemToTableRow(
-                item,
-                assets,
-                accounts,
-                seenAssets
-              )
-            )
-            .filter((i): i is WatchlistTableRow => i != null);
+      const children: WatchlistTableRow[] = Array.from(item.items)
+        .map((item) =>
+          convertCollectionToTableRow(item, holdings, assets, accounts)
+        )
+        .filter((i): i is WatchlistTableRow => i != null);
 
-          return {
-            cells: {
-              name: account.name,
-            },
-            children,
-            type: RowType.Account,
-          };
-        }
-        default: {
-          assert(false);
-        }
-      }
+      return {
+        cells: {
+          name: account.name,
+        },
+        children,
+        type: RowType.Account,
+      };
     }
     default: {
+      console.log(item.type);
       assert(false);
     }
   }
-}
-
-function convertCollectionToTableRows(
-  collection: Collection,
-  assets: Record<string, Asset>,
-  accounts: Record<string, Account>
-): WatchlistTableRow {
-  const seenAssets: Set<string> = new Set();
-  const rows: WatchlistTableRow[] = Array.from(collection.items)
-    .map((item) =>
-      convertCollectionItemToTableRow(item, assets, accounts, seenAssets)
-    )
-    .filter((i): i is WatchlistTableRow => i !== null);
-
-  const cells = rows.length ? computeHeaderData(rows) : {};
-
-  return {
-    cells,
-    children: rows.length > 0 ? rows : undefined,
-    type: RowType.Asset,
-  };
 }
 
 export function prepareWatchlistTableData(
@@ -299,13 +279,26 @@ export function prepareWatchlistTableData(
     assets,
     accounts,
     holdings,
-    [],
+    [CollectionType.Account],
     null
   );
   console.log(collection);
 
-  const data = convertCollectionToTableRows(collection, assets, accounts);
+  const groupedCollection = groupCollectionItems(
+    collection,
+    CollectionGroupKey.Asset,
+    holdings
+  );
+  console.log(groupedCollection);
+
+  const data = convertCollectionToTableRow(
+    groupedCollection,
+    holdings,
+    assets,
+    accounts
+  );
   console.log(data);
+  assert(data);
 
   return data;
 }
