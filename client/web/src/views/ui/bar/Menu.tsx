@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import Switch from "@mui/material/Switch";
 import { PaletteMode } from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -18,7 +18,7 @@ import Typography from "@mui/material/Typography";
 import { LightMode } from "../../../components/settings";
 import { AppBarColors } from "../AppBar";
 import { LoginModal } from "../Login";
-import { getUsers, logoutThunk } from "../../../store/user";
+import { useAppDispatch, getUsers, logoutThunk } from "../../../store";
 import { setLightMode } from "../../../store/ui";
 
 interface Props {
@@ -34,7 +34,7 @@ export function AccountMenu({
   lightModeName,
   setSettingsOpen,
 }: Props) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [loginModalOpen, setLoginModalOpen] = React.useState(false);
   const users = useSelector(getUsers);

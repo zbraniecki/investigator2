@@ -1,6 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import MUITableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import TablePagination from "@mui/material/TablePagination";
@@ -11,10 +11,11 @@ import { StyledRowsData } from "./data/Row";
 import { TabRow, TabInfo } from "../Tabs";
 import { assert } from "../../../utils/helpers";
 import {
+  useAppDispatch,
   getRowsPerPageOption,
   setRowsPerPageOption,
   getInfoDisplayMode,
-} from "../../../store/ui";
+} from "../../../store";
 import { TableMenu } from "./Menu";
 import { InfoDisplayMode } from "../../../components/settings";
 import { getOutletContext } from "../../ui/Content";
@@ -48,7 +49,7 @@ export function TableContainer({
     setTableSettings(newSettings);
   };
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [page, setPage] = React.useState(0);
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
 

@@ -4,10 +4,7 @@ from investigator.user.models import (
     User,
     Holding,
 )
-from investigator.oracle.models import (
-    Category,
-    Tag
-)
+from investigator.oracle.models import Category, Tag
 from django.core.management.base import BaseCommand
 from decimal import *
 import datetime
@@ -25,8 +22,7 @@ PROVIDER_MAP = {
     "oasis": "oasis_wallet",
 }
 
-SYMBOL_MAP = {
-}
+SYMBOL_MAP = {}
 
 
 def normalize_symbol(input):
@@ -81,8 +77,8 @@ class Command(BaseCommand):
 
         user = User.objects.get(username="zbraniecki")
         holdings = Holding.objects.filter(
-                account__owner=user,
-                asset__asset_class__in=[crypto, fiat],
+            account__owner=user,
+            asset__asset_class__in=[crypto, fiat],
         ).order_by(
             "account__service__provider__id",
             "asset__symbol",

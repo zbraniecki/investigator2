@@ -15,8 +15,7 @@ import toml
 
 getcontext().prec = 2
 
-SYMBOL_MAP = {
-}
+SYMBOL_MAP = {}
 
 
 def normalize_symbol(input):

@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import Toolbar from "@mui/material/Toolbar";
 import { PaletteMode } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
@@ -10,7 +10,7 @@ import { AccountMenu } from "./Menu";
 import { Switch } from "../../components/Switch";
 import { setInfoDisplayMode, getInfoDisplayMode } from "../../../store/ui";
 import { InfoDisplayMode } from "../../../components/settings";
-import { getSession } from "../../../store/user";
+import { useAppDispatch, getSession } from "../../../store";
 import { fetchAssetsThunk } from "../../../api/oracle";
 import { getAssetUpdated } from "../../../store/oracle";
 import { AppBarColors } from "../AppBar";
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function Controls({ lightModeName, setSettingsOpen, colors }: Props) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [refreshInProgress, setRefreshInProgress] = React.useState(false);
 
   const session = useSelector(getSession);

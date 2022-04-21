@@ -94,7 +94,10 @@ function convertCollectionToTableRow(
         convertCollectionToTableRow(item, state)
       );
 
-      const value = children.reduce((total, row) => total + (row.cells.value ? row.cells.value : 0), 0);
+      const value = children.reduce(
+        (total, row) => total + (row.cells.value ? row.cells.value : 0),
+        0
+      );
 
       return {
         cells: {

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   fetchPortfoliosThunk,
   fetchWatchlistsThunk,
@@ -15,11 +15,11 @@ import {
   fetchTargetsThunk,
   fetchTargetChangesThunk,
 } from "../api";
-import { getSession } from "../store";
+import { useAppDispatch, getSession } from "../store";
 import { Chrome } from "./ui/Chrome";
 
 export function App() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const session = useSelector(getSession);
 
   useEffect(() => {

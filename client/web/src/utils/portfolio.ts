@@ -1,7 +1,6 @@
 /* eslint camelcase: "off" */
 
 import { Portfolio, Account, Holding, Asset, Service } from "../types";
-import { getServiceAsset } from "./service";
 import {
   assert,
   DataState,

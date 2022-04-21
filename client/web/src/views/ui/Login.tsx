@@ -10,7 +10,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import IconButton from "@mui/material/IconButton";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../../store";
 import { AuthenticateState } from "../../types";
 import { setAuthenticateState, authenticateThunk } from "../../store/user";
 import { assert } from "../../utils/helpers";
@@ -23,7 +23,7 @@ interface Props {
 
 export function LoginModal({ open, handleClose, authenticateState }: Props) {
   const [showPassword, setShowPassword] = React.useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);

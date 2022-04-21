@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
 
 import uiReducer from "./ui";
 import userReducer from "./user";
@@ -63,3 +64,6 @@ const store = configureStore({
 store.subscribe(() => saveToLocalStorage(store.getState()));
 
 export default store;
+
+export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = () => useDispatch<AppDispatch>();

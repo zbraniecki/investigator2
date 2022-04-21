@@ -6,11 +6,12 @@ import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Collapse from "@mui/material/Collapse";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { TableMeta } from "./data/Table";
 import { ColumnMeta } from "./data/Column";
 import { StyledRowData } from "./data/Row";
 import {
+  useAppDispatch,
   getSession,
   getHoldings,
   getTargets,
@@ -129,7 +130,7 @@ export function Row({ id, data, tableMeta, minWidths }: Props) {
   );
   const outletContext = getOutletContext();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleCellUpdate = async (cid: string, value: number) => {
     switch (cid) {
