@@ -22,7 +22,8 @@ export enum DataLoadedState {
 }
 
 export function isSufficientDataLoaded(data: DataState): DataLoadedState {
-  const state = data.assets !== undefined && data.publicWatchlists !== undefined;
+  const state =
+    data.assets !== undefined && data.publicWatchlists !== undefined;
   if (!state) {
     return DataLoadedState.None;
   }

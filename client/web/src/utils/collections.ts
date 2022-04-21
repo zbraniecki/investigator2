@@ -74,10 +74,10 @@ export function collectPortfolioHoldings(
     if (preserve.includes(CollectionType.Account)) {
       items.add(subCollection);
     } else if (subCollection.items) {
-        for (const item of subCollection.items) {
-          items.add(item);
-        }
+      for (const item of subCollection.items) {
+        items.add(item);
       }
+    }
   });
 
   if (portfolio.tags.length > 0) {
@@ -155,10 +155,10 @@ export function collectWatchlistHoldings(
     if (preserve.includes(CollectionType.Portfolio) && depth > 0) {
       items.add(subCollection);
     } else if (subCollection.items) {
-        for (const item of subCollection.items) {
-          items.add(item);
-        }
+      for (const item of subCollection.items) {
+        items.add(item);
       }
+    }
   }
 
   return {
@@ -170,6 +170,7 @@ export function collectWatchlistHoldings(
 
 export enum CollectionGroupKey {
   Asset,
+  Account,
 }
 
 export function groupCollectionItems(
@@ -186,34 +187,57 @@ export function groupCollectionItems(
     return input;
   }
   const newItems: Set<Collection> = new Set();
-  const assets: Map<string, Set<string>> = new Map();
+  const groups: Map<string, Set<string>> = new Map();
   Array.from(input.items).forEach((item) => {
     if (item.type == CollectionType.Holding) {
       assert(item.pk);
       const holding = state.holdings[item.pk];
-      const map = assets.get(holding.asset);
+      let groupKey;
+      switch (key) {
+        case CollectionGroupKey.Asset: {
+          groupKey = holding.asset;
+          break;
+        }
+        case CollectionGroupKey.Account: {
+          groupKey = holding.account;
+          break;
+        }
+      }
+      assert(groupKey);
+      const map = groups.get(groupKey);
       if (map) {
         map.add(item.pk);
       } else {
-        assets.set(holding.asset, new Set([item.pk]));
+        groups.set(groupKey, new Set([item.pk]));
       }
     } else if (!item.items) {
-        newItems.add(item);
-      } else {
-        newItems.add(groupCollectionItems(item, key, state));
-      }
+      newItems.add(item);
+    } else {
+      newItems.add(groupCollectionItems(item, key, state));
+    }
   });
-  Array.from(assets).forEach(([aid, holdings]) => {
+  Array.from(groups).forEach(([gid, holdings]) => {
     const items = Array.from(holdings).map((hid) => ({
-        type: CollectionType.Holding,
-        pk: hid,
-      }));
+      type: CollectionType.Holding,
+      pk: hid,
+    }));
     if (options?.collapseSingle && items.length === 1) {
       newItems.add(items[0]);
     } else {
+      let groupType;
+      switch (key) {
+        case CollectionGroupKey.Asset: {
+          groupType = CollectionType.Asset;
+          break;
+        }
+        case CollectionGroupKey.Account: {
+          groupType = CollectionType.Account;
+          break;
+        }
+      }
       newItems.add({
-        type: CollectionType.Asset,
-        pk: aid,
+        type: groupType,
+        pk: gid,
         items: new Set(items),
       });
     }

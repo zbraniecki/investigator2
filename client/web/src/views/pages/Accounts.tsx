@@ -3,6 +3,7 @@ import { TableContainer } from "../components/table/Contrainer";
 import {
   prepareAccountsTableData,
   computeAccountsTableDataStyle,
+  isSufficientDataLoaded,
 } from "../../utils/service";
 import { Portfolio } from "../../types";
 import {
@@ -105,9 +106,15 @@ export function Accounts() {
 
   let tabs: TabInfo[] = [];
 
-  if (portfolios !== undefined) {
-    const currentUser = session.user_pk ? users[session.user_pk] : undefined;
-    const plists: string[] = currentUser?.visible_lists.portfolios || [];
+  const ready = isSufficientDataLoaded({
+    accounts,
+    assets,
+    holdings,
+    portfolios,
+  });
+
+  if (ready && session.user_pk) {
+    const plists: string[] = users[session.user_pk].visible_lists.portfolios;
 
     tabs = plists
       .filter((pid) => pid in portfolios)

@@ -6,7 +6,14 @@ import {
   ServiceAsset,
   Account,
 } from "../types";
-import { assert } from "./helpers";
+import { assert, DataState } from "./helpers";
+import {
+  CollectionType,
+  Collection,
+  collectPortfolioHoldings,
+  groupCollectionItems,
+  CollectionGroupKey,
+} from "./collections";
 import {
   RowData,
   RowType,
@@ -15,21 +22,13 @@ import {
   newCellData,
 } from "../views/components/table/data/Row";
 
-export function getServiceAsset(
-  serviceId: string,
-  assetId: string,
-  services: Record<string, Service>
-): ServiceAsset | null {
-  const service = services[serviceId];
-  if (!service) {
-    return null;
-  }
-  for (const asset of service.assets) {
-    if (asset.asset_pk === assetId) {
-      return asset;
-    }
-  }
-  return null;
+export function isSufficientDataLoaded(state: DataState): boolean {
+  return (
+    state.accounts !== undefined &&
+    state.assets !== undefined &&
+    state.holdings !== undefined &&
+    state.portfolios !== undefined
+  );
 }
 
 export interface AccountsTableRow extends RowData {
@@ -59,6 +58,76 @@ export interface StyledAccountsTableRow extends StyledRowData {
   type: RowType;
 }
 
+function convertCollectionToTableRow(
+  item: Collection,
+  state: {
+    accounts: Record<string, Account>;
+    assets: Record<string, Asset>;
+    holdings: Record<string, Holding>;
+    portfolios: Record<string, Portfolio>;
+    services: Record<string, Service>;
+  }
+): AccountsTableRow {
+  switch (item.type) {
+    case CollectionType.Portfolio: {
+      assert(item.pk);
+      assert(item.items);
+      console.log(item);
+      const portfolio = state.portfolios[item.pk];
+
+      const children: AccountsTableRow[] = Array.from(item.items).map((item) =>
+        convertCollectionToTableRow(item, state)
+      );
+
+      return {
+        cells: {},
+        children,
+        type: RowType.Portfolio,
+      };
+    }
+    case CollectionType.Account: {
+      assert(item.pk);
+      assert(item.items);
+      const account = state.accounts[item.pk];
+
+      const children: AccountsTableRow[] = Array.from(item.items).map((item) =>
+        convertCollectionToTableRow(item, state)
+      );
+
+      const value = children.reduce((total, row) => total + (row.cells.value ? row.cells.value : 0), 0);
+
+      return {
+        cells: {
+          id: account.pk,
+          account: account.name,
+          value,
+        },
+        children,
+        type: RowType.Account,
+      };
+    }
+    case CollectionType.Holding: {
+      assert(item.pk);
+      const holding = state.holdings[item.pk];
+      const asset = state.assets[holding.asset];
+
+      return {
+        cells: {
+          id: holding.pk,
+          name: asset.symbol.toUpperCase(),
+          quantity: holding.quantity,
+          value: holding.quantity * asset.info.value,
+        },
+        type: RowType.Holding,
+      };
+    }
+    default: {
+      console.log(item.type);
+      assert(false);
+    }
+  }
+}
+
 export function prepareAccountsTableData(
   pid: string,
   state: {
@@ -69,64 +138,23 @@ export function prepareAccountsTableData(
     services: Record<string, Service>;
   }
 ): AccountsTableRow | null {
-  return null;
-  // const portfolio = portfolios[pid];
-  // assert(portfolio);
-  // if (
-  //   assets === undefined ||
-  //   holdings === undefined ||
-  //   accounts === undefined
-  // ) {
-  //   return undefined;
-  // }
-  //
-  // const ph = collectPortfolioHoldings(
-  //   portfolio,
-  //   portfolios,
-  //   assets,
-  //   accounts,
-  //   holdings
-  // );
-  //
-  // const groups = groupHoldings(ph, "account");
-  //
-  // return {
-  //   cells: {},
-  //   type: RowType.Asset,
-  //   children: groups.map((group) => {
-  //     const account = accounts[group.item];
-  //     const service = services[account.service];
-  //     let groupValue = 0;
-  //
-  //     const children = group.children?.map((item) => {
-  //       const holding = holdings[item.item];
-  //       const asset = assets[holding.asset];
-  //       const value = holding.quantity * asset.info.value;
-  //       groupValue += value;
-  //
-  //       return {
-  //         cells: {
-  //           id: holding.pk,
-  //           name: asset.name,
-  //           symbol: asset.symbol,
-  //           quantity: holding.quantity,
-  //           value,
-  //         },
-  //         type: RowType.Asset,
-  //       };
-  //     });
-  //
-  //     return {
-  //       cells: {
-  //         id: group.item,
-  //         account: service.provider_name,
-  //         value: groupValue,
-  //       },
-  //       children,
-  //       type: RowType.Account,
-  //     };
-  //   }),
-  // };
+  const portfolio = state.portfolios[pid];
+  assert(portfolio);
+
+  const collection = collectPortfolioHoldings(portfolio, state, [], null);
+
+  const groupedCollection = groupCollectionItems(
+    collection,
+    CollectionGroupKey.Account,
+    state,
+    {
+      collapseSingle: false,
+    }
+  );
+
+  const data = convertCollectionToTableRow(groupedCollection, state);
+
+  return data;
 }
 
 interface StylingColumnData {

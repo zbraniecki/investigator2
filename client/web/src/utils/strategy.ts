@@ -104,109 +104,6 @@ function computeHeaderData(
   return cells;
 }
 
-export function createStrategyTableData(
-  strategy: Strategy,
-  targets: Record<string, Target>,
-  targetChanges: Record<string, TargetChange>,
-  portfolios: Record<string, Portfolio>,
-  assetInfo: Record<string, Asset>,
-  computedTableData: Record<string, Record<string, any>>
-): StrategyTableRow {
-  const totalPortfolioValue = Object.values(computedTableData).reduce(
-    (total, asset) => total + asset.value,
-    0
-  );
-
-  const rows: StrategyTableRow[] = Object.values(strategy.targets).map(
-    (tid) => {
-      const target = targets[tid];
-      const asset = assetInfo[target.asset];
-      assert(asset);
-
-      const computedData = computedTableData[asset.pk];
-
-      let currentValue = computedData?.value || 0;
-
-      for (const a of target.contains) {
-        const containsAsset = assetInfo[a];
-        assert(containsAsset);
-        const subComputedData = computedTableData[containsAsset.pk];
-        currentValue += subComputedData?.value || 0;
-      }
-      const targetValue = totalPortfolioValue * target.percent;
-      const currentPercent = currentValue / totalPortfolioValue;
-      const deviation = Math.abs(target.percent - currentPercent);
-      const delta = targetValue / currentValue - 1;
-      const deltaUsd = targetValue - currentValue;
-      return {
-        cells: {
-          id: target.pk,
-          name: asset.symbol.toUpperCase(),
-          target: target.percent,
-          current: currentPercent,
-          deviation,
-          delta,
-          deltaUsd,
-        },
-        type: RowType.Asset,
-      };
-    }
-  );
-
-  const targettedAssetIds = Object.values(strategy.targets)
-    .map((tid) => {
-      const target = targets[tid];
-      return [target.asset, ...target.contains];
-    })
-    .flat();
-  const unlistedAssetIds: Set<string> = new Set();
-  for (const asset of Object.keys(computedTableData)) {
-    if (!targettedAssetIds.includes(asset)) {
-      unlistedAssetIds.add(asset);
-    }
-  }
-  if (unlistedAssetIds.size > 0) {
-    const children: StrategyTableRow[] = [];
-    for (const assetId of unlistedAssetIds) {
-      const asset = assetInfo[assetId];
-      assert(asset);
-
-      const computedData = computedTableData[asset.pk];
-      assert(computedData);
-
-      const current = computedData.value / totalPortfolioValue;
-
-      children.push({
-        cells: {
-          name: asset.name,
-          current,
-        },
-        type: RowType.Asset,
-      });
-    }
-
-    rows.push({
-      cells: {
-        name: "?",
-        current: children.reduce(
-          (total, row) => total + (row.cells.current || 0),
-          0
-        ),
-      },
-      children,
-      type: RowType.Portfolio,
-    });
-  }
-
-  const cells = computeHeaderData(strategy, rows);
-
-  return {
-    cells,
-    children: rows.length > 0 ? rows : undefined,
-    type: RowType.Asset,
-  };
-}
-
 function convertCollectionToTableRow(
   item: Collection,
   sid: string,
@@ -245,7 +142,10 @@ function convertCollectionToTableRow(
         }, 0);
         assetValues[item.pk] = assetValue;
       });
-      const totalValue = Object.values(assetValues).reduce((total, item) => total + item, 0);
+      const totalValue = Object.values(assetValues).reduce(
+        (total, item) => total + item,
+        0
+      );
 
       let children: StrategyTableRow[] = Array.from(item.items).map((item) =>
         convertCollectionToTableRow(item, sid, state)
@@ -264,9 +164,6 @@ function convertCollectionToTableRow(
         }
         const targetValue = totalValue * targetPercent;
 
-        // const deviation = Math.abs(target.percent - currentPercent);
-        // const delta = targetValue / currentValue - 1;
-        // const deltaUsd = targetValue - currentValue;
         const deviation = Math.abs(targetPercent - currentPercent);
         const delta = targetValue / assetValue - 1;
         const deltaUsd = targetValue - assetValue;
@@ -313,14 +210,9 @@ function convertCollectionToTableRow(
 
       return {
         cells: {
-          // id: target.pk,
           id: asset.pk,
           name: asset.symbol.toUpperCase(),
           target: target?.percent,
-          // current: currentPercent,
-          // deviation,
-          // delta,
-          // deltaUsd,
         },
         type: RowType.Asset,
       };
