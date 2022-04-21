@@ -1,7 +1,7 @@
 export interface Strategy {
   pk: string;
   portfolio: string;
-  targets: Record<string, string>;
+  targets: Array<string>;
   changes: Record<string, string>;
 }
 

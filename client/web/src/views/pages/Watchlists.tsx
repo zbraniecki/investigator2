@@ -10,6 +10,8 @@ import { StyledRowData } from "../components/table/data/Row";
 import {
   prepareWatchlistTableData,
   computeWatchlistTableDataStyle,
+  isSufficientDataLoaded,
+  DataLoadedState,
 } from "../../utils/watchlist";
 import { Watchlist } from "../../types";
 import {
@@ -157,16 +159,17 @@ const tableSettings: TableSettings = {
 };
 
 export function Watchlists() {
+  const accounts = useSelector(getAccounts);
+  const assets = useSelector(getAssets);
+  const holdings = useSelector(getHoldings);
+  const portfolios = useSelector(getPortfolios);
   const publicWatchlists: Record<string, Watchlist> =
     useSelector(getPublicWatchlists);
   const userWatchlists: Record<string, Watchlist> | undefined =
     useSelector(getUserWatchlists);
-  const assets = useSelector(getAssets);
-  const portfolios = useSelector(getPortfolios);
+
   const users = useSelector(getUsers);
   const session = useSelector(getSession);
-  const holdings = useSelector(getHoldings);
-  const accounts = useSelector(getAccounts);
 
   const watchlists: Record<string, Watchlist> = {};
   if (publicWatchlists) {
@@ -182,9 +185,21 @@ export function Watchlists() {
 
   let tabs: TabInfo[] = [];
 
+  const dataLoadedState = isSufficientDataLoaded({
+    accounts,
+    assets,
+    holdings,
+    portfolios,
+    publicWatchlists,
+    users,
+    userWatchlists,
+  });
+
+  // We don't want to flicker. If user is logged in, don't show public
+  // until user watchlists are loaded.
   const ready = session.token
-    ? userWatchlists !== undefined && Object.keys(users).length > 0
-    : Object.keys(watchlists).length > 0;
+    ? dataLoadedState === DataLoadedState.User
+    : dataLoadedState !== DataLoadedState.None;
 
   if (ready) {
     const wids: string[] = session.user_pk
@@ -202,17 +217,16 @@ export function Watchlists() {
       });
   }
 
-  const getTableData = (id: string): StyledRowData | undefined => {
-    const data = prepareWatchlistTableData(
-      id,
-      watchlists,
+  const getTableData = (id: string): StyledRowData | null => {
+    const data = prepareWatchlistTableData(id, {
+      accounts,
       assets,
-      portfolios,
       holdings,
-      accounts
-    );
-    if (data === undefined) {
-      return undefined;
+      portfolios,
+      watchlists,
+    });
+    if (data === null) {
+      return null;
     }
     return computeWatchlistTableDataStyle(data);
   };

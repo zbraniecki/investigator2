@@ -4,6 +4,10 @@ from investigator.user.models import (
     User,
     Holding,
 )
+from investigator.oracle.models import (
+    Category,
+    Tag
+)
 from django.core.management.base import BaseCommand
 from decimal import *
 import datetime
@@ -65,12 +69,21 @@ class Command(BaseCommand):
     help = "Dump portfolio data to git"
 
     def add_arguments(self, parser):
-        parser.add_argument("path", type=str, help="Path to clone of a git repo")
+        # parser.add_argument("path", type=str, help="Path to dump portfolio to file")
+        pass
 
     def handle(self, *args, **kwargs):
-        path = kwargs["path"]
+        # path = kwargs["path"]
+
+        asset_class = Category.objects.get(name="asset_class")
+        crypto = Tag.objects.get(name="crypto", category__in=[asset_class])
+        fiat = Tag.objects.get(name="fiat", category__in=[asset_class])
+
         user = User.objects.get(username="zbraniecki")
-        holdings = Holding.objects.filter(account__owner=user).order_by(
+        holdings = Holding.objects.filter(
+                account__owner=user,
+                asset__asset_class__in=[crypto, fiat],
+        ).order_by(
             "account__service__provider__id",
             "asset__symbol",
             "-quantity",

@@ -10,12 +10,19 @@ import {
   Account,
   Service,
 } from "../types";
-import { buildPortfolioTableData } from "./portfolio";
 import {
   assert,
   groupTableDataByColumn2,
   computeGroupedTableData,
+  DataState,
 } from "./helpers";
+import {
+  CollectionType,
+  Collection,
+  collectPortfolioHoldings,
+  groupCollectionItems,
+  CollectionGroupKey,
+} from "./collections";
 import {
   RowData,
   RowType,
@@ -23,6 +30,19 @@ import {
   StyledRowData,
   newCellData,
 } from "../views/components/table/data/Row";
+
+export function isSufficientDataLoaded(state: DataState): boolean {
+  return (
+    state.accounts !== undefined &&
+    state.assets !== undefined &&
+    state.holdings !== undefined &&
+    state.portfolios !== undefined &&
+    state.strategies !== undefined &&
+    state.targets !== undefined &&
+    state.targetChanges !== undefined &&
+    state.users !== undefined
+  );
+}
 
 export interface StrategyTableRow extends RowData {
   cells: {
@@ -187,56 +207,165 @@ export function createStrategyTableData(
   };
 }
 
-export function prepareStrategyTableData(
+function convertCollectionToTableRow(
+  item: Collection,
   sid: string,
-  strategies: Record<string, Strategy>,
-  targets: Record<string, Target>,
-  targetChanges: Record<string, TargetChange>,
-  portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>,
-  assetInfo: Record<string, Asset>,
-  accounts: Record<string, Account>,
-  services: Record<string, Service>
-): StrategyTableRow | undefined {
-  const strategy = strategies[sid];
+  state: {
+    accounts: Record<string, Account>;
+    assets: Record<string, Asset>;
+    holdings: Record<string, Holding>;
+    portfolios: Record<string, Portfolio>;
+    services: Record<string, Service>;
+    strategies: Record<string, Strategy>;
+    targets: Record<string, Target>;
+  }
+): StrategyTableRow {
+  const strategy = state.strategies[sid];
   assert(strategy);
 
-  if (
-    Object.keys(assetInfo).length === 0 ||
-    Object.keys(portfolios).length === 0
-  ) {
-    return undefined;
-  }
+  switch (item.type) {
+    case CollectionType.Portfolio: {
+      assert(item.pk);
+      const portfolio = state.portfolios[item.pk];
+      assert(item.items);
+      const ungroupedAssets = new Set();
 
-  const portfolio = portfolios[strategy.portfolio];
+      const assetValues: Record<string, number> = {};
+
+      Array.from(item.items).forEach((item) => {
+        assert(item.pk);
+        const asset = state.assets[item.pk];
+        assert(asset);
+        assert(item.items);
+
+        const assetValue = Array.from(item.items).reduce((total, item) => {
+          assert(item.pk);
+          const holding = state.holdings[item.pk];
+          return total + holding.quantity * asset.info.value;
+        }, 0);
+        assetValues[item.pk] = assetValue;
+      });
+      const totalValue = Object.values(assetValues).reduce((total, item) => total + item, 0);
+
+      let children: StrategyTableRow[] = Array.from(item.items).map((item) =>
+        convertCollectionToTableRow(item, sid, state)
+      );
+
+      children.forEach((row) => {
+        assert(row.cells.id);
+        const assetValue = assetValues[row.cells.id];
+        assert(assetValue);
+        const currentPercent = assetValue / totalValue;
+        row.cells.current = currentPercent;
+
+        const targetPercent = row.cells.target;
+        if (!targetPercent) {
+          return;
+        }
+        const targetValue = totalValue * targetPercent;
+
+        // const deviation = Math.abs(target.percent - currentPercent);
+        // const delta = targetValue / currentValue - 1;
+        // const deltaUsd = targetValue - currentValue;
+        const deviation = Math.abs(targetPercent - currentPercent);
+        const delta = targetValue / assetValue - 1;
+        const deltaUsd = targetValue - assetValue;
+
+        row.cells.deviation = deviation;
+        row.cells.delta = delta;
+        row.cells.deltaUsd = deltaUsd;
+      });
+
+      const ungroupedChildren = children.filter(
+        (item) => item.cells.target === undefined
+      );
+      children = children.filter((item) => item.cells.target !== undefined);
+
+      const ungroupedChildrenTotal = ungroupedChildren.reduce((total, item) => {
+        assert(item.cells.current);
+        return total + item.cells.current;
+      }, 0);
+
+      children.push({
+        cells: {
+          name: "?",
+          current: ungroupedChildrenTotal,
+        },
+        children: ungroupedChildren,
+        type: RowType.Group,
+      });
+
+      // const cells = children.length ? computeHeaderData(portfolio, children) : {};
+      const cells = {};
+      return {
+        cells,
+        children,
+        type: RowType.Portfolio,
+      };
+    }
+    case CollectionType.Asset: {
+      assert(item.pk);
+      const asset = state.assets[item.pk];
+      const tid = strategy.targets.find(
+        (tid) => state.targets[tid].asset === asset.pk
+      );
+      const target = tid ? state.targets[tid] : undefined;
+
+      return {
+        cells: {
+          // id: target.pk,
+          id: asset.pk,
+          name: asset.symbol.toUpperCase(),
+          target: target?.percent,
+          // current: currentPercent,
+          // deviation,
+          // delta,
+          // deltaUsd,
+        },
+        type: RowType.Asset,
+      };
+    }
+    default: {
+      console.log(item.type);
+      assert(false);
+    }
+  }
+}
+
+export function prepareStrategyTableData(
+  sid: string,
+  state: {
+    accounts: Record<string, Account>;
+    assets: Record<string, Asset>;
+    holdings: Record<string, Holding>;
+    portfolios: Record<string, Portfolio>;
+    services: Record<string, Service>;
+    strategies: Record<string, Strategy>;
+    targets: Record<string, Target>;
+    targetChanges: Record<string, TargetChange>;
+  }
+): StrategyTableRow | null {
+  const strategy = state.strategies[sid];
+  assert(strategy);
+
+  const portfolio = state.portfolios[strategy.portfolio];
   assert(portfolio);
 
-  const portfolioData = buildPortfolioTableData(
-    portfolio,
-    portfolios,
-    holdings,
-    assetInfo,
-    accounts,
-    services
-  );
-  const groupedPortfolioData = groupTableDataByColumn2(
-    portfolioData,
-    "asset",
-    true
-  );
-  assert(groupedPortfolioData.ungrouped.length === 0);
-  const computedTableData = computeGroupedTableData(
-    groupedPortfolioData.grouped,
-    ["value"]
+  const collection = collectPortfolioHoldings(portfolio, state, [], null);
+
+  const groupedCollection = groupCollectionItems(
+    collection,
+    CollectionGroupKey.Asset,
+    state,
+    {
+      collapseSingle: false,
+    }
   );
 
-  const data = createStrategyTableData(
-    strategy,
-    targets,
-    targetChanges,
-    portfolios,
-    assetInfo,
-    computedTableData
+  const data = convertCollectionToTableRow(
+    groupedCollection,
+    strategy.pk,
+    state
   );
 
   return data;

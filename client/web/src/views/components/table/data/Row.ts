@@ -10,6 +10,8 @@ export enum RowType {
   Asset,
   Portfolio,
   Account,
+  Holding,
+  Group,
 }
 
 export interface RowData {

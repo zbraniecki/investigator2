@@ -7,7 +7,7 @@ import {
   Asset,
   Service,
 } from "../types";
-import { assert } from "./helpers";
+import { assert, DataState } from "./helpers";
 
 export enum CollectionType {
   Watchlist,
@@ -27,10 +27,9 @@ export interface Collection {
 
 export function collectPortfolioHoldings(
   portfolio: Portfolio,
-  portfolios: Record<string, Portfolio>,
-  assets: Record<string, Asset>,
-  accounts: Record<string, Account>,
-  holdings: Record<string, Holding>,
+  data: Required<
+    Pick<DataState, "accounts" | "assets" | "holdings" | "portfolios">
+  >,
   preserve: CollectionType[],
   maxDepth: number | null,
   depth: number = 0
@@ -67,11 +66,8 @@ export function collectPortfolioHoldings(
   //
   Object.values(portfolio.accounts).forEach((aid) => {
     const subCollection = collectAccountHoldings(
-      accounts[aid],
-      portfolios,
-      assets,
-      accounts,
-      holdings,
+      data.accounts[aid],
+      data,
       preserve,
       maxDepth === null ? null : maxDepth - 1
     );
@@ -86,10 +82,10 @@ export function collectPortfolioHoldings(
 
   if (portfolio.tags.length > 0) {
     const result: Set<string> = new Set();
-    Object.values(accounts).forEach((account) => {
+    Object.values(data.accounts).forEach((account) => {
       account.holdings.forEach((hid) => {
-        const holding = holdings[hid];
-        const asset = assets[holding.asset];
+        const holding = data.holdings[hid];
+        const asset = data.assets[holding.asset];
         if (portfolio.tags.includes(asset.asset_class)) {
           result.add(hid);
         }
@@ -112,10 +108,9 @@ export function collectPortfolioHoldings(
 
 export function collectAccountHoldings(
   account: Account,
-  portfolios: Record<string, Portfolio>,
-  assets: Record<string, Asset>,
-  accounts: Record<string, Account>,
-  holdings: Record<string, Holding>,
+  data: Required<
+    Pick<DataState, "accounts" | "assets" | "holdings" | "portfolios">
+  >,
   preserve: CollectionType[],
   maxDepth: number | null
 ): Collection {
@@ -135,11 +130,13 @@ export function collectAccountHoldings(
 
 export function collectWatchlistHoldings(
   watchlist: Watchlist,
-  watchlists: Record<string, Watchlist>,
-  portfolios: Record<string, Portfolio>,
-  assets: Record<string, Asset>,
-  accounts: Record<string, Account>,
-  holdings: Record<string, Holding>,
+  // data: DataState<"accounts" | "assets" | "holdings" | "portfolios" | "watchlists">,
+  data: Required<
+    Pick<
+      DataState,
+      "accounts" | "assets" | "holdings" | "portfolios" | "watchlists"
+    >
+  >,
   preserve: CollectionType[],
   maxDepth: number | null,
   depth: number = 0
@@ -149,11 +146,8 @@ export function collectWatchlistHoldings(
   if (watchlist.type === WatchlistType.Portfolio) {
     assert(watchlist.portfolio);
     const subCollection = collectPortfolioHoldings(
-      portfolios[watchlist.portfolio],
-      portfolios,
-      assets,
-      accounts,
-      holdings,
+      data.portfolios[watchlist.portfolio],
+      data,
       preserve,
       maxDepth === null ? null : maxDepth - 1,
       depth
@@ -181,29 +175,48 @@ export enum CollectionGroupKey {
 export function groupCollectionItems(
   input: Collection,
   key: CollectionGroupKey,
-  holdings: Record<string, Holding>
+  state: {
+    holdings: Record<string, Holding>;
+  },
+  options?: {
+    collapseSingle?: boolean;
+  }
 ): Collection {
   if (!input.items) {
     return input;
   }
   const newItems: Set<Collection> = new Set();
-  const assets: Set<string> = new Set();
+  const assets: Map<string, Set<string>> = new Map();
   Array.from(input.items).forEach((item) => {
     if (item.type == CollectionType.Holding) {
       assert(item.pk);
-      const holding = holdings[item.pk];
-      assets.add(holding.asset);
+      const holding = state.holdings[item.pk];
+      const map = assets.get(holding.asset);
+      if (map) {
+        map.add(item.pk);
+      } else {
+        assets.set(holding.asset, new Set([item.pk]));
+      }
     } else if (!item.items) {
         newItems.add(item);
       } else {
-        newItems.add(groupCollectionItems(item, key, holdings));
+        newItems.add(groupCollectionItems(item, key, state));
       }
   });
-  Array.from(assets).forEach((aid) => {
-    newItems.add({
-      type: CollectionType.Asset,
-      pk: aid,
-    });
+  Array.from(assets).forEach(([aid, holdings]) => {
+    const items = Array.from(holdings).map((hid) => ({
+        type: CollectionType.Holding,
+        pk: hid,
+      }));
+    if (options?.collapseSingle && items.length === 1) {
+      newItems.add(items[0]);
+    } else {
+      newItems.add({
+        type: CollectionType.Asset,
+        pk: aid,
+        items: new Set(items),
+      });
+    }
   });
   return {
     type: input.type,

@@ -1,4 +1,16 @@
 import { RowData, RowsData, RowType } from "../views/components/table/data/Row";
+import {
+  Asset,
+  Watchlist,
+  Portfolio,
+  Holding,
+  Account,
+  Service,
+  User,
+  Strategy,
+  Target,
+  TargetChange,
+} from "../types";
 
 const CATCH_ALL_KEY = "?";
 
@@ -218,4 +230,19 @@ export function groupTableDataByColumn(
   }
 
   return result;
+}
+
+export interface DataState {
+  accounts?: Record<string, Account>;
+  assets?: Record<string, Asset>;
+  holdings?: Record<string, Holding>;
+  portfolios?: Record<string, Portfolio>;
+  services?: Record<string, Service>;
+  strategies?: Record<string, Strategy>;
+  targets?: Record<string, Target>;
+  targetChanges?: Record<string, TargetChange>;
+  watchlists?: Record<string, Watchlist>;
+  publicWatchlists?: Record<string, Watchlist>;
+  users?: Record<string, User>;
+  userWatchlists?: Record<string, Watchlist>;
 }

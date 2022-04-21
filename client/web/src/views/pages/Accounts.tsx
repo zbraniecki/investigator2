@@ -119,17 +119,16 @@ export function Accounts() {
         };
       });
   }
-  const getTableData = (id: string): StyledRowData | undefined => {
-    const data = prepareAccountsTableData(
-      id,
-      portfolios,
-      assets,
-      services,
+  const getTableData = (id: string): StyledRowData | null => {
+    const data = prepareAccountsTableData(id, {
       accounts,
-      holdings
-    );
-    if (data === undefined) {
-      return undefined;
+      assets,
+      holdings,
+      portfolios,
+      services,
+    });
+    if (data === null) {
+      return null;
     }
     return computeAccountsTableDataStyle(data);
   };

@@ -1,5 +1,5 @@
 import { Asset, Watchlist, Portfolio, Holding, Account } from "../types";
-import { assert } from "./helpers";
+import { assert, DataState } from "./helpers";
 import {
   RowData,
   RowType,
@@ -14,6 +14,29 @@ import {
   groupCollectionItems,
   CollectionGroupKey,
 } from "./collections";
+
+export enum DataLoadedState {
+  None,
+  Public,
+  User,
+}
+
+export function isSufficientDataLoaded(data: DataState): DataLoadedState {
+  const state = data.assets !== undefined && data.publicWatchlists !== undefined;
+  if (!state) {
+    return DataLoadedState.None;
+  }
+  if (
+    data.accounts !== undefined &&
+    data.holdings !== undefined &&
+    data.userWatchlists !== undefined &&
+    data.portfolios !== undefined &&
+    data.users !== undefined
+  ) {
+    return DataLoadedState.User;
+  }
+  return DataLoadedState.Public;
+}
 
 export interface WatchlistTableRow extends RowData {
   cells: {
@@ -31,6 +54,7 @@ export interface WatchlistTableRow extends RowData {
   children?: WatchlistTableRow[];
   type: RowType;
 }
+
 export interface StyledWatchlistTableRow extends StyledRowData {
   cells: {
     id?: CellData<string>;
@@ -89,111 +113,19 @@ function computeHeaderData(
   return cells;
 }
 
-function getAssetsFromPortfolio(
-  portfolio: Portfolio,
-  portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>,
-  accounts: Record<string, Account>,
-  assetInfo: Record<string, Asset>
-): Set<string> {
-  const symbols: Set<string> = new Set();
-  for (const hid of portfolio.holdings) {
-    const holding = holdings[hid];
-    symbols.add(holding.asset);
-  }
-  for (const pid of portfolio.portfolios) {
-    const p = portfolios[pid];
-    assert(p);
-    const subset = getAssetsFromPortfolio(
-      p,
-      portfolios,
-      holdings,
-      accounts,
-      assetInfo
-    );
-    subset.forEach(symbols.add, symbols);
-  }
-  if (portfolio.tags.length > 0) {
-    Object.values(accounts).forEach((account) => {
-      account.holdings.forEach((hid) => {
-        const holding = holdings[hid];
-        const asset = assetInfo[holding.asset];
-        assert(asset);
-        if (portfolio.tags.includes(asset.asset_class)) {
-          symbols.add(asset.pk);
-        }
-      });
-    });
-  }
-  return symbols;
-}
-
-export function createWatchlistTableData(
-  watchlist: Watchlist,
-  watchlists: Record<string, Watchlist>,
-  assetInfo: Record<string, Asset>,
-  portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>,
-  accounts: Record<string, Account>
-): WatchlistTableRow {
-  const symbols: Set<string> = new Set(watchlist.assets);
-
-  if (watchlist.portfolio) {
-    const portfolio = portfolios[watchlist.portfolio];
-    assert(portfolio);
-    const subset = getAssetsFromPortfolio(
-      portfolio,
-      portfolios,
-      holdings,
-      accounts,
-      assetInfo
-    );
-    subset.forEach(symbols.add, symbols);
-  }
-
-  const rows: WatchlistTableRow[] = Array.from(symbols).map((symbol) => {
-    const asset = assetInfo[symbol];
-    assert(asset, `Missing asset: ${symbol}`);
-
-    return {
-      cells: {
-        id: asset.pk,
-        market_cap_rank: asset.info.market_cap_rank,
-        market_cap: asset.info.market_cap,
-        name: asset.symbol.toUpperCase(),
-        symbol: asset.symbol,
-        price: asset.info.value,
-        price_change_percentage_1h: asset.info.price_change_percentage_1h,
-        price_change_percentage_24h: asset.info.price_change_percentage_24h,
-        price_change_percentage_7d: asset.info.price_change_percentage_7d,
-        price_change_percentage_30d: asset.info.price_change_percentage_30d,
-      },
-      type: RowType.Asset,
-    };
-  });
-
-  const cells = rows.length ? computeHeaderData(rows) : {};
-
-  return {
-    cells,
-    children: rows.length > 0 ? rows : undefined,
-    type: RowType.Asset,
-  };
-}
-
 function convertCollectionToTableRow(
   item: Collection,
-  holdings: Record<string, Holding>,
-  assets: Record<string, Asset>,
-  accounts: Record<string, Account>
+  state: {
+    accounts: Record<string, Account>;
+    assets: Record<string, Asset>;
+    holdings: Record<string, Holding>;
+  }
 ): WatchlistTableRow | null {
   switch (item.type) {
     case CollectionType.Watchlist: {
       assert(item.items);
       const children: WatchlistTableRow[] = Array.from(item.items)
-        .map((item) =>
-          convertCollectionToTableRow(item, holdings, assets, accounts)
-        )
+        .map((item) => convertCollectionToTableRow(item, state))
         .filter((i): i is WatchlistTableRow => i != null);
 
       const cells = children.length ? computeHeaderData(children) : {};
@@ -205,7 +137,7 @@ function convertCollectionToTableRow(
     }
     case CollectionType.Asset: {
       assert(item.pk);
-      const asset = assets[item.pk];
+      const asset = state.assets[item.pk];
       return {
         cells: {
           id: asset.pk,
@@ -225,12 +157,10 @@ function convertCollectionToTableRow(
     case CollectionType.Account: {
       assert(item.pk);
       assert(item.items);
-      const account = accounts[item.pk];
+      const account = state.accounts[item.pk];
 
       const children: WatchlistTableRow[] = Array.from(item.items)
-        .map((item) =>
-          convertCollectionToTableRow(item, holdings, assets, accounts)
-        )
+        .map((item) => convertCollectionToTableRow(item, state))
         .filter((i): i is WatchlistTableRow => i != null);
 
       return {
@@ -250,35 +180,23 @@ function convertCollectionToTableRow(
 
 export function prepareWatchlistTableData(
   wid: string,
-  watchlists: Record<string, Watchlist>,
-  assets: Record<string, Asset>,
-  portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>,
-  accounts: Record<string, Account>
-): WatchlistTableRow | undefined {
-  if (
-    watchlists === undefined ||
-    assets === undefined ||
-    accounts === undefined ||
-    portfolios === undefined ||
-    holdings === undefined
-  ) {
-    return undefined;
+  state: {
+    accounts: Record<string, Account>;
+    assets: Record<string, Asset>;
+    holdings: Record<string, Holding>;
+    portfolios: Record<string, Portfolio>;
+    watchlists: Record<string, Watchlist>;
   }
-
-  const watchlist = watchlists[wid];
+): WatchlistTableRow | null {
+  const watchlist = state.watchlists[wid];
   if (watchlist === undefined) {
-    return undefined;
+    return null;
   }
 
   assert(watchlist.portfolio);
   const collection = collectWatchlistHoldings(
     watchlist,
-    watchlists,
-    portfolios,
-    assets,
-    accounts,
-    holdings,
+    state,
     [CollectionType.Account],
     null
   );
@@ -287,16 +205,11 @@ export function prepareWatchlistTableData(
   const groupedCollection = groupCollectionItems(
     collection,
     CollectionGroupKey.Asset,
-    holdings
+    state
   );
   console.log(groupedCollection);
 
-  const data = convertCollectionToTableRow(
-    groupedCollection,
-    holdings,
-    assets,
-    accounts
-  );
+  const data = convertCollectionToTableRow(groupedCollection, state);
   console.log(data);
   assert(data);
 

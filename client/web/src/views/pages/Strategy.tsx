@@ -23,6 +23,7 @@ import {
 import {
   prepareStrategyTableData,
   computeStrategyTableDataStyle,
+  isSufficientDataLoaded,
 } from "../../utils/strategy";
 import { TabInfo } from "../components/Tabs";
 
@@ -136,14 +137,18 @@ export function Strategy() {
 
   let tabs: TabInfo[] = [];
 
-  const ready =
-    Object.keys(strategies).length > 0 &&
-    Object.keys(users).length > 0 &&
-    Object.keys(targets).length > 0 &&
-    Object.keys(targetChanges).length > 0 &&
-    session.user_pk;
+  const ready = isSufficientDataLoaded({
+    accounts,
+    assets,
+    holdings,
+    portfolios,
+    strategies,
+    targets,
+    targetChanges,
+    users,
+  });
 
-  if (ready) {
+  if (ready && session.user_pk) {
     const wids: string[] = users[session.user_pk].visible_lists.strategies;
 
     tabs = wids
@@ -157,20 +162,19 @@ export function Strategy() {
       });
   }
 
-  const getTableData = (id: string): StyledRowData | undefined => {
-    const data = prepareStrategyTableData(
-      id,
+  const getTableData = (id: string): StyledRowData | null => {
+    const data = prepareStrategyTableData(id, {
+      accounts,
+      assets,
+      holdings,
+      portfolios,
+      services,
       strategies,
       targets,
       targetChanges,
-      portfolios,
-      holdings,
-      assets,
-      accounts,
-      services
-    );
-    if (data === undefined) {
-      return undefined;
+    });
+    if (data === null) {
+      return null;
     }
     return computeStrategyTableDataStyle(data);
   };

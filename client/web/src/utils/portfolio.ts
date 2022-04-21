@@ -2,7 +2,12 @@
 
 import { Portfolio, Account, Holding, Asset, Service } from "../types";
 import { getServiceAsset } from "./service";
-import { assert, groupTableDataByColumn, GroupingStrategy } from "./helpers";
+import {
+  assert,
+  DataState,
+  groupTableDataByColumn,
+  GroupingStrategy,
+} from "./helpers";
 import {
   RowData,
   RowType,
@@ -10,78 +15,21 @@ import {
   StyledRowData,
   newCellData,
 } from "../views/components/table/data/Row";
-import { collectPortfolioHoldings as collectPortfolioHoldings2 } from "./collections";
+import {
+  CollectionType,
+  Collection,
+  collectPortfolioHoldings,
+  groupCollectionItems,
+  CollectionGroupKey,
+} from "./collections";
 
-export function collectPortfolioHoldings(
-  portfolio: Portfolio,
-  portfolios: Record<string, Portfolio>,
-  assets: Record<string, Asset>,
-  accounts: Record<string, Account>,
-  holdings: Record<string, Holding>
-): Set<Holding> {
-  const result: Set<Holding> = new Set(
-    Object.values(portfolio.holdings).map((hid) => holdings[hid])
+export function isSufficientDataLoaded(state: DataState): boolean {
+  return (
+    state.portfolios !== undefined &&
+    state.assets !== undefined &&
+    state.holdings !== undefined &&
+    state.accounts !== undefined
   );
-
-  Object.values(portfolio.accounts).forEach((aid) => {
-    for (const hid of accounts[aid].holdings) {
-      result.add(holdings[hid]);
-    }
-  });
-
-  if (portfolio.tags.length > 0) {
-    Object.values(accounts).forEach((account) => {
-      account.holdings.forEach((hid) => {
-        const holding = holdings[hid];
-        const asset = assets[holding.asset];
-        if (portfolio.tags.includes(asset.asset_class)) {
-          result.add(holding);
-        }
-      });
-    });
-  }
-
-  Object.values(portfolio.portfolios).forEach((pid) => {
-    for (const hid of collectPortfolioHoldings(
-      portfolios[pid],
-      portfolios,
-      assets,
-      accounts,
-      holdings
-    )) {
-      result.add(hid);
-    }
-  });
-
-  return result;
-}
-
-export interface HoldingsGroup {
-  item: string;
-  children?: Array<HoldingsGroup>;
-}
-
-export function groupHoldings(
-  holdings: Set<Holding>,
-  column: string
-): Array<HoldingsGroup> {
-  const groups: Record<string, Array<Holding>> = {};
-
-  for (const holding of holdings) {
-    const key = holding[column];
-    assert(key);
-    if (!Object.prototype.hasOwnProperty.call(groups, key)) {
-      groups[key] = [];
-    }
-    groups[key].push(holding);
-  }
-
-  return Object.entries(groups).map(([key, values]) => ({
-    item: key,
-    children: values.map((value) => ({
-      item: value.pk,
-    })),
-  }));
 }
 
 export interface PortfolioTableRow extends RowData {
@@ -156,262 +104,152 @@ function computeHeaderData(
   return cells;
 }
 
-export function buildPortfolioTableData(
-  portfolio: Portfolio,
-  portfolios: Record<string, Portfolio>,
-  holdings: Record<string, Holding>,
-  assetInfo: Record<string, Asset>,
-  accounts: Record<string, Account>,
-  services: Record<string, Service>
-): PortfolioTableRow[] {
-  const rows: PortfolioTableRow[] = portfolio.holdings.map((hid) => {
-    const { pk, asset: assetPk, quantity } = holdings[hid];
-    const asset = assetInfo[assetPk];
-    assert(asset);
-
-    const mcap_share = asset.info.circulating_supply
-      ? quantity / asset.info.circulating_supply
-      : undefined;
-
-    return {
-      cells: {
-        id: pk,
-        asset: asset.pk,
-        name: asset.symbol.toUpperCase(),
-        symbol: asset.symbol,
-        price: asset.info.value,
-        quantity,
-        value: asset.info.value * quantity,
-        mcap: asset.info.market_cap,
-        mcap_share,
-        minted_perc: asset.info.circulating_supply / asset.info.max_supply,
-      },
-      type: RowType.Asset,
-    };
-  });
-  const res2: PortfolioTableRow[] = portfolio.portfolios.map((pid) => {
-    const subPortfolio = portfolios[pid];
-    assert(subPortfolio);
-    return {
-      cells: {
-        id: subPortfolio.pk,
-        name: subPortfolio.name,
-      },
-      children: buildPortfolioTableData(
-        subPortfolio,
-        portfolios,
-        holdings,
-        assetInfo,
-        accounts,
-        services
-      ),
-      type: RowType.Portfolio,
-    };
-  });
-  rows.push(...res2);
-  if (portfolio.tags.length > 0) {
-    Object.values(accounts).forEach((account) => {
-      account.holdings.forEach((hid) => {
-        const holding = holdings[hid];
-        const asset = assetInfo[holding.asset];
-        assert(asset);
-        if (portfolio.tags.includes(asset.asset_class)) {
-          const serviceAsset = getServiceAsset(
-            account.service,
-            asset.pk,
-            services
-          );
-          const mcap_share = asset.info.circulating_supply
-            ? holding.quantity / asset.info.circulating_supply
-            : undefined;
-          const service = services[account.service];
-
-          rows.push({
-            cells: {
-              id: holding.pk,
-              account_id: account?.pk,
-              asset: asset.pk,
-              name: asset.symbol.toUpperCase(),
-              symbol: asset.symbol,
-              price: asset.info.value,
-              quantity: holding.quantity,
-              value: asset.info.value * holding.quantity,
-              account: service?.provider_name,
-              yield: serviceAsset?.apy,
-              mcap: asset.info.market_cap,
-              mcap_share,
-              minted_perc:
-                asset.info.circulating_supply / asset.info.max_supply,
-            },
-            type: RowType.Asset,
-          });
-        }
-      });
-    });
+function convertCollectionToTableRow(
+  item: Collection,
+  state: {
+    accounts: Record<string, Account>;
+    assets: Record<string, Asset>;
+    holdings: Record<string, Holding>;
+    portfolios: Record<string, Portfolio>;
+    services: Record<string, Service>;
   }
-  return rows;
-}
+): PortfolioTableRow | null {
+  switch (item.type) {
+    case CollectionType.Portfolio: {
+      assert(item.pk);
+      const portfolio = state.portfolios[item.pk];
+      assert(item.items);
+      const children: PortfolioTableRow[] = Array.from(item.items)
+        .map((item) => convertCollectionToTableRow(item, state))
+        .filter((i): i is PortfolioTableRow => i != null);
 
-export function createPortfolioTableData(
-  portfolio: Portfolio,
-  portfolios: Record<string, Portfolio>,
-  assetInfo: Record<string, Asset>,
-  services: Record<string, Service>,
-  accounts: Record<string, Account>,
-  holdings: Record<string, Holding>,
-  topLevel: boolean
-): PortfolioTableRow {
-  const rows: PortfolioTableRow[] = portfolio.holdings.map((hid) => {
-    const { pk, asset: assetId, quantity, account: accountId } = holdings[hid];
-    const asset = assetInfo[assetId];
-    assert(asset, `Missing asset: ${assetId}`);
-    const account = accountId ? accounts[accountId] : undefined;
-    let serviceAsset;
-    let service;
-    if (account) {
-      serviceAsset = getServiceAsset(account.service, asset.pk, services);
-      service = services[account?.service];
+      const cells = children.length
+        ? computeHeaderData(portfolio, children, true)
+        : {};
+      return {
+        cells,
+        children,
+        type: RowType.Portfolio,
+      };
     }
-    const mcap_share = asset.info.circulating_supply
-      ? quantity / asset.info.circulating_supply
-      : undefined;
+    case CollectionType.Asset: {
+      assert(item.pk);
+      assert(item.items);
+      const asset = state.assets[item.pk];
 
-    return {
-      cells: {
-        id: pk,
-        account_id: account?.pk,
-        asset: asset.pk,
-        name: asset.symbol.toUpperCase(),
-        symbol: asset.symbol,
-        price: asset.info.value,
-        quantity,
-        value: asset.info.value * quantity,
-        account: service?.provider_name,
-        yield: serviceAsset?.apy,
-        mcap: asset.info.market_cap,
-        mcap_share,
-        minted_perc: asset.info.circulating_supply / asset.info.max_supply,
-      },
-      type: RowType.Asset,
-    };
-  });
-  const res2 = portfolio.portfolios.map((pid) => {
-    const subPortfolio = portfolios[pid];
-    assert(subPortfolio);
-    return createPortfolioTableData(
-      subPortfolio,
-      portfolios,
-      assetInfo,
-      services,
-      accounts,
-      holdings,
-      false
-    );
-  });
-  rows.push(...res2);
-  if (portfolio.tags.length > 0) {
-    Object.values(accounts).forEach((account) => {
-      account.holdings.forEach((hid) => {
-        const holding = holdings[hid];
-        const asset = assetInfo[holding.asset];
-        assert(asset);
-        if (portfolio.tags.includes(asset.asset_class)) {
-          let serviceAsset;
-          if (account) {
-            serviceAsset = getServiceAsset(account.service, asset.pk, services);
-          }
+      const children: PortfolioTableRow[] = Array.from(item.items)
+        .map((item) => convertCollectionToTableRow(item, state))
+        .filter((i): i is PortfolioTableRow => i != null);
 
-          const mcap_share = asset.info.circulating_supply
-            ? holding.quantity / asset.info.circulating_supply
-            : undefined;
-          const service = services[account.service];
+      const quantity = children.reduce((total, row) => {
+        assert(row.cells.quantity !== undefined);
+        return total + row.cells.quantity;
+      }, 0);
+      const mcap_share = asset.info.circulating_supply
+        ? quantity / asset.info.circulating_supply
+        : undefined;
 
-          rows.push({
-            cells: {
-              id: holding.pk,
-              account_id: account?.pk,
-              asset: asset.pk,
-              name: asset.symbol.toUpperCase(),
-              symbol: asset.symbol,
-              price: asset.info.value,
-              quantity: holding.quantity,
-              value: asset.info.value * holding.quantity,
-              account: service?.provider_name,
-              yield: serviceAsset?.apy,
-              mcap: asset.info.market_cap,
-              mcap_share,
-              minted_perc:
-                asset.info.circulating_supply / asset.info.max_supply,
-            },
-            type: RowType.Asset,
-          });
-        }
+      children.forEach((row) => {
+        row.cells.name = undefined;
+        row.cells.price = undefined;
+        row.cells.mcap = undefined;
       });
-    });
+
+      return {
+        cells: {
+          id: asset.pk,
+          asset: asset.pk,
+          name: asset.symbol.toUpperCase(),
+          symbol: asset.symbol,
+          price: asset.info.value,
+          quantity,
+          value: asset.info.value * quantity,
+          mcap: asset.info.market_cap,
+          mcap_share,
+          minted_perc: asset.info.circulating_supply / asset.info.max_supply,
+        },
+        type: RowType.Asset,
+        children,
+      };
+    }
+    case CollectionType.Holding: {
+      assert(item.pk);
+      const holding = state.holdings[item.pk];
+      const asset = state.assets[holding.asset];
+      const account = holding.account
+        ? state.accounts[holding.account]
+        : undefined;
+      const service = account ? state.services[account.service] : undefined;
+
+      const mcap_share = asset.info.circulating_supply
+        ? holding.quantity / asset.info.circulating_supply
+        : undefined;
+
+      return {
+        cells: {
+          id: holding.pk,
+          account_id: account?.pk,
+          asset: asset.pk,
+          name: asset.symbol.toUpperCase(),
+          symbol: asset.symbol,
+          price: asset.info.value,
+          quantity: holding.quantity,
+          value: asset.info.value * holding.quantity,
+          account: service?.provider_name,
+          // yield: serviceAsset?.apy,
+          mcap: asset.info.market_cap,
+          mcap_share,
+          minted_perc: asset.info.circulating_supply / asset.info.max_supply,
+        },
+        type: RowType.Holding,
+      };
+    }
+    case CollectionType.Account: {
+      assert(item.pk);
+      assert(item.items);
+      const account = state.accounts[item.pk];
+
+      const children: PortfolioTableRow[] = Array.from(item.items)
+        .map((item) => convertCollectionToTableRow(item, state))
+        .filter((i): i is PortfolioTableRow => i != null);
+
+      return {
+        cells: {
+          name: account.name,
+        },
+        children,
+        type: RowType.Account,
+      };
+    }
+    default: {
+      console.log(item.type);
+      assert(false);
+    }
   }
-
-  rows.sort((a, b) => (b.cells.value || 0) - (a.cells.value || 0));
-
-  const cells = computeHeaderData(portfolio, rows, topLevel);
-
-  return {
-    cells,
-    children: rows.length > 0 ? rows : undefined,
-    type: RowType.Portfolio,
-  };
 }
 
 export function preparePortfolioTableData(
   pid: string,
-  portfolios: Record<string, Portfolio>,
-  assets: Record<string, Asset>,
-  services: Record<string, Service>,
-  accounts: Record<string, Account>,
-  holdings: Record<string, Holding>
-): PortfolioTableRow | undefined {
-  const portfolio = portfolios[pid];
+  state: {
+    accounts: Record<string, Account>;
+    assets: Record<string, Asset>;
+    holdings: Record<string, Holding>;
+    portfolios: Record<string, Portfolio>;
+    services: Record<string, Service>;
+  }
+): PortfolioTableRow | null {
+  const portfolio = state.portfolios[pid];
   assert(portfolio);
-  if (Object.keys(assets).length === 0 || Object.keys(holdings).length === 0) {
-    return undefined;
-  }
 
-  const collection = collectPortfolioHoldings2(
-    portfolio,
-    portfolios,
-    assets,
-    accounts,
-    holdings,
-    [],
-    null
-  );
-  console.log(collection);
+  const collection = collectPortfolioHoldings(portfolio, state, [], null);
 
-  const data = createPortfolioTableData(
-    portfolio,
-    portfolios,
-    assets,
-    services,
-    accounts,
-    holdings,
-    true
+  const groupedCollection = groupCollectionItems(
+    collection,
+    CollectionGroupKey.Asset,
+    state
   );
-  if (data.children !== undefined) {
-    data.children = groupTableDataByColumn(
-      data.children,
-      "asset",
-      [
-        { key: "name", strategy: GroupingStrategy.IfSame },
-        { key: "price", strategy: GroupingStrategy.IfSame },
-        { key: "account", strategy: GroupingStrategy.IfSame },
-        { key: "yield", strategy: GroupingStrategy.Average },
-        { key: "quantity", strategy: GroupingStrategy.Sum },
-        { key: "mcap", strategy: GroupingStrategy.IfSame },
-        { key: "mcap_share", strategy: GroupingStrategy.Sum },
-        { key: "minted_perc", strategy: GroupingStrategy.IfSame },
-      ],
-      false
-    ) as PortfolioTableRow[];
-  }
+
+  const data = convertCollectionToTableRow(groupedCollection, state);
 
   return data;
 }

@@ -6,7 +6,6 @@ import {
   ServiceAsset,
   Account,
 } from "../types";
-import { collectPortfolioHoldings, groupHoldings } from "./portfolio";
 import { assert } from "./helpers";
 import {
   RowData,
@@ -62,69 +61,72 @@ export interface StyledAccountsTableRow extends StyledRowData {
 
 export function prepareAccountsTableData(
   pid: string,
-  portfolios: Record<string, Portfolio>,
-  assets: Record<string, Asset>,
-  services: Record<string, Service>,
-  accounts: Record<string, Account>,
-  holdings: Record<string, Holding>
-): AccountsTableRow | undefined {
-  const portfolio = portfolios[pid];
-  assert(portfolio);
-  if (
-    assets === undefined ||
-    holdings === undefined ||
-    accounts === undefined
-  ) {
-    return undefined;
+  state: {
+    accounts: Record<string, Account>;
+    assets: Record<string, Asset>;
+    holdings: Record<string, Holding>;
+    portfolios: Record<string, Portfolio>;
+    services: Record<string, Service>;
   }
-
-  const ph = collectPortfolioHoldings(
-    portfolio,
-    portfolios,
-    assets,
-    accounts,
-    holdings
-  );
-
-  const groups = groupHoldings(ph, "account");
-
-  return {
-    cells: {},
-    type: RowType.Asset,
-    children: groups.map((group) => {
-      const account = accounts[group.item];
-      const service = services[account.service];
-      let groupValue = 0;
-
-      const children = group.children?.map((item) => {
-        const holding = holdings[item.item];
-        const asset = assets[holding.asset];
-        const value = holding.quantity * asset.info.value;
-        groupValue += value;
-
-        return {
-          cells: {
-            id: holding.pk,
-            name: asset.name,
-            symbol: asset.symbol,
-            quantity: holding.quantity,
-            value,
-          },
-          type: RowType.Asset,
-        };
-      });
-
-      return {
-        cells: {
-          id: group.item,
-          account: service.provider_name,
-          value: groupValue,
-        },
-        children,
-        type: RowType.Account,
-      };
-    }),
-  };
+): AccountsTableRow | null {
+  return null;
+  // const portfolio = portfolios[pid];
+  // assert(portfolio);
+  // if (
+  //   assets === undefined ||
+  //   holdings === undefined ||
+  //   accounts === undefined
+  // ) {
+  //   return undefined;
+  // }
+  //
+  // const ph = collectPortfolioHoldings(
+  //   portfolio,
+  //   portfolios,
+  //   assets,
+  //   accounts,
+  //   holdings
+  // );
+  //
+  // const groups = groupHoldings(ph, "account");
+  //
+  // return {
+  //   cells: {},
+  //   type: RowType.Asset,
+  //   children: groups.map((group) => {
+  //     const account = accounts[group.item];
+  //     const service = services[account.service];
+  //     let groupValue = 0;
+  //
+  //     const children = group.children?.map((item) => {
+  //       const holding = holdings[item.item];
+  //       const asset = assets[holding.asset];
+  //       const value = holding.quantity * asset.info.value;
+  //       groupValue += value;
+  //
+  //       return {
+  //         cells: {
+  //           id: holding.pk,
+  //           name: asset.name,
+  //           symbol: asset.symbol,
+  //           quantity: holding.quantity,
+  //           value,
+  //         },
+  //         type: RowType.Asset,
+  //       };
+  //     });
+  //
+  //     return {
+  //       cells: {
+  //         id: group.item,
+  //         account: service.provider_name,
+  //         value: groupValue,
+  //       },
+  //       children,
+  //       type: RowType.Account,
+  //     };
+  //   }),
+  // };
 }
 
 interface StylingColumnData {
