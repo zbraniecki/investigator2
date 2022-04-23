@@ -213,7 +213,7 @@ export function groupCollectionItems(
     } else if (!item.items) {
       newItems.add(item);
     } else {
-      newItems.add(groupCollectionItems(item, key, state));
+      newItems.add(groupCollectionItems(item, key, state, options));
     }
   });
   Array.from(groups).forEach(([gid, holdings]) => {

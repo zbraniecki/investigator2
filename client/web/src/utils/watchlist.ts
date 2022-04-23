@@ -201,17 +201,14 @@ export function prepareWatchlistTableData(
     [CollectionType.Account],
     null
   );
-  console.log(collection);
 
   const groupedCollection = groupCollectionItems(
     collection,
     CollectionGroupKey.Asset,
     state
   );
-  console.log(groupedCollection);
 
   const data = convertCollectionToTableRow(groupedCollection, state);
-  console.log(data);
   assert(data);
 
   return data;

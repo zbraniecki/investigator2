@@ -25,7 +25,7 @@ import { StyledRowData } from "../components/table/data/Row";
 import { TabInfo } from "../components/Tabs";
 
 const baseTableMeta: BaseTableMeta = {
-  name: "wallet",
+  name: "accounts",
   nested: true,
   showHeaders: true,
   columns: {

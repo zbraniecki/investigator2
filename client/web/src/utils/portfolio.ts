@@ -240,12 +240,20 @@ export function preparePortfolioTableData(
   const portfolio = state.portfolios[pid];
   assert(portfolio);
 
-  const collection = collectPortfolioHoldings(portfolio, state, [], null);
+  const collection = collectPortfolioHoldings(
+    portfolio,
+    state,
+    [CollectionType.Account],
+    null
+  );
 
   const groupedCollection = groupCollectionItems(
     collection,
     CollectionGroupKey.Asset,
-    state
+    state,
+    {
+      collapseSingle: true,
+    }
   );
 
   const data = convertCollectionToTableRow(groupedCollection, state);

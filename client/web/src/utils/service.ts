@@ -1,11 +1,4 @@
-import {
-  Portfolio,
-  Holding,
-  Asset,
-  Service,
-  ServiceAsset,
-  Account,
-} from "../types";
+import { Portfolio, Holding, Asset, Service, Account } from "../types";
 import { assert, DataState } from "./helpers";
 import {
   CollectionType,
@@ -66,13 +59,15 @@ function convertCollectionToTableRow(
     holdings: Record<string, Holding>;
     portfolios: Record<string, Portfolio>;
     services: Record<string, Service>;
+  },
+  options?: {
+    hideAccount: boolean;
   }
 ): AccountsTableRow {
   switch (item.type) {
     case CollectionType.Portfolio: {
       assert(item.pk);
       assert(item.items);
-      console.log(item);
       const portfolio = state.portfolios[item.pk];
 
       const children: AccountsTableRow[] = Array.from(item.items).map((item) =>
@@ -91,7 +86,9 @@ function convertCollectionToTableRow(
       const account = state.accounts[item.pk];
 
       const children: AccountsTableRow[] = Array.from(item.items).map((item) =>
-        convertCollectionToTableRow(item, state)
+        convertCollectionToTableRow(item, state, {
+          hideAccount: true,
+        })
       );
 
       const value = children.reduce(
@@ -113,10 +110,13 @@ function convertCollectionToTableRow(
       assert(item.pk);
       const holding = state.holdings[item.pk];
       const asset = state.assets[holding.asset];
+      assert(holding.account);
+      const account = state.accounts[holding.account];
 
       return {
         cells: {
           id: holding.pk,
+          account: options?.hideAccount ? undefined : account.name,
           name: asset.symbol.toUpperCase(),
           quantity: holding.quantity,
           value: holding.quantity * asset.info.value,
@@ -151,7 +151,7 @@ export function prepareAccountsTableData(
     CollectionGroupKey.Account,
     state,
     {
-      collapseSingle: false,
+      collapseSingle: true,
     }
   );
 
