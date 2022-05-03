@@ -178,8 +178,6 @@ def fetch_crypto_assets(active=False, dry=False):
             "active": True,
         },
     )
-    if created:
-        usd.tags.add(fiat)
 
     if active:
         active_asset_ids = list(
@@ -233,7 +231,7 @@ def fetch_stock_assets(input_data, active, dry):
     fiat = Tag.objects.get(name="fiat", category__in=[asset_class])
     usd, created = Asset.all_objects.update_or_create(
         symbol="usd",
-        tags__in=[fiat],
+        asset_class=fiat,
         defaults={
             "id": "usd",
             "symbol": "usd",
@@ -242,8 +240,6 @@ def fetch_stock_assets(input_data, active, dry):
             "active": True,
         },
     )
-    if created:
-        usd.tags.add(fiat)
 
     for input in input_data:
         provider = Provider.objects.get(name__iexact=input["provider"])
@@ -297,6 +293,7 @@ def fetch_stock_assets(input_data, active, dry):
                 holding = Holding.objects.update_or_create(
                     asset=usd,
                     account=account,
+                    owner=owner,
                     defaults={
                         "quantity": hdata["quantity"],
                     },
@@ -320,16 +317,14 @@ def fetch_stock_assets(input_data, active, dry):
                 defaults["value"] = d["value"]
             asset, created = Asset.all_objects.update_or_create(
                 api_id=symbol,
-                tags__in=[stock],
+                asset_class=stock,
                 defaults=defaults,
             )
-
-            if created:
-                asset.tags.add(stock)
 
             holding = Holding.objects.update_or_create(
                 asset=asset,
                 account=account,
+                owner=owner,
                 defaults={
                     "quantity": hdata["quantity"],
                 },
