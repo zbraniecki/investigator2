@@ -12,6 +12,7 @@ import {
   computePortfolioTableDataStyle,
   isSufficientDataLoaded,
 } from "../../utils/portfolio";
+import { assert, loadData, verifyDataState } from "../../utils";
 import { Portfolio } from "../../types";
 import {
   getPortfolios,
@@ -175,33 +176,30 @@ const tableSettings: TableSettings = {
 };
 
 export function Portfolios() {
-  const portfolios: Record<string, Portfolio> = useSelector(getPortfolios);
-  const assets = useSelector(getAssets);
-  const services = useSelector(getServices);
-  const users = useSelector(getUsers);
+  const state = loadData([
+    "accounts",
+    "assets",
+    "holdings",
+    "portfolios",
+    "services",
+    "users",
+  ]);
   const session = useSelector(getSession);
-  const accounts = useSelector(getAccounts);
-  const holdings = useSelector(getHoldings);
 
   let tabs: TabInfo[] = [];
 
-  if (
-    isSufficientDataLoaded({
-      accounts,
-      assets,
-      holdings,
-      portfolios,
-      services,
-      users,
-    })
-  ) {
-    const currentUser = session.user_pk ? users[session.user_pk] : undefined;
+  if (isSufficientDataLoaded(state)) {
+    assert(state.users);
+    const currentUser = session.user_pk
+      ? state.users[session.user_pk]
+      : undefined;
     const plists: string[] = currentUser?.visible_lists.portfolios || [];
 
     tabs = plists
-      .filter((pid) => pid in portfolios)
+      .filter((pid) => state.portfolios && pid in state.portfolios)
       .map((pid) => {
-        const portfolio = portfolios[pid];
+        assert(state.portfolios);
+        const portfolio = state.portfolios[pid];
         return {
           id: portfolio.pk,
           label: portfolio.name,
@@ -210,13 +208,16 @@ export function Portfolios() {
   }
 
   const getTableData = (id: string): StyledRowData | null => {
-    const data = preparePortfolioTableData(id, {
-      accounts,
-      assets,
-      holdings,
-      services,
-      portfolios,
-    });
+    const data = preparePortfolioTableData(
+      id,
+      verifyDataState(state, [
+        "accounts",
+        "assets",
+        "holdings",
+        "portfolios",
+        "services",
+      ])
+    );
     if (data === null) {
       return null;
     }

@@ -1,5 +1,6 @@
 import { Asset, Watchlist, Portfolio, Holding, Account } from "../types";
-import { assert, DataState } from "./helpers";
+import { DataState, DatabaseKey } from "./state";
+import { assert } from "./helpers";
 import {
   RowData,
   RowType,
@@ -121,13 +122,13 @@ function convertCollectionToTableRow(
     assets: Record<string, Asset>;
     holdings: Record<string, Holding>;
   }
-): WatchlistTableRow | null {
+): WatchlistTableRow {
   switch (item.type) {
     case CollectionType.Watchlist: {
       assert(item.items);
-      const children: WatchlistTableRow[] = Array.from(item.items)
-        .map((item) => convertCollectionToTableRow(item, state))
-        .filter((i): i is WatchlistTableRow => i != null);
+      const children: WatchlistTableRow[] = Array.from(item.items).map((item) =>
+        convertCollectionToTableRow(item, state)
+      );
 
       const cells = children.length ? computeHeaderData(children) : {};
       return {
@@ -160,9 +161,9 @@ function convertCollectionToTableRow(
       assert(item.items);
       const account = state.accounts[item.pk];
 
-      const children: WatchlistTableRow[] = Array.from(item.items)
-        .map((item) => convertCollectionToTableRow(item, state))
-        .filter((i): i is WatchlistTableRow => i != null);
+      const children: WatchlistTableRow[] = Array.from(item.items).map((item) =>
+        convertCollectionToTableRow(item, state)
+      );
 
       return {
         cells: {

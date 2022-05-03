@@ -52,10 +52,9 @@ class Command(BaseCommand):
     help = "Dump strategy data to git"
 
     def add_arguments(self, parser):
-        parser.add_argument("path", type=str, help="Path to clone of a git repo")
+        pass
 
     def handle(self, *args, **kwargs):
-        path = kwargs["path"]
         user = User.objects.get(username="zbraniecki")
         strat = Strategy.objects.get(owner=user)
 

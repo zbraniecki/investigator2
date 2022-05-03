@@ -10,12 +10,8 @@ import {
   Account,
   Service,
 } from "../types";
-import {
-  assert,
-  groupTableDataByColumn2,
-  computeGroupedTableData,
-  DataState,
-} from "./helpers";
+import { assert } from "./helpers";
+import { DataState } from "./state";
 import {
   CollectionType,
   Collection,
@@ -142,6 +138,7 @@ function convertCollectionToTableRow(
         }, 0);
         assetValues[item.pk] = assetValue;
       });
+
       const totalValue = Object.values(assetValues).reduce(
         (total, item) => total + item,
         0
@@ -151,10 +148,38 @@ function convertCollectionToTableRow(
         convertCollectionToTableRow(item, sid, state)
       );
 
+      for (const tid of strategy.targets) {
+        const target = state.targets[tid];
+        if (!assetValues[target.asset]) {
+          const asset = state.assets[target.asset];
+          children.push({
+            cells: {
+              id: asset.pk,
+              name: asset.symbol.toUpperCase(),
+              target: target?.percent,
+            },
+            type: RowType.Asset,
+          });
+          assetValues[target.asset] = 0;
+        }
+      }
+
+      // children = children.filter((row) => {
+      // 	assert(row.cells.id);
+      // 	let asset = state.assets[row.cells.id];
+      // 	for (let tid of strategy.targets) {
+      // 		let target = state.targets[tid];
+      // 		if (target.contains.includes(asset.pk)) {
+      // 			return false;
+      // 		}
+      // 	}
+      // 	return true;
+      // });
+
       children.forEach((row) => {
         assert(row.cells.id);
         const assetValue = assetValues[row.cells.id];
-        assert(assetValue);
+        assert(assetValue !== undefined);
         const currentPercent = assetValue / totalValue;
         row.cells.current = currentPercent;
 
@@ -192,8 +217,9 @@ function convertCollectionToTableRow(
         type: RowType.Group,
       });
 
-      // const cells = children.length ? computeHeaderData(portfolio, children) : {};
-      const cells = {};
+      const cells = children.length
+        ? computeHeaderData(strategy, children)
+        : {};
       return {
         cells,
         children,

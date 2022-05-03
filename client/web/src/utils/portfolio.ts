@@ -1,12 +1,8 @@
 /* eslint camelcase: "off" */
 
 import { Portfolio, Account, Holding, Asset, Service } from "../types";
-import {
-  assert,
-  DataState,
-  groupTableDataByColumn,
-  GroupingStrategy,
-} from "./helpers";
+import { assert } from "./helpers";
+import { DataState } from "./state";
 import {
   RowData,
   RowType,
@@ -71,17 +67,17 @@ export interface StyledPortfolioTableRow extends StyledRowData {
 }
 
 function computeHeaderData(
-  portfolio: Portfolio,
   data: PortfolioTableRow[],
-  topLevel: boolean
+  topLevel: boolean,
+  portfolio?: Portfolio
 ): PortfolioTableRow["cells"] {
   const cells: PortfolioTableRow["cells"] = {
     value:
-      portfolio.value ??
+      portfolio?.value ??
       data.reduce((total, curr) => total + (curr.cells.value || 0), 0),
   };
 
-  if (!topLevel) {
+  if (!topLevel && portfolio) {
     cells.name = portfolio.name;
   }
 
@@ -112,18 +108,18 @@ function convertCollectionToTableRow(
     portfolios: Record<string, Portfolio>;
     services: Record<string, Service>;
   }
-): PortfolioTableRow | null {
+): PortfolioTableRow {
   switch (item.type) {
     case CollectionType.Portfolio: {
       assert(item.pk);
       const portfolio = state.portfolios[item.pk];
       assert(item.items);
-      const children: PortfolioTableRow[] = Array.from(item.items)
-        .map((item) => convertCollectionToTableRow(item, state))
-        .filter((i): i is PortfolioTableRow => i != null);
+      const children: PortfolioTableRow[] = Array.from(item.items).map((item) =>
+        convertCollectionToTableRow(item, state)
+      );
 
       const cells = children.length
-        ? computeHeaderData(portfolio, children, true)
+        ? computeHeaderData(children, true, portfolio)
         : {};
       return {
         cells,
@@ -208,14 +204,15 @@ function convertCollectionToTableRow(
       assert(item.items);
       const account = state.accounts[item.pk];
 
-      const children: PortfolioTableRow[] = Array.from(item.items)
-        .map((item) => convertCollectionToTableRow(item, state))
-        .filter((i): i is PortfolioTableRow => i != null);
+      const children: PortfolioTableRow[] = Array.from(item.items).map((item) =>
+        convertCollectionToTableRow(item, state)
+      );
+
+      const cells = children.length ? computeHeaderData(children, false) : {};
+      cells.name = account.name;
 
       return {
-        cells: {
-          name: account.name,
-        },
+        cells,
         children,
         type: RowType.Account,
       };

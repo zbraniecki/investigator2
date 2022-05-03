@@ -147,7 +147,10 @@ export function Row({ id, data, tableMeta, minWidths }: Props) {
       }
       case "target": {
         const tid = data.cells.id.value;
-        const target = targets[tid];
+        const target = Object.values<Target>(targets).find(
+          (t: Target) => t.asset === tid
+        );
+        assert(target);
         return handleTargetUpdate(
           dispatch,
           session.token,

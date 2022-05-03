@@ -1,5 +1,6 @@
 import { Portfolio, Holding, Asset, Service, Account } from "../types";
-import { assert, DataState } from "./helpers";
+import { assert } from "./helpers";
+import { DataState } from "./state";
 import {
   CollectionType,
   Collection,

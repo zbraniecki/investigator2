@@ -13,17 +13,8 @@ import {
   isSufficientDataLoaded,
   DataLoadedState,
 } from "../../utils/watchlist";
-import { Watchlist } from "../../types";
-import {
-  getPortfolios,
-  getWatchlists as getUserWatchlists,
-  getUsers,
-  getSession,
-  getHoldings,
-  getAssets,
-  getPublicWatchlists,
-  getAccounts,
-} from "../../store";
+import { assert, loadData, verifyDataState } from "../../utils";
+import { getSession } from "../../store";
 import { TabInfo } from "../components/Tabs";
 import { DialogType } from "../ui/modal/dialog";
 
@@ -159,41 +150,27 @@ const tableSettings: TableSettings = {
 };
 
 export function Watchlists() {
-  const accounts = useSelector(getAccounts);
-  const assets = useSelector(getAssets);
-  const holdings = useSelector(getHoldings);
-  const portfolios = useSelector(getPortfolios);
-  const publicWatchlists: Record<string, Watchlist> =
-    useSelector(getPublicWatchlists);
-  const userWatchlists: Record<string, Watchlist> | undefined =
-    useSelector(getUserWatchlists);
+  const state = loadData([
+    "accounts",
+    "assets",
+    "holdings",
+    "portfolios",
+    "publicWatchlists",
+    "userWatchlists",
+    "users",
+  ]);
 
-  const users = useSelector(getUsers);
   const session = useSelector(getSession);
 
-  const watchlists: Record<string, Watchlist> = {};
-  if (publicWatchlists) {
-    for (const list of Object.values(publicWatchlists)) {
-      watchlists[list.pk] = list;
-    }
-  }
-  if (userWatchlists !== undefined) {
-    for (const list of Object.values(userWatchlists)) {
-      watchlists[list.pk] = list;
-    }
-  }
+  state.watchlists = {
+    
+    ...state.publicWatchlists,
+    ...state.userWatchlists
+  };
 
   let tabs: TabInfo[] = [];
 
-  const dataLoadedState = isSufficientDataLoaded({
-    accounts,
-    assets,
-    holdings,
-    portfolios,
-    publicWatchlists,
-    users,
-    userWatchlists,
-  });
+  const dataLoadedState = isSufficientDataLoaded(state);
 
   // We don't want to flicker. If user is logged in, don't show public
   // until user watchlists are loaded.
@@ -202,14 +179,16 @@ export function Watchlists() {
     : dataLoadedState !== DataLoadedState.None;
 
   if (ready) {
+    assert(state.users);
     const wids: string[] = session.user_pk
-      ? users[session.user_pk].visible_lists.watchlists
-      : Object.keys(watchlists);
+      ? state.users[session.user_pk].visible_lists.watchlists
+      : Object.keys(state.watchlists);
 
     tabs = wids
-      .filter((wid) => wid in watchlists)
+      .filter((wid) => state.watchlists && wid in state.watchlists)
       .map((wid) => {
-        const watchlist = watchlists[wid];
+        assert(state.watchlists);
+        const watchlist = state.watchlists[wid];
         return {
           id: watchlist.pk,
           label: watchlist.name,
@@ -218,13 +197,16 @@ export function Watchlists() {
   }
 
   const getTableData = (id: string): StyledRowData | null => {
-    const data = prepareWatchlistTableData(id, {
-      accounts,
-      assets,
-      holdings,
-      portfolios,
-      watchlists,
-    });
+    const data = prepareWatchlistTableData(
+      id,
+      verifyDataState(state, [
+        "accounts",
+        "assets",
+        "holdings",
+        "portfolios",
+        "watchlists",
+      ])
+    );
     if (data === null) {
       return null;
     }

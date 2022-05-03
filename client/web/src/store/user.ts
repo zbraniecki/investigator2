@@ -168,7 +168,7 @@ const userSlice = createSlice({
 });
 
 export const getPortfolios = (state: any) => state.user.portfolios;
-export const getWatchlists = (state: any) => state.user.watchlists;
+export const getUserWatchlists = (state: any) => state.user.watchlists;
 export const getHoldings = (state: any) => state.user.holdings;
 export const getSession = (state: any) => state.user.session;
 export const getUsers = (state: any) => state.user.users;
