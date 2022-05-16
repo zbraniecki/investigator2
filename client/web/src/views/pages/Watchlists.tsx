@@ -163,9 +163,8 @@ export function Watchlists() {
   const session = useSelector(getSession);
 
   state.watchlists = {
-    
     ...state.publicWatchlists,
-    ...state.userWatchlists
+    ...state.userWatchlists,
   };
 
   let tabs: TabInfo[] = [];
