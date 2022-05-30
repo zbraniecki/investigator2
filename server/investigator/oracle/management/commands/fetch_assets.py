@@ -137,12 +137,13 @@ def fetch_batch(source, batch_idx, crypto, usd, enable, only_update):
             "last_updated": parse_datetime(entry["last_updated"]),
         }
         for key in ASSET_KEYS["exact"]:
-            defaults[key] = entry[key]
+            if entry[key]:
+                defaults[key] = entry[key]
         for key, value in ASSET_KEYS["mapped"].items():
             defaults[key] = entry[value]
 
         for key in ASSET_KEYS["percent"]:
-            if defaults[key] is not None:
+            if key in defaults and defaults[key] is not None:
                 defaults[key] /= 100
 
         if only_update:
