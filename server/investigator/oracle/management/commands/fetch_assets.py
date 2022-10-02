@@ -49,7 +49,7 @@ COINS = [
     "uma",
     ["usdc", "usd-coin"],
     ["usdt", "tether"],
-    ["reef", "reef-finance"],
+    ["reef", "reef"],
     ["gs", "genesis-shards"],
     ["powr", "power-ledger"],
     ["nu", "nucypher"],
