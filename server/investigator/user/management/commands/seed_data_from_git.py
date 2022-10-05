@@ -9,7 +9,7 @@ from investigator.oracle.models import (
     PassiveChange,
     PassiveChangeType,
     Category,
-    Tag
+    Tag,
 )
 
 from investigator.user.models import (
@@ -248,9 +248,7 @@ def upload_portfolio_data(data, dt, dry=False):
         name = account.service.provider.name.lower()
         current_accounts[name] = {}
 
-        holdings = account.holdings.filter(
-            asset__tags__in=[crypto_tag]
-        )
+        holdings = account.holdings.filter(asset__tags__in=[crypto_tag])
         for holding in holdings:
             symbol = holding.asset.symbol.lower()
             if symbol not in current_accounts[name]:

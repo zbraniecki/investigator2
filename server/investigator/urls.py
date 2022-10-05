@@ -28,6 +28,6 @@ router.register(r"strategy/changes", strategy_views.TargetChangeViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("auth/", include("rest_auth.urls")),
+    path("auth/", include("dj_rest_auth.urls")),
     path("", include(router.urls)),
 ]
