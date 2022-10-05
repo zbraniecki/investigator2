@@ -17,6 +17,7 @@ from investigator.oracle.models import AssetInfo, PassiveABC
 
 class HoldingInline(admin.TabularInline):
     model = Holding
+    fields = ["asset", "quantity", "account"]
 
 
 class TransactionInline(admin.TabularInline):
