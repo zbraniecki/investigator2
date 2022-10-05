@@ -21,6 +21,10 @@ class HoldingInline(admin.TabularInline):
 
 class TransactionInline(admin.TabularInline):
     model = Transaction
+    max_num = 3
+    extra = 0
+    fields = ["asset", "quantity", "type", "timestamp"]
+    readonly_fields = ["asset", "quantity", "type", "timestamp"]
     ordering = ("-timestamp",)
 
 
@@ -30,13 +34,13 @@ class AccountAdmin(admin.ModelAdmin):
         HoldingInline,
         TransactionInline,
     ]
-    list_display = ("service", "owner")
+    list_display = ("label", "service", "owner")
     list_filter = ("service__provider", "service__type", "owner")
     search_fields = ["service", "owner"]
     ordering = ("service",)
 
-    def provider(self, obj):
-        return obj.service.provider.name
+    def label(self, obj):
+        return obj.__str__()
 
 
 @admin.register(Holding)
