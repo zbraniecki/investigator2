@@ -78,7 +78,7 @@ export function Controls({ lightModeName, setSettingsOpen, colors }: Props) {
             onClick={handleRefresh}
           >
             {refreshInProgress ? (
-              <CircularProgress sx={{ color: colors.primary }} size="small" />
+              <CircularProgress sx={{ color: colors.primary }} size="1.5rem" />
             ) : (
               <RefreshIcon
                 sx={{ color: session.token ? colors.primary : "" }}
