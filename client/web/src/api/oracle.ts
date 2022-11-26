@@ -8,7 +8,7 @@ import { Asset, Watchlist, Tag, Category, Service } from "../types";
 const fetchAssets = fetchEntries.bind(
   undefined,
   "oracle/assets/",
-  undefined
+  { tags: (input: Array<string>) => new Set(input) },
 ) as fetchPublicEntriesType<Asset>;
 const fetchPublicWatchlists = fetchEntries.bind(
   undefined,

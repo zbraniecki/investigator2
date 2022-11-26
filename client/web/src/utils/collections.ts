@@ -79,13 +79,17 @@ export function collectPortfolioHoldings(
     }
   });
 
-  if (portfolio.tags.length > 0) {
+  if (portfolio.tags.size > 0) {
     const result: Set<string> = new Set();
     Object.values(data.accounts).forEach((account) => {
       account.holdings.forEach((hid) => {
         const holding = data.holdings[hid];
         const asset = data.assets[holding.asset];
-        if (portfolio.tags.includes(asset.asset_class)) {
+        if (portfolio.tags.has(asset.asset_class)) {
+          result.add(hid);
+        }
+        let intersect = [...asset.tags].filter(tag => portfolio.tags.has(tag));
+        if (intersect.length > 0) {
           result.add(hid);
         }
       });

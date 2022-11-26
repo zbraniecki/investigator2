@@ -55,7 +55,7 @@ export interface Portfolio {
   holdings: string[];
   portfolios: string[];
   accounts: string[];
-  tags: string[];
+  tags: Set<string>;
   value?: number;
 }
 

@@ -6,7 +6,7 @@ import { Watchlist, Portfolio, Account, User } from "../types";
 const fetchPortfolios = fetchEntries.bind(
   undefined,
   "user/portfolios/",
-  undefined
+  { tags: (input: Array<string>) => new Set(input) },
 ) as fetchAuthEntriesType<Portfolio>;
 const fetchAccounts = fetchEntries.bind(
   undefined,

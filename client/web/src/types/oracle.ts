@@ -19,7 +19,7 @@ export interface Asset {
   symbol: string;
   name: string;
   asset_class: string;
-  tags: Array<string>;
+  tags: Set<string>;
   info: {
     pair: [string, string];
     value: number;
