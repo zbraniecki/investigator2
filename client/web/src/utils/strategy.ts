@@ -111,7 +111,8 @@ function convertCollectionToTableRow(
     services: Record<string, Service>;
     strategies: Record<string, Strategy>;
     targets: Record<string, Target>;
-  }
+  },
+  topLevel: boolean,
 ): StrategyTableRow {
   const strategy = state.strategies[sid];
   assert(strategy);
@@ -145,7 +146,7 @@ function convertCollectionToTableRow(
       );
 
       let children: StrategyTableRow[] = Array.from(item.items).map((item) =>
-        convertCollectionToTableRow(item, sid, state)
+        convertCollectionToTableRow(item, sid, state, false)
       );
 
       for (const tid of strategy.targets) {
@@ -285,7 +286,8 @@ export function prepareStrategyTableData(
   const data = convertCollectionToTableRow(
     groupedCollection,
     strategy.pk,
-    state
+    state,
+    true
   );
 
   return data;
