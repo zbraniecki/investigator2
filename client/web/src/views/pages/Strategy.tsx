@@ -28,7 +28,7 @@ import {
 import { TabInfo } from "../components/Tabs";
 
 const baseTableMeta: BaseTableMeta = {
-  name: "strategy",
+  name: "strategies",
   nested: true,
   showHeaders: true,
   columns: {

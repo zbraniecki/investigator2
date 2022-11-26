@@ -208,14 +208,16 @@ function convertCollectionToTableRow(
         return total + item.cells.current;
       }, 0);
 
-      children.push({
-        cells: {
-          name: "?",
-          current: ungroupedChildrenTotal,
-        },
-        children: ungroupedChildren,
-        type: RowType.Group,
-      });
+      if (ungroupedChildrenTotal) {
+        children.push({
+          cells: {
+            name: "?",
+            current: ungroupedChildrenTotal,
+          },
+          children: ungroupedChildren,
+          type: RowType.Group,
+        });
+      }
 
       const cells = children.length
         ? computeHeaderData(strategy, children)
