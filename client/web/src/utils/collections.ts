@@ -40,29 +40,23 @@ export function collectPortfolioHoldings(
     }))
   );
 
-  // Object.values(portfolio.portfolios).forEach((pid) => {
-  //   const subCollection = collectPortfolioHoldings(
-  //     portfolios[pid],
-  //     portfolios,
-  //     assets,
-  //     accounts,
-  //     holdings,
-  //     preserve,
-  //     maxDepth === null ? null : maxDepth - 1,
-  //     depth + 1
-  //   );
-  //   if (preserve.includes(CollectionType.Portfolio) && depth > 0) {
-  //     items.add({
-  //       type: CollectionItemType.Collection,
-  //       value: subCollection,
-  //     });
-  //   } else {
-  //     for (const item of subCollection.items) {
-  //       items.add(item);
-  //     }
-  //   }
-  // });
-  //
+  Object.values(portfolio.portfolios).forEach((pid) => {
+    const subCollection = collectPortfolioHoldings(
+      data.portfolios[pid],
+      data,
+      preserve,
+      maxDepth === null ? null : maxDepth - 1,
+      depth + 1
+    );
+    if (preserve.includes(CollectionType.Portfolio)) {
+      items.add(subCollection);
+    } else if(subCollection.items) {
+      for (const item of subCollection.items) {
+        items.add(item);
+      }
+    }
+  });
+  
   Object.values(portfolio.accounts).forEach((aid) => {
     const subCollection = collectAccountHoldings(
       data.accounts[aid],

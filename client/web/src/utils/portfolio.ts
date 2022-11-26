@@ -107,7 +107,8 @@ function convertCollectionToTableRow(
     holdings: Record<string, Holding>;
     portfolios: Record<string, Portfolio>;
     services: Record<string, Service>;
-  }
+  },
+  topLevel: boolean,
 ): PortfolioTableRow {
   switch (item.type) {
     case CollectionType.Portfolio: {
@@ -115,11 +116,11 @@ function convertCollectionToTableRow(
       const portfolio = state.portfolios[item.pk];
       assert(item.items);
       const children: PortfolioTableRow[] = Array.from(item.items).map((item) =>
-        convertCollectionToTableRow(item, state)
+        convertCollectionToTableRow(item, state, false)
       );
 
       const cells = children.length
-        ? computeHeaderData(children, true, portfolio)
+        ? computeHeaderData(children, topLevel, portfolio)
         : {};
       return {
         cells,
@@ -133,7 +134,7 @@ function convertCollectionToTableRow(
       const asset = state.assets[item.pk];
 
       const children: PortfolioTableRow[] = Array.from(item.items)
-        .map((item) => convertCollectionToTableRow(item, state))
+        .map((item) => convertCollectionToTableRow(item, state, false))
         .filter((i): i is PortfolioTableRow => i != null);
 
       const quantity = children.reduce((total, row) => {
@@ -205,7 +206,7 @@ function convertCollectionToTableRow(
       const account = state.accounts[item.pk];
 
       const children: PortfolioTableRow[] = Array.from(item.items).map((item) =>
-        convertCollectionToTableRow(item, state)
+        convertCollectionToTableRow(item, state, false)
       );
 
       const cells = children.length ? computeHeaderData(children, false) : {};
@@ -240,7 +241,7 @@ export function preparePortfolioTableData(
   const collection = collectPortfolioHoldings(
     portfolio,
     state,
-    [CollectionType.Account],
+    [CollectionType.Account, CollectionType.Portfolio],
     null
   );
 
@@ -253,7 +254,7 @@ export function preparePortfolioTableData(
     }
   );
 
-  const data = convertCollectionToTableRow(groupedCollection, state);
+  const data = convertCollectionToTableRow(groupedCollection, state, true);
 
   return data;
 }
