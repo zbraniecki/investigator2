@@ -108,7 +108,7 @@ function convertCollectionToTableRow(
     portfolios: Record<string, Portfolio>;
     services: Record<string, Service>;
   },
-  topLevel: boolean,
+  topLevel: boolean
 ): PortfolioTableRow {
   switch (item.type) {
     case CollectionType.Portfolio: {

@@ -50,13 +50,13 @@ export function collectPortfolioHoldings(
     );
     if (preserve.includes(CollectionType.Portfolio)) {
       items.add(subCollection);
-    } else if(subCollection.items) {
+    } else if (subCollection.items) {
       for (const item of subCollection.items) {
         items.add(item);
       }
     }
   });
-  
+
   Object.values(portfolio.accounts).forEach((aid) => {
     const subCollection = collectAccountHoldings(
       data.accounts[aid],
@@ -82,7 +82,9 @@ export function collectPortfolioHoldings(
         if (portfolio.tags.has(asset.asset_class)) {
           result.add(hid);
         }
-        let intersect = [...asset.tags].filter(tag => portfolio.tags.has(tag));
+        const intersect = [...asset.tags].filter((tag) =>
+          portfolio.tags.has(tag)
+        );
         if (intersect.length > 0) {
           result.add(hid);
         }

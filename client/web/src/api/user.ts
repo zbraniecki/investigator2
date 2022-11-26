@@ -3,11 +3,9 @@ import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
 import { Watchlist, Portfolio, Account, User } from "../types";
 
-const fetchPortfolios = fetchEntries.bind(
-  undefined,
-  "user/portfolios/",
-  { tags: (input: Array<string>) => new Set(input) },
-) as fetchAuthEntriesType<Portfolio>;
+const fetchPortfolios = fetchEntries.bind(undefined, "user/portfolios/", {
+  tags: (input: Array<string>) => new Set(input),
+}) as fetchAuthEntriesType<Portfolio>;
 const fetchAccounts = fetchEntries.bind(
   undefined,
   "user/accounts/",

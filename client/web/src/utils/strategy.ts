@@ -112,7 +112,7 @@ function convertCollectionToTableRow(
     strategies: Record<string, Strategy>;
     targets: Record<string, Target>;
   },
-  topLevel: boolean,
+  topLevel: boolean
 ): StrategyTableRow {
   const strategy = state.strategies[sid];
   assert(strategy);
