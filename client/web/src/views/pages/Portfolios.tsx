@@ -102,8 +102,8 @@ const baseTableMeta: BaseTableMeta = {
       sortDirection: SortDirection.Desc,
       formatter: Formatter.Currency,
     },
-    mcap_share: {
-      label: "Mcap Share",
+    circ_supply_share: {
+      label: "Circ Supply Share",
       align: CellAlign.Right,
       sortDirection: SortDirection.Desc,
       formatter: Formatter.Fraction,
@@ -161,7 +161,7 @@ const tableSettings: TableSettings = {
       width: 125,
     },
     {
-      key: "mcap_share",
+      key: "circ_supply_share",
       visible: false,
       minWidth: 115,
       width: 125,

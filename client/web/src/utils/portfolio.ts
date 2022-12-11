@@ -40,7 +40,7 @@ export interface PortfolioTableRow extends RowData {
     account?: string;
     yield?: number;
     mcap?: number;
-    mcap_share?: number;
+    circ_supply_share?: number;
     minted_perc?: number;
   };
   children?: PortfolioTableRow[];
@@ -59,7 +59,7 @@ export interface StyledPortfolioTableRow extends StyledRowData {
     account?: CellData<string>;
     yield?: CellData<number>;
     mcap?: CellData<number>;
-    mcap_share?: CellData<number>;
+    circ_supply_share?: CellData<number>;
     minted_perc?: CellData<number>;
   };
   children?: StyledPortfolioTableRow[];
@@ -141,7 +141,7 @@ function convertCollectionToTableRow(
         assert(row.cells.quantity !== undefined);
         return total + row.cells.quantity;
       }, 0);
-      const mcap_share = asset.info.circulating_supply
+      const circ_supply_share = asset.info.circulating_supply
         ? quantity / asset.info.circulating_supply
         : undefined;
 
@@ -161,7 +161,7 @@ function convertCollectionToTableRow(
           quantity,
           value: asset.info.value * quantity,
           mcap: asset.info.market_cap,
-          mcap_share,
+          circ_supply_share,
           minted_perc: asset.info.circulating_supply / asset.info.max_supply,
         },
         type: RowType.Asset,
@@ -177,7 +177,7 @@ function convertCollectionToTableRow(
         : undefined;
       const service = account ? state.services[account.service] : undefined;
 
-      const mcap_share = asset.info.circulating_supply
+      const circ_supply_share = asset.info.circulating_supply
         ? holding.quantity / asset.info.circulating_supply
         : undefined;
 
@@ -194,7 +194,7 @@ function convertCollectionToTableRow(
           account: service?.provider_name,
           // yield: serviceAsset?.apy,
           mcap: asset.info.market_cap,
-          mcap_share,
+          circ_supply_share,
           minted_perc: asset.info.circulating_supply / asset.info.max_supply,
         },
         type: RowType.Holding,
@@ -289,7 +289,7 @@ export function computePortfolioTableDataStyle(
       account: newCellData(data.cells.account),
       yield: newCellData(data.cells.yield),
       mcap: newCellData(data.cells.mcap),
-      mcap_share: newCellData(data.cells.mcap_share),
+      circ_supply_share: newCellData(data.cells.circ_supply_share),
       minted_perc: newCellData(data.cells.minted_perc),
     },
     children: data.children?.map((row) => computePortfolioTableDataStyle(row)),
