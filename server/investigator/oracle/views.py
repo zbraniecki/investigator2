@@ -66,5 +66,7 @@ class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
 
     def get_queryset(self):
-        queryset = Tag.objects.filter(owner__isnull=True).order_by("-name")
+        #  We need to move per-user tags to user
+        # .filter(owner__isnull=True)
+        queryset = Tag.objects.order_by("-name")
         return queryset

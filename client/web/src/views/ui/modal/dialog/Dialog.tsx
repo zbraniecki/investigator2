@@ -103,7 +103,7 @@ export function ModalDialog({ state, updateState }: Props) {
       const aid = state.meta?.asset;
       assert(aid);
       const asset = assets[aid];
-      const assetTags = asset.tags.map((tid: string) => tags[tid]);
+      const assetTags = [...asset.tags].map((tid: string) => tags[tid]);
       const assetHoldings = Object.values<Holding>(holdings).filter(
         (holding: Holding) => holding.asset === asset.pk
       );
@@ -127,7 +127,7 @@ export function ModalDialog({ state, updateState }: Props) {
       const holding = holdings[hid];
       const asset = assets[holding.asset];
       const account = accounts[holding.account];
-      const assetTags = asset.tags.map((tid: string) => tags[tid]);
+      const assetTags = [...asset.tags].map((tid: string) => tags[tid]);
       const assetHoldings = Object.values<Holding>(holdings).filter(
         (holding: Holding) => holding.asset === asset.pk
       );

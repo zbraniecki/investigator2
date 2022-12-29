@@ -58,7 +58,7 @@ export function HoldingDialogTitle({
       <Stack>
         <Typography>{asset.symbol.toUpperCase()}</Typography>
         <Typography>
-          <Link onClick={handleAssetClick}>{asset.name}</Link>
+          <Link href="#" onClick={handleAssetClick}>{asset.name}</Link>
         </Typography>
       </Stack>
       <Stack>
@@ -93,9 +93,10 @@ export function HoldingDialogContent({
 
   const asset = assets[holding.asset];
   const account = accounts[holding.account];
+  console.log(account.transactions);
 
   const transactions = account.transactions
-    .filter((transaction) => transaction.asset === asset.pk)
+    .filter((transaction) => transaction.asset === asset.pk && transaction.account == account.pk)
     .map((transaction) => ({
       pk: transaction.pk,
       timestamp: transaction.timestamp,
@@ -118,7 +119,7 @@ export function HoldingDialogContent({
               textAlign: "center",
             }}
           >
-            0.38088422
+	    {holding.quantity}
           </Typography>
           <Stack
             direction="row"

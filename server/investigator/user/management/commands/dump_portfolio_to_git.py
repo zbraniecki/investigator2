@@ -78,7 +78,7 @@ class Command(BaseCommand):
         user = User.objects.get(username="zbraniecki")
         holdings = Holding.objects.filter(
             account__owner=user,
-            asset__asset_class__in=[crypto, fiat],
+            asset__asset_class__in=[crypto],
         ).order_by(
             "account__service__provider__id",
             "asset__symbol",

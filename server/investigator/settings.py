@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "rest_framework",
     "rest_framework.authtoken",
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
     "allauth",
     "allauth.account",
     # "allauth.socialaccount",
@@ -89,7 +89,7 @@ WSGI_APPLICATION = "investigator.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": BASE_DIR / "db2.sqlite3",
     }
 }
 

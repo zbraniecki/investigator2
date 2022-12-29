@@ -43,12 +43,18 @@ const baseTableMeta: BaseTableMeta = {
       formatter: Formatter.Symbol,
       priority: 0,
       modal: (cells: Record<string, any>, updateDialogState: any) => {
-        updateDialogState({
+        let data = cells.account_id ? {
           type: DialogType.Holding,
           meta: {
             holding: cells.id.value,
           },
-        });
+	}: {
+          type: DialogType.Asset,
+          meta: {
+            asset: cells.id.value,
+          },
+	};
+        updateDialogState(data);
       },
     },
     price: {
