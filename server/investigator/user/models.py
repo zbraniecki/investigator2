@@ -55,6 +55,9 @@ class Transaction(models.Model):
     account = models.ForeignKey(
         Account, related_name="transactions", on_delete=models.CASCADE
     )
+    holding = models.ForeignKey(
+        Holding, related_name="transactions", null=True, on_delete=models.SET_NULL
+    )
     asset = models.ForeignKey(Asset, related_name="+", on_delete=models.CASCADE)
     quantity = models.FloatField(blank=True, null=True)
     fee = models.FloatField(blank=True, null=True)

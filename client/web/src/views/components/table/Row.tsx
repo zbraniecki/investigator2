@@ -49,6 +49,7 @@ const handleQuantityUpdate = (
         token,
         input: {
           account: holding.account,
+	  holding: holding.pk,
           asset: holding.asset,
           type,
           quantity: diffQuantity,

@@ -24,6 +24,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = [
             "pk",
             "account",
+            "holding",
             "asset",
             "type",
             "quantity",

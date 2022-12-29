@@ -34,6 +34,7 @@ export function getTransactionTypeLabel(input: TransactionType): string {
 export interface Transaction {
   pk: string;
   account: string;
+  holding?: string;
   asset: string;
   type: TransactionType;
   quantity: number;
