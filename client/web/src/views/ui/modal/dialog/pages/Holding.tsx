@@ -96,7 +96,7 @@ export function HoldingDialogContent({
   console.log(account.transactions);
 
   const transactions = account.transactions
-    .filter((transaction) => transaction.asset === asset.pk && transaction.account == account.pk)
+    .filter((transaction) => transaction.asset === asset.pk && (transaction.holding === null || transaction.holding == holding.pk))
     .map((transaction) => ({
       pk: transaction.pk,
       timestamp: transaction.timestamp,
