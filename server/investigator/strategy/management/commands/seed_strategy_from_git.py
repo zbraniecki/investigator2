@@ -145,3 +145,4 @@ class Command(BaseCommand):
 
             # if i >= 1:
             #     break
+        repo.head.reference = repo.heads.master

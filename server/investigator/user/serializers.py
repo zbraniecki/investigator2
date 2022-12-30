@@ -59,7 +59,6 @@ class PortfolioSerializer(serializers.ModelSerializer):
 class WatchlistSerializer(serializers.ModelSerializer):
     portfolio = serializers.SerializerMethodField("get_portfolio")
     assets = serializers.SerializerMethodField("get_assets")
-    # type = serializers.SerializerMethodField("get_type")
 
     class Meta:
         model = Watchlist
@@ -70,9 +69,6 @@ class WatchlistSerializer(serializers.ModelSerializer):
             return obj.portfolio.id
         else:
             return None
-
-    def get_type(self, obj):
-        return "dynamic"
 
     def get_assets(self, obj):
         user = self.context["request"].user
