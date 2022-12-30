@@ -28,17 +28,17 @@ type Args = Record<string, string>;
 export type fetchAuthEntriesType<E> = (input: {
   token: string;
   args?: Args;
-}) => Promise<E[]>;
+}) => Promise<null | E[]>;
 export type fetchPublicEntriesType<E> = (input?: {
   token?: string;
   args?: Args;
-}) => Promise<E[]>;
+}) => Promise<null | E[]>;
 
 export const fetchEntries = async <E>(
   path: string,
   converters?: Record<string, (input: any) => any>,
   params?: { token?: string; args?: Args }
-): Promise<E[]> => {
+): Promise<null | E[]> => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -49,11 +49,19 @@ export const fetchEntries = async <E>(
       query = `?${new URLSearchParams(params.args).toString()}`;
     }
   }
-  const data = await fetch(`${BASE_URL}${path}${query}`, {
+  const fullPath = `${BASE_URL}${path}${query}`;
+  const resp = await fetch(fullPath, {
     method: "GET",
     headers,
+  }).then((response) => {
+    if (!response.ok) {
+      console.log(`Error when fetching ${fullPath} - ${response.status}`);
+      return null;
+    }
+
+    // XXX: Handle JSON errors
+    return response.json();
   });
-  const resp = await data.json();
 
   if (converters) {
     Object.entries(converters).forEach(([key, converter]) => {

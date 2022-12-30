@@ -178,10 +178,10 @@ export function Watchlists() {
     : dataLoadedState !== DataLoadedState.None;
 
   if (ready) {
-    assert(state.users);
-    const wids: string[] = session.user_pk
-      ? state.users[session.user_pk].visible_lists.watchlists
-      : Object.keys(state.watchlists);
+    const wids: string[] =
+      session.user_pk && state.users
+        ? state.users[session.user_pk].visible_lists.watchlists
+        : Object.keys(state.watchlists);
 
     tabs = wids
       .filter((wid) => state.watchlists && wid in state.watchlists)

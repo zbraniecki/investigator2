@@ -38,7 +38,7 @@ const oracleSlice = createSlice({
       fetchAssetsThunk,
       "assets",
       undefined,
-      (state) => {
+      (state, action) => {
         let lastUpdated = null;
         for (const asset of Object.values<Asset>(state.assets)) {
           if (asset.info.last_updated) {

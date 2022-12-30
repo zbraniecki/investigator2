@@ -115,7 +115,19 @@ const userSlice = createSlice({
         });
       }
     );
-    setFetchEntitiesReducer(builder, fetchUsersThunk, "users");
+    setFetchEntitiesReducer(
+      builder,
+      fetchUsersThunk,
+      "users",
+      undefined,
+      (state, action) => {
+        if (action.payload === null) {
+          state.session.authenticateState = AuthenticateState.Error;
+          state.session.token = undefined;
+          state.session.user_pk = undefined;
+        }
+      }
+    );
 
     builder.addCase(authenticateThunk.fulfilled, (state, action) => {
       if (action.payload.error) {

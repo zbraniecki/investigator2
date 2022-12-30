@@ -41,7 +41,6 @@ const uiSlice = createSlice({
       state.rowsPerPageOption = payload;
     },
   },
-  extraReducers: {},
 });
 
 export const getLightMode = (state: any) => state.ui.lightMode;
