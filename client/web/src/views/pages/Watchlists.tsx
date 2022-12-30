@@ -199,10 +199,10 @@ export function Watchlists() {
     const data = prepareWatchlistTableData(
       id,
       verifyDataState(state, [
-        "accounts",
+        // "accounts",
         "assets",
-        "holdings",
-        "portfolios",
+        // "holdings",
+        // "portfolios",
         "watchlists",
       ])
     );

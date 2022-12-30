@@ -112,7 +112,7 @@ class PublicWatchlistSerializer(serializers.ModelSerializer):
             return None
 
     def get_type(self, obj):
-        return "dynamic"
+        return obj.type
 
     def get_assets(self, obj):
         if obj.type == WatchlistType.DYNAMIC:

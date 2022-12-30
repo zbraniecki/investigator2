@@ -158,6 +158,13 @@ export function collectWatchlistHoldings(
         items.add(item);
       }
     }
+  } else if (watchlist.type === WatchlistType.Dynamic) {
+    watchlist.assets.forEach((asset: string) => {
+      items.add({
+	type: CollectionType.Asset,
+	pk: asset,
+      });
+    });
   }
 
   return {

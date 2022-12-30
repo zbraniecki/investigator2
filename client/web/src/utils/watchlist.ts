@@ -195,7 +195,7 @@ export function prepareWatchlistTableData(
     return null;
   }
 
-  assert(watchlist.portfolio);
+  // assert(watchlist.portfolio);
   const collection = collectWatchlistHoldings(
     watchlist,
     state,
