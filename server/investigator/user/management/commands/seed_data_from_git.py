@@ -25,6 +25,7 @@ from git import Repo
 import datetime
 import toml
 import pprint
+from django.utils import timezone
 from decimal import *
 from .helpers import find_matches
 
@@ -230,6 +231,8 @@ def upload_portfolio_data(data, dt, dry=False):
     for input in inputs:
         name = normalize_provider(input["wallet"]).lower()
         symbol = normalize_symbol(input["symbol"]).lower()
+        if symbol == "usd":
+            continue
         quantity = input["quantity"]
         if name not in input_accounts:
             input_accounts[name] = {}
@@ -248,7 +251,7 @@ def upload_portfolio_data(data, dt, dry=False):
         name = account.service.provider.name.lower()
         current_accounts[name] = {}
 
-        holdings = account.holdings.filter(asset__tags__in=[crypto_tag])
+        holdings = account.holdings.filter(asset__asset_class=crypto_tag)
         for holding in holdings:
             symbol = holding.asset.symbol.lower()
             if symbol not in current_accounts[name]:
@@ -342,6 +345,7 @@ def upload_portfolio_data(data, dt, dry=False):
                         holding.save()
                     transaction = Transaction(
                         account=account,
+                        holding=holding,
                         asset=asset,
                         quantity=quantity,
                         type=TransactionType.DEPOSIT,
@@ -356,18 +360,32 @@ def upload_portfolio_data(data, dt, dry=False):
                         asset=asset, account=account, quantity=change[0]
                     )
                     delta = Decimal(change[1]) - Decimal(change[0])
+                    assert delta != 0
+
+                    transaction_type = (
+                        TransactionType.DEPOSIT
+                        if delta > 0
+                        else TransactionType.WITHDRAW
+                    )
+
+                    interest_usd_threshold = 50  # 50 USD
+                    interest_perc_threshold = 0.03  # 3%
+                    transaction_value = Decimal(asset.value) * delta
+                    if change[1] > 0:
+                        transaction_perc = delta / Decimal(change[1])
+                        if transaction_perc < interest_perc_threshold:
+                            transaction_type = TransactionType.INTEREST
+
                     holding.quantity = change[1]
                     if not dry:
                         holding.save()
 
-                    assert delta != 0
                     transaction = Transaction(
                         account=account,
+                        holding=holding,
                         asset=asset,
                         quantity=abs(delta),
-                        type=TransactionType.DEPOSIT
-                        if delta > 0
-                        else TransactionType.WITHDRAW,
+                        type=transaction_type,
                         timestamp=dt,
                     )
                     if not dry:
@@ -408,13 +426,16 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            # if i < 75:
+            # if i < 11:
             #     continue
             repo.head.reference = commit
 
             id = commit.hexsha
             msg = commit.message
-            dt = datetime.datetime.fromtimestamp(commit.committed_date)
+            tz = timezone.get_current_timezone()
+            dt = datetime.datetime.fromtimestamp(commit.committed_date).replace(
+                tzinfo=tz
+            )
             print(f"{i}: {id} - {msg} - {dt}")
 
             file_path = "oracle/wallets.toml"
@@ -424,5 +445,6 @@ class Command(BaseCommand):
             file_path = "account/portfolio.toml"
             file_contents = repo.git.show("{}:{}".format(commit.hexsha, file_path))
             upload_portfolio_data(file_contents, dt, dry)
-            # if i >= 5:
+            # if i >= 30:
             #     break
+        repo.head.reference = repo.heads.master
