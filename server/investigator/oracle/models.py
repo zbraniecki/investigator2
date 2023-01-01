@@ -72,7 +72,7 @@ class AssetInfo(models.Model):
     high_24h = models.FloatField(blank=True, null=True)
     low_24h = models.FloatField(blank=True, null=True)
     last_updated = models.DateTimeField(blank=True, null=True)
-    image = models.CharField(max_length=200, blank=True, null=True)
+    image = models.CharField(max_length=300, blank=True, null=True)
 
     class Meta:
         abstract = True
