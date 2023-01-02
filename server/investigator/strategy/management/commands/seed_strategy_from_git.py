@@ -19,6 +19,7 @@ from investigator.strategy.models import (
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from git import Repo
+from django.utils import timezone
 from decimal import *
 import datetime
 import toml
@@ -56,14 +57,16 @@ def upload_strategy_data(data, dt, dry=False):
         strat.save()
     assert strat
 
+    symbols = []
     for coin in coins:
-        symbol = normalize_symbol(coin["symbol"])
-        asset = Asset.objects.get(symbol__iexact=symbol)
-        target = Target.objects.filter(
-            strategy=strat,
-            asset=asset,
-        ).first()
+        symbols.append(normalize_symbol(coin["symbol"]))
 
+    assets = Asset.objects.filter(symbol__in=symbols)
+    targets = Target.objects.filter(
+        strategy=strat,
+        asset__in=assets,
+    ).order_by('asset_id', '-id').distinct("asset")
+    for target in targets:
         if target:
             delta = Decimal(coin["percent"]) - Decimal(target.percent)
             if delta == 0.0:
@@ -130,13 +133,16 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            # if i < 2:
+            # if i < 93:
             #     continue
             repo.head.reference = commit
 
             id = commit.hexsha
             msg = commit.message
-            dt = datetime.datetime.fromtimestamp(commit.committed_date)
+            tz = timezone.get_current_timezone()
+            dt = datetime.datetime.fromtimestamp(commit.committed_date).replace(
+                tzinfo=tz
+            )
             print(f"{i}: {id} - {msg} - {dt}")
 
             file_path = "account/strategy.toml"

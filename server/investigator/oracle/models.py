@@ -113,6 +113,12 @@ class Asset(AssetInfo):
     max_supply = models.FloatField(blank=True, null=True)
     inflation = models.FloatField(blank=True, null=True)
 
+    class Meta:
+       indexes = [
+           models.Index(fields=['active']),
+           models.Index(fields=['asset_class',]),
+        ]
+
     def __str__(self):
         return f"{self.name} ({self.symbol})"
 

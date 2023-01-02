@@ -26,6 +26,14 @@ class Target(models.Model):
         Portfolio, on_delete=models.CASCADE, blank=True, null=True
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint]
+                 fields=['strategy', 'asset'],
+                 name='unique_asset_strategy',
+            )
+        ]
+
     def __str__(self):
         if self.asset:
             return f"{self.strategy} - {self.asset}"
