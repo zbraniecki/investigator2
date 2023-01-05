@@ -29,8 +29,8 @@ class Target(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                 fields=['strategy', 'asset'],
-                 name='unique_asset_strategy',
+                fields=["strategy", "asset"],
+                name="unique_asset_strategy",
             )
         ]
 

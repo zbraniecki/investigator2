@@ -114,9 +114,13 @@ class Asset(AssetInfo):
     inflation = models.FloatField(blank=True, null=True)
 
     class Meta:
-       indexes = [
-           models.Index(fields=['active']),
-           models.Index(fields=['asset_class',]),
+        indexes = [
+            models.Index(fields=["active"]),
+            models.Index(
+                fields=[
+                    "asset_class",
+                ]
+            ),
         ]
 
     def __str__(self):

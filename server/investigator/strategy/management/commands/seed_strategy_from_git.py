@@ -62,10 +62,14 @@ def upload_strategy_data(data, dt, dry=False):
         symbols.append(normalize_symbol(coin["symbol"]))
 
     assets = Asset.objects.filter(symbol__in=symbols)
-    targets = Target.objects.filter(
-        strategy=strat,
-        asset__in=assets,
-    ).order_by('asset_id', '-id').distinct("asset")
+    targets = (
+        Target.objects.filter(
+            strategy=strat,
+            asset__in=assets,
+        )
+        .order_by("asset_id", "-id")
+        .distinct("asset")
+    )
     for target in targets:
         if target:
             delta = Decimal(coin["percent"]) - Decimal(target.percent)
