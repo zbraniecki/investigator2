@@ -64,8 +64,8 @@ class Command(BaseCommand):
             for asset in target.contains.all().order_by("symbol"):
                 contains.append(asset.symbol)
             entry = {
-                "symbol": normalize_symbol(target.asset.symbol),
                 "percent": float(target.percent),
+                "symbol": normalize_symbol(target.asset.symbol),
             }
             if len(contains) != 0:
                 entry["contains"] = contains

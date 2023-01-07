@@ -57,20 +57,14 @@ def upload_strategy_data(data, dt, dry=False):
         strat.save()
     assert strat
 
-    symbols = []
     for coin in coins:
-        symbols.append(normalize_symbol(coin["symbol"]))
-
-    assets = Asset.objects.filter(symbol__in=symbols)
-    targets = (
-        Target.objects.filter(
+        symbol = normalize_symbol(coin["symbol"])
+        asset = Asset.objects.get(symbol__iexact=symbol)
+        target = Target.objects.filter(
             strategy=strat,
-            asset__in=assets,
-        )
-        .order_by("asset_id", "-id")
-        .distinct("asset")
-    )
-    for target in targets:
+            asset=asset,
+        ).first()
+
         if target:
             delta = Decimal(coin["percent"]) - Decimal(target.percent)
             if delta == 0.0:
@@ -87,12 +81,13 @@ def upload_strategy_data(data, dt, dry=False):
             if not dry:
                 target.save()
         else:
-            target = Target(strategy=strat, asset=asset, percent=coin["percent"])
+            target = Target(
+                strategy=strat, asset=asset, percent=coin["percent"]
+            )
             if not dry:
                 target.save()
             change = TargetChange(
-                strategy=strat,
-                asset=target.asset,
+                target=target,
                 change=coin["percent"],
                 timestamp=dt,
             )
@@ -109,7 +104,7 @@ def upload_strategy_data(data, dt, dry=False):
                 break
         if not found:
             change = TargetChange(
-                strategy=strat,
+                strategy=target.strategy,
                 asset=target.asset,
                 change=target.percent * -1,
                 timestamp=dt,
@@ -137,8 +132,8 @@ class Command(BaseCommand):
         i = 0
         for commit in commits:
             i += 1
-            # if i < 93:
-            #     continue
+            if i < 175:
+                continue
             repo.head.reference = commit
 
             id = commit.hexsha
@@ -155,4 +150,5 @@ class Command(BaseCommand):
 
             # if i >= 1:
             #     break
+
         repo.head.reference = repo.heads.master
