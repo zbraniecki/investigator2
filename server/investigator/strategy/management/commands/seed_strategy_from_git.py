@@ -81,9 +81,7 @@ def upload_strategy_data(data, dt, dry=False):
             if not dry:
                 target.save()
         else:
-            target = Target(
-                strategy=strat, asset=asset, percent=coin["percent"]
-            )
+            target = Target(strategy=strat, asset=asset, percent=coin["percent"])
             if not dry:
                 target.save()
             change = TargetChange(
