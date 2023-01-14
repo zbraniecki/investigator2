@@ -90,8 +90,8 @@ class Command(BaseCommand):
         for holding in holdings:
             account = normalize_provider(holding.account.service.provider.id)
             entry = {
-                "symbol": normalize_symbol(holding.asset.symbol),
                 "quantity": float(holding.quantity),
+                "symbol": normalize_symbol(holding.asset.symbol),
                 "wallet": account,
             }
             result.append(entry)
