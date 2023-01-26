@@ -9,6 +9,8 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 
 import { Watchlist } from "../../../types";
+import { DialogType } from "../../ui/modal/dialog";
+import { getOutletContext } from "../../ui/Content";
 
 interface Props {
   anchorEl: any;
@@ -24,6 +26,7 @@ export function AddTabMenu({
   handleAddTab,
 }: Props) {
   const [wId, setWId] = React.useState("");
+  const outletContext = getOutletContext();
 
   const open = Boolean(anchorEl);
 
@@ -33,6 +36,15 @@ export function AddTabMenu({
 
   const handleAddPublicWatchlist = () => {
     handleAddTab(wId);
+    setWId("");
+  };
+  const handleAddNewWatchlist = () => {
+    handleClose();
+    outletContext.updateDialogState({
+      type: DialogType.Watchlist,
+      meta: {
+      },
+    });
   };
 
   return (
@@ -72,7 +84,7 @@ export function AddTabMenu({
           Add
         </Button>
       </MenuItem>
-      <MenuItem>New Watchlist</MenuItem>
+      <MenuItem onClick={handleAddNewWatchlist}>New Watchlist</MenuItem>
     </Menu>
   );
 }

@@ -240,9 +240,9 @@ export function Watchlists() {
     assert(state.users);
     const user = state.users[session.user_pk];
     const wids = Array.from(user.visible_lists.watchlists);
+    setAddTabAnchorEl(null);
     if (wids.indexOf(wid) === -1) {
       wids.push(wid);
-      console.log(wids);
       dispatch(
         setUserWatchlistsThunk({
           token: session.token,
@@ -251,7 +251,6 @@ export function Watchlists() {
         })
       );
     }
-    setAddTabAnchorEl(null);
   }
 
   return (

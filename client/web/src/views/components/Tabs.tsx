@@ -7,8 +7,6 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import MenuIcon from "@mui/icons-material/Menu";
 import { NavLink } from "react-router-dom";
 import { SearchInput } from "./Search";
-import { getOutletContext } from "../ui/Content";
-import { DialogType } from "../ui/modal/dialog";
 
 export interface TabInfo {
   id: string;
@@ -32,8 +30,6 @@ export function TabRow({
   handleMenuOpen,
   handleAddTab,
 }: Props) {
-  const outletContext = getOutletContext();
-
   const handleSearch = (event: any) => {
     const query = event.target.value.trim();
     if (query.length === 0) {
@@ -48,21 +44,9 @@ export function TabRow({
 
   function addTab(event: any) {
     handleAddTab(event.currentTarget);
-    // outletContext.updateDialogState({
-    //   type: DialogType.Watchlist,
-    //   meta: {
-    //     watchlist: null
-    //   }
-    // });
   }
 
   function editTab(id: string, e: any) {
-    outletContext.updateDialogState({
-      type: DialogType.Watchlist,
-      meta: {
-        watchlist: id,
-      },
-    });
     e.preventDefault();
   }
 

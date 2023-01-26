@@ -165,6 +165,13 @@ export function collectWatchlistHoldings(
         pk: asset,
       });
     });
+  } else if (watchlist.type == WatchlistType.Assets) {
+    watchlist.assets.forEach((asset: string) => {
+      items.add({
+        type: CollectionType.Asset,
+        pk: asset,
+      });
+    });
   }
 
   return {
