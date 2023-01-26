@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from .models import Portfolio, Holding, Watchlist, Account, Transaction
+from .models import Portfolio, Holding, Watchlist, Account, Transaction, WatchlistUI
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from .serializers import (
     PortfolioSerializer,
     HoldingSerializer,
     WatchlistSerializer,
+    WatchlistUISerializer,
     AccountSerializer,
     UserSerializer,
     TransactionSerializer,
@@ -86,3 +89,22 @@ class UserViewSet(viewsets.ModelViewSet):
         model = get_user_model()
         user = self.request.user
         return model.objects.filter(id=user.id).order_by("-id")
+
+    @action(methods=["patch"], detail=True)
+    def watchlists(self, request, pk):
+        model = get_user_model()
+        user = model.objects.get(id=pk)
+
+        params = request.data
+        wids = params.get("wids")
+        print(len(wids))
+
+        WatchlistUI.objects.filter(user=user).delete()
+
+        for (idx, wid) in enumerate(wids):
+            watchlist = Watchlist.objects.get(pk=wid)
+            wui = WatchlistUI(watchlist=watchlist, user=user, visible_order=idx)
+            wui.save()
+
+        wuis = WatchlistUI.objects.filter(user=user).order_by("visible_order")
+        return Response([wui.watchlist.pk for wui in wuis])

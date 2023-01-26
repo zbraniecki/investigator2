@@ -1,22 +1,31 @@
+import React from "react";
 import { useSelector } from "react-redux";
-import { TableContainer } from "../components/table/Contrainer";
+import { TableContainer } from "../../components/table/Contrainer";
 import {
   CellAlign,
   SortDirection,
   Formatter,
-} from "../components/table/data/Column";
-import { BaseTableMeta, TableSettings } from "../components/table/data/Table";
-import { StyledRowData } from "../components/table/data/Row";
+} from "../../components/table/data/Column";
+import {
+  BaseTableMeta,
+  TableSettings,
+} from "../../components/table/data/Table";
+import { StyledRowData } from "../../components/table/data/Row";
 import {
   prepareWatchlistTableData,
   computeWatchlistTableDataStyle,
   isSufficientDataLoaded,
   DataLoadedState,
-} from "../../utils/watchlist";
-import { assert, loadData, verifyDataState } from "../../utils";
-import { getSession } from "../../store";
-import { TabInfo } from "../components/Tabs";
-import { DialogType } from "../ui/modal/dialog";
+} from "../../../utils/watchlist";
+import { assert, loadData, verifyDataState } from "../../../utils";
+import {
+  useAppDispatch,
+  getSession,
+  setUserWatchlistsThunk,
+} from "../../../store";
+import { TabInfo } from "../../components/Tabs";
+import { DialogType } from "../../ui/modal/dialog";
+import { AddTabMenu } from "./TabMenus";
 
 const baseTableMeta: BaseTableMeta = {
   name: "watchlists",
@@ -150,6 +159,10 @@ const tableSettings: TableSettings = {
 };
 
 export function Watchlists() {
+  const [addTabAnchorEl, setAddTabAnchorEl] =
+    React.useState<null | HTMLElement>(null);
+  const dispatch = useAppDispatch();
+
   const state = loadData([
     "accounts",
     "assets",
@@ -178,10 +191,13 @@ export function Watchlists() {
     : dataLoadedState !== DataLoadedState.None;
 
   if (ready) {
-    const wids: string[] =
-      session.user_pk && state.users
-        ? state.users[session.user_pk].visible_lists.watchlists
-        : Object.keys(state.watchlists);
+    let wids: string[] = [];
+    if (session.user_pk && state.users) {
+      wids = state.users[session.user_pk].visible_lists.watchlists;
+    }
+    if (wids.length == 0) {
+      wids = Object.keys(state.watchlists);
+    }
 
     tabs = wids
       .filter((wid) => state.watchlists && wid in state.watchlists)
@@ -212,12 +228,47 @@ export function Watchlists() {
     return computeWatchlistTableDataStyle(data);
   };
 
+  function handleAddTabOpen(anchorEl: HTMLElement) {
+    setAddTabAnchorEl(anchorEl);
+  }
+
+  function handleCloseAddTab() {
+    setAddTabAnchorEl(null);
+  }
+
+  function handleAddTab(wid: string) {
+    assert(state.users);
+    const user = state.users[session.user_pk];
+    const wids = Array.from(user.visible_lists.watchlists);
+    if (wids.indexOf(wid) === -1) {
+      wids.push(wid);
+      console.log(wids);
+      dispatch(
+        setUserWatchlistsThunk({
+          token: session.token,
+          uid: session.user_pk,
+          wids,
+        })
+      );
+    }
+    setAddTabAnchorEl(null);
+  }
+
   return (
-    <TableContainer
-      tabs={tabs}
-      baseMeta={baseTableMeta}
-      settings={tableSettings}
-      getTableData={getTableData}
-    />
+    <>
+      <TableContainer
+        tabs={tabs}
+        baseMeta={baseTableMeta}
+        settings={tableSettings}
+        getTableData={getTableData}
+        handleAddTab={handleAddTabOpen}
+      />
+      <AddTabMenu
+        anchorEl={addTabAnchorEl}
+        handleClose={handleCloseAddTab}
+        publicWatchlists={state.publicWatchlists}
+        handleAddTab={handleAddTab}
+      />
+    </>
   );
 }

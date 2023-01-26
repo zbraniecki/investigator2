@@ -25,13 +25,20 @@ import {
   AccountDialogActions,
 } from "./pages/Account";
 import {
+  WatchlistDialogTitle,
+  WatchlistDialogContent,
+  WatchlistDialogActions,
+} from "./pages/Watchlist";
+import {
   getAssets,
   getTags,
   getHoldings,
   getAccounts,
   getServices,
+  getPublicWatchlists,
+  getUserWatchlists,
 } from "../../../../store";
-import { Holding } from "../../../../types";
+import { Holding, Watchlist } from "../../../../types";
 import { assert } from "../../../../utils/helpers";
 
 export enum DialogType {
@@ -40,6 +47,7 @@ export enum DialogType {
   Asset,
   Holding,
   Account,
+  Watchlist,
 }
 
 export interface DialogState {
@@ -80,6 +88,8 @@ export function ModalDialog({ state, updateState }: Props) {
   const holdings = useSelector(getHoldings);
   const accounts = useSelector(getAccounts);
   const services = useSelector(getServices);
+  const publicWatchlists = useSelector(getPublicWatchlists);
+  const userWatchlists = useSelector(getUserWatchlists);
 
   const handleCloseModal = () => {
     updateState({
@@ -167,6 +177,35 @@ export function ModalDialog({ state, updateState }: Props) {
           services={services}
         />
       );
+      break;
+    }
+    case DialogType.Watchlist: {
+      function getWatchlist(
+        pw: Watchlist[],
+        uw: Watchlist[],
+        wid: string
+      ): Watchlist | null {
+        return null;
+      }
+
+      const wid = state.meta?.watchlist;
+      const watchlist = wid
+        ? getWatchlist(publicWatchlists, userWatchlists, wid)
+        : null;
+      title = (
+        <WatchlistDialogTitle
+          watchlist={watchlist}
+          onClose={handleCloseModal}
+        />
+      );
+      content = (
+        <WatchlistDialogContent
+          watchlist={watchlist}
+          publicWatchlists={publicWatchlists}
+          userWatchlists={userWatchlists}
+        />
+      );
+      actions = <WatchlistDialogActions handleCloseModal={handleCloseModal} />;
       break;
     }
   }

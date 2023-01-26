@@ -21,10 +21,11 @@ import { InfoDisplayMode } from "../../../components/settings";
 import { getOutletContext } from "../../ui/Content";
 
 export interface Props {
+  tabs: TabInfo[];
   baseMeta: BaseTableMeta;
   settings: TableSettings;
-  tabs: TabInfo[];
   getTableData: any;
+  handleAddTab: any;
 }
 
 export function TableContainer({
@@ -32,6 +33,7 @@ export function TableContainer({
   baseMeta,
   settings,
   getTableData,
+  handleAddTab,
 }: Props) {
   const [tableSettings, setTableSettings] = React.useState(settings);
   const outletContext = getOutletContext();
@@ -189,6 +191,7 @@ export function TableContainer({
         idx={tabIdx}
         setFilter={handleSetFilter}
         handleMenuOpen={handleMenuOpen}
+        handleAddTab={handleAddTab}
       />
       <Box
         sx={{

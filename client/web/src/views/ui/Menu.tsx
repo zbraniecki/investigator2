@@ -4,7 +4,7 @@ import PieChartIcon from "@mui/icons-material/PieChart";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 // import DashboardIcon from '@mui/icons-material/Dashboard';
 // import { Dashboard } from "../../pages/Dashboard";
-import { Watchlists } from "../pages/Watchlists";
+import { Watchlists } from "../pages/watchlists";
 import { Portfolios } from "../pages/Portfolios";
 import { Accounts } from "../pages/Accounts";
 import { Strategy } from "../pages/Strategy";

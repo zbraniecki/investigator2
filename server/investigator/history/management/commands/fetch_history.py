@@ -9,14 +9,14 @@ from django.utils import timezone
 
 
 CHUNKS = [
-    # {
-    #     "scale": 60,
-    #     "duration": 60,
-    # },
+    {
+        "scale": 60,
+        "duration": 60,
+    },
     {
         "scale": 60 * 10,
         "duration": 60 * 5,
-    }
+    },
 ]
 
 
@@ -36,16 +36,14 @@ def shift_value(value, divergence, down=True, up=True):
     return d / 100
 
 
-def retrieve_asset_history(asset, start, end, freq):
+def retrieve_asset_history(asset, start, end, freq, latest_tick):
     result = []
 
     ts = start
 
-    close = None
+    close = None if latest_tick is None else float(latest_tick.close)
 
-    while ts < end:
-        ts += timedelta(seconds=freq)
-
+    while ts > end:
         close = generate_rand(1, 1000) if close is None else shift_value(close, 0.1)
         open = shift_value(close, 0.1)
         high = shift_value(close, 0.1, down=False)
@@ -59,36 +57,19 @@ def retrieve_asset_history(asset, start, end, freq):
                 "low": low,
             }
         )
+        ts -= timedelta(seconds=freq)
 
     return result
 
 
-def validate_chunk_ticks(ticks, chunk, dt):
-    ts = dt
-    limit = dt - timedelta(seconds=chunk["scale"])
-    while ts > limit:
-        end = ts
-        ts -= timedelta(seconds=chunk["duration"])
-        start = ts
-        subticks = ticks.filter(timestamp__gte=start, timestamp__lte=end)
-        if subticks.count() != 1:
-            return False
-    return True
+def fetch_asset_chunk(asset, dt, chunk, latest_tick, dry):
+    print(f"fetching chunk {chunk['duration']} for {asset.symbol}")
 
-
-def fetch_asset_chunk(asset, dt, chunk, ticks, dry):
-    left = chunk["scale"]
-
-    start = dt - timedelta(seconds=chunk["scale"])
-    end = dt
-    subticks = ticks.filter(timestamp__lte=end, timestamp__gte=start)
-    print(subticks)
-    if validate_chunk_ticks(subticks, chunk, dt):
-        return
-
+    start = dt
+    end = dt - timedelta(seconds=chunk["scale"])
     print(start)
     print(end)
-    history = retrieve_asset_history(asset, start, end, chunk["duration"])
+    history = retrieve_asset_history(asset, start, end, chunk["duration"], latest_tick)
     pprint(history)
 
     for entry in history:
@@ -103,27 +84,26 @@ def fetch_asset_chunk(asset, dt, chunk, ticks, dry):
         if not dry:
             tick.save()
 
-    # while left > 0:
-    #     cut_off = dt - timedelta(seconds = chunk["duration"])
-    # tick = next(ticks, None)
-    # print(cut_off)
-    # print(tick)
-    # if tick is None:
-    #     start = cut_off
-    #     end = dt
-    #     freq = chunk["duration"]
-    #     history = retrieve_asset_history(asset, start, end, freq)
-    #     pprint(history)
-    # left -= chunk["duration"]
+
+def has_gaps(ticks, chunk, dt):
+    start = dt - timedelta(seconds=chunk["duration"])
+    end = dt
+
+    ticks = ticks.filter(timestamp__gte=start, timestamp__lte=end)
+    print(ticks)
+
+    return False
 
 
-def fetch_asset_history(asset, dt, dry):
-    ticks = TickData.objects.filter(asset=asset).order_by("-timestamp")
-
+def fetch_asset_history(asset, ticks, dt, dry):
     print(f"now: {dt}")
 
+    # time_diff = dt - latest_tick.timestamp
     for chunk in CHUNKS:
-        fetch_asset_chunk(asset, dt, chunk, ticks, dry)
+        if has_gaps(ticks, chunk, dt):
+            pass
+        # if time_diff > timedelta(seconds = chunk["duration"]):
+        #     fetch_asset_chunk(asset, dt, chunk, latest_tick, dry)
 
     # pprint(asset)
     # pprint(tick)
@@ -133,8 +113,11 @@ def fetch_history(dry=False):
     tz = timezone.get_current_timezone()
     dt = datetime.now().replace(tzinfo=tz)
     assets = Asset.objects.all().order_by("symbol")
+
+    ticks = TickData.objects.all().order_by("-timestamp")
+
     for asset in assets:
-        fetch_asset_history(asset, dt, dry)
+        fetch_asset_history(asset, ticks.filter(asset=asset), dt, dry)
         break
 
 

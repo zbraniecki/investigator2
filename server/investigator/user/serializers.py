@@ -129,3 +129,9 @@ class MyCustomTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Token
         fields = ("key", "user")
+
+
+class WatchlistUISerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WatchlistUI
+        fields = ["pk", "watchlist", "user", "visible_order"]

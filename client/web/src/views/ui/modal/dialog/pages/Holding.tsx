@@ -101,7 +101,7 @@ export function HoldingDialogContent({
     .filter(
       (transaction) =>
         transaction.asset === asset.pk &&
-        (transaction.holding === null || transaction.holding == holding.pk)
+        (transaction.holding === null || transaction.holding === holding.pk)
     )
     .map((transaction) => ({
       pk: transaction.pk,

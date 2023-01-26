@@ -146,6 +146,7 @@ export function Accounts() {
       baseMeta={baseTableMeta}
       settings={tableSettings}
       getTableData={getTableData}
+      handleAddTab={null}
     />
   );
 }

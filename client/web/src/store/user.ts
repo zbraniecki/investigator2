@@ -9,6 +9,7 @@ import {
   authenticate,
   logout,
   updateUserInfo,
+  setUserWatchlists,
 } from "../api/user";
 import {
   fetchHoldingsThunk,
@@ -55,6 +56,11 @@ export const updateUserInfoThunk = createAsyncThunk(
 export const createTransactionThunk = createAsyncThunk(
   "user/createTransaction",
   createTransaction
+);
+
+export const setUserWatchlistsThunk = createAsyncThunk(
+  "user/setUserWatchlists",
+  setUserWatchlists
 );
 
 interface AccountState {
@@ -175,6 +181,14 @@ const userSlice = createSlice({
       if (state.users) {
         state.users[action.payload.pk] = action.payload;
       }
+    });
+    builder.addCase(setUserWatchlistsThunk.fulfilled, (state, action) => {
+      const userPk = state.session.user_pk;
+      assert(userPk);
+      assert(state.users);
+      const user = state.users[userPk];
+      assert(user);
+      user.visible_lists.watchlists = action.payload;
     });
   },
 });

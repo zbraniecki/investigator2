@@ -237,6 +237,7 @@ export function Portfolios() {
       baseMeta={baseTableMeta}
       settings={tableSettings}
       getTableData={getTableData}
+      handleAddTab={null}
     />
   );
 }

@@ -108,3 +108,31 @@ export const updateUserInfo = async ({
 
   return resp;
 };
+
+export const setUserWatchlists = async ({
+  token,
+  uid,
+  wids,
+}: {
+  token: string;
+  uid: string;
+  wids: string[];
+}): Promise<string[]> => {
+  const params = {
+    wids,
+  };
+
+  const data = await fetch(`${BASE_URL}user/users/${uid}/watchlists/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(params),
+  });
+  const resp = await data.json();
+
+  console.log(resp);
+
+  return wids;
+};
