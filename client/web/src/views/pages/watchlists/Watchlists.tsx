@@ -284,6 +284,17 @@ export function Watchlists() {
     );
   }
 
+  function handleReorderTabs(newTabs: TabInfo[]) {
+    const wids = newTabs.map((tab) => tab.id);
+    dispatch(
+      setUserWatchlistsThunk({
+        token: session.token,
+        uid: session.user_pk,
+        wids,
+      })
+    );
+  }
+
   return (
     <>
       <TableContainer
@@ -293,6 +304,7 @@ export function Watchlists() {
         getTableData={getTableData}
         handleAddTab={handleAddTabOpen}
         handleModifyTab={handleModifyTabOpen}
+        handleReorderTabs={handleReorderTabs}
       />
       <AddTabMenu
         anchorEl={addTabAnchorEl}

@@ -27,6 +27,7 @@ export interface Props {
   getTableData: any;
   handleAddTab: any;
   handleModifyTab: any;
+  handleReorderTabs: any;
 }
 
 export function TableContainer({
@@ -36,6 +37,7 @@ export function TableContainer({
   getTableData,
   handleAddTab,
   handleModifyTab,
+  handleReorderTabs,
 }: Props) {
   const [tableSettings, setTableSettings] = React.useState(settings);
   const outletContext = getOutletContext();
@@ -195,6 +197,7 @@ export function TableContainer({
         handleMenuOpen={handleMenuOpen}
         handleAddTab={handleAddTab}
         handleModifyTab={handleModifyTab}
+        handleReorderTabs={handleReorderTabs}
       />
       <Box
         sx={{

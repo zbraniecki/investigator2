@@ -6,6 +6,8 @@ import IconButton from "@mui/material/IconButton";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import MenuIcon from "@mui/icons-material/Menu";
 import { NavLink } from "react-router-dom";
+// @ts-ignore
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { SearchInput } from "./Search";
 
 export interface TabInfo {
@@ -21,6 +23,7 @@ interface Props {
   handleMenuOpen: any;
   handleAddTab: any;
   handleModifyTab: any;
+  handleReorderTabs: any;
 }
 
 export function TabRow({
@@ -31,6 +34,7 @@ export function TabRow({
   handleMenuOpen,
   handleAddTab,
   handleModifyTab,
+  handleReorderTabs,
 }: Props) {
   const handleSearch = (event: any) => {
     const query = event.target.value.trim();
@@ -53,6 +57,16 @@ export function TabRow({
     event.preventDefault();
   }
 
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+    if (result.destination.index === result.source.index) return;
+
+    const newTabs = Array.from(tabs);
+    const [removed] = newTabs.splice(result.source.index, 1);
+    newTabs.splice(result.destination.index, 0, removed);
+    handleReorderTabs(newTabs);
+  };
+
   return (
     <Box
       sx={{
@@ -63,23 +77,41 @@ export function TabRow({
         borderColor: "divider",
       }}
     >
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="tabs">
+          {(props: any) => (
+            <Tabs ref={props.innerRef} {...props.droppableProps} value={idx}>
+              {tabs.map((tab, index) => (
+                <Draggable
+                  key={`tab-${tab.id}`}
+                  draggableId={`id-${tab.id}`} // must be a string
+                  index={index}
+                  disableInteractiveElementBlocking
+                >
+                  {(props: any) => (
+                    <Tab
+                      ref={props.innerRef}
+                      {...props.draggableProps}
+                      {...props.dragHandleProps}
+                      component={NavLink}
+                      to={`/${page}/${tab.id}`}
+                      label={tab.label}
+                      onContextMenu={modifyTab.bind(null, tab.id)}
+                    />
+                  )}
+                </Draggable>
+              ))}
+              {props.placeholder}
+            </Tabs>
+          )}
+        </Droppable>
+      </DragDropContext>
       <Box
         sx={{
           flexDirection: "row",
           display: "flex",
         }}
       >
-        <Tabs value={idx}>
-          {tabs.map((tab) => (
-            <Tab
-              component={NavLink}
-              to={`/${page}/${tab.id}`}
-              key={`tab-${tab.id}`}
-              label={tab.label}
-              onContextMenu={modifyTab.bind(null, tab.id)}
-            />
-          ))}
-        </Tabs>
         {handleAddTab && tabs.length > 0 && (
           <IconButton
             onClick={addTab}

@@ -239,6 +239,7 @@ export function Portfolios() {
       getTableData={getTableData}
       handleAddTab={null}
       handleModifyTab={null}
+      handleReorderTabs={null}
     />
   );
 }

@@ -148,6 +148,7 @@ export function Accounts() {
       getTableData={getTableData}
       handleAddTab={null}
       handleModifyTab={null}
+      handleReorderTabs={null}
     />
   );
 }
