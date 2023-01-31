@@ -8,6 +8,7 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 
+import { assert } from "../../../utils";
 import { Watchlist } from "../../../types";
 import { DialogType } from "../../ui/modal/dialog";
 import { getOutletContext } from "../../ui/Content";
@@ -42,8 +43,7 @@ export function AddTabMenu({
     handleClose();
     outletContext.updateDialogState({
       type: DialogType.Watchlist,
-      meta: {
-      },
+      meta: {},
     });
   };
 
@@ -85,6 +85,37 @@ export function AddTabMenu({
         </Button>
       </MenuItem>
       <MenuItem onClick={handleAddNewWatchlist}>New Watchlist</MenuItem>
+    </Menu>
+  );
+}
+
+interface ModifyProps {
+  anchor: any;
+  handleClose: any;
+  handleRemoveTab: any;
+}
+
+export function ModifyTabMenu({
+  anchor,
+  handleClose,
+  handleRemoveTab,
+}: ModifyProps) {
+  const open = Boolean(anchor);
+
+  const handleRemove = () => {
+    assert(anchor);
+    handleRemoveTab(anchor[0]);
+  };
+  const anchorEl = anchor ? anchor[1] : null;
+
+  return (
+    <Menu
+      id="watchlist-modify-tab-menu"
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+    >
+      <MenuItem onClick={handleRemove}>Remove</MenuItem>
     </Menu>
   );
 }

@@ -186,6 +186,7 @@ export function Strategy() {
       settings={tableSettings}
       getTableData={getTableData}
       handleAddTab={null}
+      handleModifyTab={null}
     />
   );
 }

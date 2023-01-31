@@ -26,6 +26,7 @@ export interface Props {
   settings: TableSettings;
   getTableData: any;
   handleAddTab: any;
+  handleModifyTab: any;
 }
 
 export function TableContainer({
@@ -34,6 +35,7 @@ export function TableContainer({
   settings,
   getTableData,
   handleAddTab,
+  handleModifyTab,
 }: Props) {
   const [tableSettings, setTableSettings] = React.useState(settings);
   const outletContext = getOutletContext();
@@ -192,6 +194,7 @@ export function TableContainer({
         setFilter={handleSetFilter}
         handleMenuOpen={handleMenuOpen}
         handleAddTab={handleAddTab}
+        handleModifyTab={handleModifyTab}
       />
       <Box
         sx={{

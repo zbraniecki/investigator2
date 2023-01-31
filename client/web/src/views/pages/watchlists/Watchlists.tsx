@@ -25,7 +25,7 @@ import {
 } from "../../../store";
 import { TabInfo } from "../../components/Tabs";
 import { DialogType } from "../../ui/modal/dialog";
-import { AddTabMenu } from "./TabMenus";
+import { AddTabMenu, ModifyTabMenu } from "./TabMenus";
 
 const baseTableMeta: BaseTableMeta = {
   name: "watchlists",
@@ -161,6 +161,10 @@ const tableSettings: TableSettings = {
 export function Watchlists() {
   const [addTabAnchorEl, setAddTabAnchorEl] =
     React.useState<null | HTMLElement>(null);
+  const [modifyTabAnchor, setModifyTabAnchor] = React.useState<
+    null | [string, HTMLElement]
+  >(null);
+
   const dispatch = useAppDispatch();
 
   const state = loadData([
@@ -232,15 +236,24 @@ export function Watchlists() {
     setAddTabAnchorEl(anchorEl);
   }
 
+  function handleModifyTabOpen(wid: string, anchorEl: HTMLElement) {
+    setModifyTabAnchor([wid, anchorEl]);
+  }
+
   function handleCloseAddTab() {
     setAddTabAnchorEl(null);
   }
 
+  function handleCloseModifyTab() {
+    setModifyTabAnchor(null);
+  }
+
   function handleAddTab(wid: string) {
+    setAddTabAnchorEl(null);
+
     assert(state.users);
     const user = state.users[session.user_pk];
     const wids = Array.from(user.visible_lists.watchlists);
-    setAddTabAnchorEl(null);
     if (wids.indexOf(wid) === -1) {
       wids.push(wid);
       dispatch(
@@ -253,6 +266,24 @@ export function Watchlists() {
     }
   }
 
+  function handleRemoveTab(wid: string) {
+    setModifyTabAnchor(null);
+
+    assert(state.users);
+    const user = state.users[session.user_pk];
+    const wids = Array.from(user.visible_lists.watchlists);
+    assert(wids.indexOf(wid) !== -1);
+
+    wids.splice(wids.indexOf(wid), 1);
+    dispatch(
+      setUserWatchlistsThunk({
+        token: session.token,
+        uid: session.user_pk,
+        wids,
+      })
+    );
+  }
+
   return (
     <>
       <TableContainer
@@ -261,12 +292,18 @@ export function Watchlists() {
         settings={tableSettings}
         getTableData={getTableData}
         handleAddTab={handleAddTabOpen}
+        handleModifyTab={handleModifyTabOpen}
       />
       <AddTabMenu
         anchorEl={addTabAnchorEl}
         handleClose={handleCloseAddTab}
         publicWatchlists={state.publicWatchlists}
         handleAddTab={handleAddTab}
+      />
+      <ModifyTabMenu
+        anchor={modifyTabAnchor}
+        handleClose={handleCloseModifyTab}
+        handleRemoveTab={handleRemoveTab}
       />
     </>
   );

@@ -20,6 +20,7 @@ interface Props {
   setFilter: any;
   handleMenuOpen: any;
   handleAddTab: any;
+  handleModifyTab: any;
 }
 
 export function TabRow({
@@ -29,6 +30,7 @@ export function TabRow({
   setFilter,
   handleMenuOpen,
   handleAddTab,
+  handleModifyTab,
 }: Props) {
   const handleSearch = (event: any) => {
     const query = event.target.value.trim();
@@ -46,8 +48,9 @@ export function TabRow({
     handleAddTab(event.currentTarget);
   }
 
-  function editTab(id: string, e: any) {
-    e.preventDefault();
+  function modifyTab(id: string, event: any) {
+    handleModifyTab(id, event.currentTarget);
+    event.preventDefault();
   }
 
   return (
@@ -73,7 +76,7 @@ export function TabRow({
               to={`/${page}/${tab.id}`}
               key={`tab-${tab.id}`}
               label={tab.label}
-              onContextMenu={editTab.bind(null, tab.id)}
+              onContextMenu={modifyTab.bind(null, tab.id)}
             />
           ))}
         </Tabs>

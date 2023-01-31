@@ -147,6 +147,7 @@ export function Accounts() {
       settings={tableSettings}
       getTableData={getTableData}
       handleAddTab={null}
+      handleModifyTab={null}
     />
   );
 }
