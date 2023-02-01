@@ -83,6 +83,8 @@ interface Props {
 }
 
 export function ModalDialog({ state, updateState }: Props) {
+  const [watchlist, setWatchlist] = React.useState({} as Partial<Watchlist>);
+
   const assets = useSelector(getAssets);
   const tags = useSelector(getTags);
   const holdings = useSelector(getHoldings);
@@ -180,21 +182,22 @@ export function ModalDialog({ state, updateState }: Props) {
       break;
     }
     case DialogType.Watchlist: {
-      function getWatchlist(
-        pw: Watchlist[],
-        uw: Watchlist[],
-        wid: string
-      ): Watchlist | null {
-        return null;
-      }
-
-      const wid = state.meta?.watchlist;
-      const watchlist = wid
-        ? getWatchlist(publicWatchlists, userWatchlists, wid)
-        : null;
+      // function getWatchlist(
+      //   pw: Watchlist[],
+      //   uw: Watchlist[],
+      //   wid: string
+      // ): Watchlist | null {
+      //   return null;
+      // }
+      //
+      // const wid = state.meta?.watchlist;
+      // const watchlist = wid
+      //   ? getWatchlist(publicWatchlists, userWatchlists, wid)
+      //   : null;
       title = (
         <WatchlistDialogTitle
-          watchlist={watchlist}
+	  watchlist={watchlist}
+	  setWatchlist={setWatchlist}
           onClose={handleCloseModal}
         />
       );
@@ -205,7 +208,7 @@ export function ModalDialog({ state, updateState }: Props) {
           userWatchlists={userWatchlists}
         />
       );
-      actions = <WatchlistDialogActions handleCloseModal={handleCloseModal} />;
+      actions = <WatchlistDialogActions handleCloseModal={handleCloseModal} watchlist={watchlist} />;
       break;
     }
   }

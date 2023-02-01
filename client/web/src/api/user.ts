@@ -134,3 +134,29 @@ export const setUserWatchlists = async ({
 
   return wids;
 };
+
+export const addUserWatchlist = async ({
+  token,
+  name
+}: {
+  token: string;
+  name: string;
+}): Promise<Watchlist> => {
+  const params = {
+    name,
+    type: "AS",
+    assets: [],
+  };
+
+  const data = await fetch(`${BASE_URL}user/watchlists/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(params),
+  });
+  const resp = await data.json();
+
+  return resp;
+};

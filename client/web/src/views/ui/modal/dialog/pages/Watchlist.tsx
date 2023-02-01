@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -17,6 +18,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import TextField from '@mui/material/TextField';
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import {
   Asset,
@@ -25,37 +27,39 @@ import {
   Service,
   getTransactionTypeLabel,
 } from "../../../../../types";
+import {
+  useAppDispatch,
+  getSession,
+  addUserWatchlistThunk,
+} from "../../../../../store";
 import { assert } from "../../../../../utils/helpers";
 import { currency, percent, datetime } from "../../../../../utils/formatters";
 import { DialogType } from "../Dialog";
 
 interface TitleProps {
-  watchlist: Watchlist | null;
+  watchlist: Partial<Watchlist>;
+  setWatchlist: any;
   onClose: any;
 }
 
-export function WatchlistDialogTitle({ watchlist, onClose }: TitleProps) {
-  if (watchlist) {
-    return (
-      <Stack direction="row">
-        <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>
-          {watchlist.name.toUpperCase().slice(0, 1)}
-        </Avatar>
-        <Stack>
-          <Typography>{watchlist.name}</Typography>
-        </Stack>
-        <Box sx={{ flex: 1 }} />
-        <IconButton onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      </Stack>
-    );
-  }
+export function WatchlistDialogTitle({ watchlist, setWatchlist, onClose }: TitleProps) {
+  const firstLetter = watchlist.name ? watchlist.name[0].toUpperCase() : "";
+
+  const handleNameChange = (event: any) => {
+    watchlist.name = event.target.value;
+    setWatchlist(watchlist);
+  };
+
   return (
     <Stack direction="row">
-      <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>N</Avatar>
+      <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>{firstLetter}</Avatar>
       <Stack>
-        <Typography>New Watchlist</Typography>
+	    <TextField 
+	      id="watchlist-name"
+	      label="Name"
+	      value={watchlist.name}
+	      onChange={handleNameChange}
+	      variant="standard" />
       </Stack>
       <Box sx={{ flex: 1 }} />
       <IconButton onClick={onClose}>
@@ -71,7 +75,7 @@ enum WatchlistType {
 }
 
 interface ContentProps {
-  watchlist: Watchlist | null;
+  watchlist: Partial<Watchlist>;
   publicWatchlists: Record<string, Watchlist>;
   userWatchlists: Record<string, Watchlist>;
 }
@@ -137,19 +141,28 @@ export function WatchlistDialogContent({
 }
 
 interface ActionProps {
+  watchlist: any;
   handleCloseModal: any;
 }
 
-export function WatchlistDialogActions({ handleCloseModal }: ActionProps) {
-  const handleCancel = () => {
+export function WatchlistDialogActions({ watchlist, handleCloseModal }: ActionProps) {
+  const dispatch = useAppDispatch();
+
+  const session = useSelector(getSession);
+
+  const handleOk = (event: any) => {
+    dispatch(
+      addUserWatchlistThunk({
+        token: session.token,
+	name: watchlist.name,
+      })
+    );
     handleCloseModal();
   };
 
-  const handleOk = () => {};
-
   return (
     <>
-      <Button autoFocus onClick={handleCancel}>
+      <Button autoFocus onClick={handleCloseModal}>
         Cancel
       </Button>
       <Button onClick={handleOk}>Ok</Button>

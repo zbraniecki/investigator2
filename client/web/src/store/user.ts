@@ -10,6 +10,7 @@ import {
   logout,
   updateUserInfo,
   setUserWatchlists,
+  addUserWatchlist,
 } from "../api/user";
 import {
   fetchHoldingsThunk,
@@ -63,6 +64,11 @@ export const setUserWatchlistsThunk = createAsyncThunk(
   setUserWatchlists
 );
 
+export const addUserWatchlistThunk = createAsyncThunk(
+  "user/addUserWatchlist",
+  addUserWatchlist
+);
+
 interface AccountState {
   session: Session;
   portfolios: Record<string, Portfolio> | undefined;
@@ -90,7 +96,7 @@ function cleanSlice(state: any) {
   state.session.user_pk = undefined;
   state.session.token = undefined;
   state.portfolios = undefined;
-  state.watchlists = undefined; // XXX: Keep public watchlists
+  state.watchlists = undefined;
   state.accounts = undefined;
   state.holdings = undefined;
   state.users = undefined;
@@ -189,6 +195,21 @@ const userSlice = createSlice({
       const user = state.users[userPk];
       assert(user);
       user.visible_lists.watchlists = action.payload;
+    });
+    builder.addCase(addUserWatchlistThunk.fulfilled, (state, action) => {
+      const watchlist = action.payload;
+
+      if (!state.watchlists) {
+	state.watchlists = {};
+      }
+      state.watchlists[watchlist.pk] = watchlist;
+
+      const userPk = state.session.user_pk;
+      assert(userPk);
+      assert(state.users);
+      const user = state.users[userPk];
+      assert(user);
+      user.visible_lists.watchlists.push(watchlist.pk);
     });
   },
 });

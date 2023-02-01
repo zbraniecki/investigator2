@@ -57,18 +57,26 @@ class PortfolioSerializer(serializers.ModelSerializer):
 
 
 class WatchlistSerializer(serializers.ModelSerializer):
-    portfolio = serializers.SerializerMethodField("get_portfolio")
     assets = serializers.SerializerMethodField("get_assets")
 
     class Meta:
         model = Watchlist
         fields = ["pk", "name", "type", "assets", "portfolio", "dynamic"]
 
-    def get_portfolio(self, obj):
-        if obj.type == WatchlistType.PORTFOLIO:
-            return obj.portfolio.id
-        else:
-            return None
+    def create(self, validated_data):
+        user = self.context["request"].user
+
+        watchlist = Watchlist.objects.create(owner=user, **validated_data)
+
+        wuis = WatchlistUI.objects.filter(user=user)
+
+        wui = WatchlistUI(
+            watchlist=watchlist,
+            user=user,
+            visible_order=len(wuis)
+        )
+        wui.save()
+        return watchlist
 
     def get_assets(self, obj):
         user = self.context["request"].user
