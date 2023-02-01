@@ -65,6 +65,7 @@ export function TabRow({
     const [removed] = newTabs.splice(result.source.index, 1);
     newTabs.splice(result.destination.index, 0, removed);
     handleReorderTabs(newTabs);
+    tabs = newTabs;
   };
 
   return (
@@ -78,17 +79,16 @@ export function TabRow({
       }}
     >
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="tabs">
+        <Droppable droppableId="tabs"  direction="horizontal">
           {(props: any) => (
             <Tabs ref={props.innerRef} {...props.droppableProps} value={idx}>
               {tabs.map((tab, index) => (
                 <Draggable
                   key={`tab-${tab.id}`}
-                  draggableId={`id-${tab.id}`} // must be a string
+                  draggableId={`id-${tab.id}-order${index}`} // must be a string
                   index={index}
-                  disableInteractiveElementBlocking
                 >
-                  {(props: any) => (
+                  {(props: any, snapshot: any) => (
                     <Tab
                       ref={props.innerRef}
                       {...props.draggableProps}

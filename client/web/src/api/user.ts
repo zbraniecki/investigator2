@@ -132,7 +132,5 @@ export const setUserWatchlists = async ({
   });
   const resp = await data.json();
 
-  console.log(resp);
-
   return wids;
 };
