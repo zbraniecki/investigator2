@@ -38,7 +38,7 @@ import {
   getPublicWatchlists,
   getUserWatchlists,
 } from "../../../../store";
-import { Holding, Watchlist } from "../../../../types";
+import { Tag, Holding, Watchlist } from "../../../../types";
 import { assert } from "../../../../utils/helpers";
 
 export enum DialogType {
@@ -115,7 +115,8 @@ export function ModalDialog({ state, updateState }: Props) {
       const aid = state.meta?.asset;
       assert(aid);
       const asset = assets[aid];
-      const assetTags = [...asset.tags].map((tid: string) => tags[tid]);
+      const assetTags: Array<Tag> = [tags[asset.asset_class]];
+      assetTags.push(...[...asset.tags].map((tid: string) => tags[tid]));
       const assetHoldings = Object.values<Holding>(holdings).filter(
         (holding: Holding) => holding.asset === asset.pk
       );

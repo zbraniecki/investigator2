@@ -128,3 +128,5 @@ client/web/.yarn/cache/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+server/investigator/private_settings.py

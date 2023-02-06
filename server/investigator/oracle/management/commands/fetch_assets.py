@@ -155,9 +155,12 @@ def fetch_chunk_coingecko(chunk, idx):
 
     tickers = ",".join([id for id in chunk])
     url = COINGECKO_URL.replace("%TICKERS%", tickers)
-    resp = requests.get(url, headers=headers)
-
-    result_list = resp.json()
+    try:
+        resp = requests.get(url, headers=headers)
+        result_list = resp.json()
+    except Exception as e:
+        print(f"Failed to receive results: {e}")
+        return {}
 
     current_api = APIS[CURRENT_API]
     check_missing(chunk, result_list, current_api["resp_id"])

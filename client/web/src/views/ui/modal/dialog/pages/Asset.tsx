@@ -243,9 +243,9 @@ export function AssetDialogContent({
                 }}
               >
                 <TableCell>Supply</TableCell>
+                    <Tooltip title={supply ? percent(supply / 100) : ""}>
                 <TableCell>
                   {supply !== undefined && (
-                    <Tooltip title={percent(supply / 100)}>
                       <LinearProgress
                         variant="determinate"
                         value={supply}
@@ -255,9 +255,9 @@ export function AssetDialogContent({
                           color: "#999999",
                         }}
                       />
-                    </Tooltip>
                   )}
                 </TableCell>
+                    </Tooltip>
               </TableRow>
             </TableBody>
           </Table>
@@ -266,6 +266,34 @@ export function AssetDialogContent({
       <Divider />
       <Table>
         <TableBody>
+          <TableRow>
+            <TableCell
+              sx={{ width: "40%", fontSize: "0.8em", color: "#999999" }}
+            >
+              Links
+            </TableCell>
+            <TableCell
+              sx={{ width: "60%", fontSize: "0.8em" }}
+              align="right"
+              colSpan={3}
+            >
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ justifyContent: "flex-end" }}
+              >
+		<Link href={`https://coinmarketcap.com/currencies/${asset.info.api_id}`}>
+		coinmarketcap
+		</Link>
+		<Link href={`https://www.coingecko.com/en/coins/${asset.info.api_id}`}>
+		coingecko
+		</Link>
+		<Link href={`https://thecoinperspective.com/compare/${asset.info.api_id}`}>
+		thecoinperspective
+		</Link>
+              </Stack>
+            </TableCell>
+          </TableRow>
           <TableRow>
             <TableCell
               sx={{ width: "40%", fontSize: "0.8em", color: "#999999" }}

@@ -37,6 +37,7 @@ export interface Asset {
     max_supply: number;
     image: string;
     last_updated: string;
+    api_id?: string;
   };
 }
 

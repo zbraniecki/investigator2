@@ -29,6 +29,7 @@ class AssetInfoSerializer(serializers.ModelSerializer):
             "max_supply",
             "image",
             "last_updated",
+            "api_id",
         ]
 
     def get_base(self, obj):
