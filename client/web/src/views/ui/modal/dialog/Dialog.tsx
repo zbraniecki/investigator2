@@ -37,6 +37,9 @@ import {
   getServices,
   getPublicWatchlists,
   getUserWatchlists,
+  getSession,
+  getUsers,
+  getPortfolios,
 } from "../../../../store";
 import { Tag, Holding, Watchlist } from "../../../../types";
 import { assert } from "../../../../utils/helpers";
@@ -92,6 +95,9 @@ export function ModalDialog({ state, updateState }: Props) {
   const services = useSelector(getServices);
   const publicWatchlists = useSelector(getPublicWatchlists);
   const userWatchlists = useSelector(getUserWatchlists);
+  const session = useSelector(getSession);
+  const users = useSelector(getUsers);
+  const portfolios = useSelector(getPortfolios);
 
   const handleCloseModal = () => {
     updateState({
@@ -183,6 +189,7 @@ export function ModalDialog({ state, updateState }: Props) {
       break;
     }
     case DialogType.Watchlist: {
+      // for (let p in account.
       // function getWatchlist(
       //   pw: Watchlist[],
       //   uw: Watchlist[],
@@ -207,6 +214,7 @@ export function ModalDialog({ state, updateState }: Props) {
           watchlist={watchlist}
           publicWatchlists={publicWatchlists}
           userWatchlists={userWatchlists}
+	  portfolios={portfolios}
         />
       );
       actions = <WatchlistDialogActions handleCloseModal={handleCloseModal} watchlist={watchlist} />;

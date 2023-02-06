@@ -23,8 +23,10 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import {
   Asset,
   Watchlist,
+  WatchlistType,
   Holding,
   Service,
+  Portfolio,
   getTransactionTypeLabel,
 } from "../../../../../types";
 import {
@@ -69,36 +71,29 @@ export function WatchlistDialogTitle({ watchlist, setWatchlist, onClose }: Title
   );
 }
 
-enum WatchlistType {
-  User = "user",
-  Public = "public",
-}
-
 interface ContentProps {
   watchlist: Partial<Watchlist>;
   publicWatchlists: Record<string, Watchlist>;
   userWatchlists: Record<string, Watchlist>;
+  portfolios: Record<string, Portfolio>;
 }
 
 export function WatchlistDialogContent({
   watchlist,
   publicWatchlists,
   userWatchlists,
+  portfolios,
 }: ContentProps) {
-  const [wType, setWType] = React.useState(WatchlistType.User);
-  const [wId, setWId] = React.useState("");
+  const [wType, setWType] = React.useState(WatchlistType.Portfolio);
+  const [wPortfolio, setWPortfolio] = React.useState("");
 
   const handleSetWType = (event: SelectChangeEvent) => {
-    setWId("");
     setWType(event.target.value as WatchlistType);
   };
 
-  const handleSetWId = (event: SelectChangeEvent) => {
-    setWId(event.target.value as string);
+  const handleSetWPortfolio = (event: SelectChangeEvent) => {
+    setWPortfolio(event.target.value);
   };
-
-  const watchlists =
-    wType == WatchlistType.Public ? publicWatchlists : userWatchlists;
 
   return (
     <Stack>
@@ -112,27 +107,23 @@ export function WatchlistDialogContent({
             label="Watchlist Type"
             onChange={handleSetWType}
           >
-            <MenuItem value={WatchlistType.User}>Your</MenuItem>
-            <MenuItem value={WatchlistType.Public}>Public</MenuItem>
+            <MenuItem value={WatchlistType.Assets}>Assets</MenuItem>
+            <MenuItem value={WatchlistType.Portfolio}>Portfolio</MenuItem>
+            <MenuItem value={WatchlistType.Tag}>Tag</MenuItem>
           </Select>
         </FormControl>
-        <FormControl sx={{ m: 1, minWidth: 300 }}>
-          <InputLabel id="watchlist-name-select">Name</InputLabel>
+        <FormControl sx={{ m: 1, minWidth: 180 }}>
+          <InputLabel id="watchlist-type-select">Portfolio</InputLabel>
           <Select
-            labelId="watchlist-name-select"
-            value={wId}
+            labelId="watchlist-portfolio-select"
+            value={wPortfolio}
             autoWidth
-            label="Name"
-            onChange={handleSetWId}
+            label="Portfolio"
+            onChange={handleSetWPortfolio}
           >
-            {Object.values(watchlists).map((watchlist) => (
-              <MenuItem
-                key={`watchlist-select-${watchlist.pk}`}
-                value={watchlist.pk}
-              >
-                {watchlist.name}
-              </MenuItem>
-            ))}
+	  {Object.values(portfolios).map((portfolio) => (
+            <MenuItem value={WatchlistType.Assets}>{portfolio.name}</MenuItem>
+	  ))}
           </Select>
         </FormControl>
       </Box>

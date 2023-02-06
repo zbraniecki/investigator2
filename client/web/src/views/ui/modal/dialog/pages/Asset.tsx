@@ -311,7 +311,7 @@ export function AssetDialogContent({
                 sx={{ justifyContent: "flex-end" }}
               >
                 {tags.map((tag) => (
-                  <Chip label={tag.name} variant="outlined" size="small" />
+                  <Chip key={`tag-chip-${tag.pk}`} label={tag.name} variant="outlined" size="small" />
                 ))}
               </Stack>
             </TableCell>
