@@ -137,14 +137,15 @@ export const setUserWatchlists = async ({
 
 export const addUserWatchlist = async ({
   token,
-  name
+  watchlist,
 }: {
   token: string;
-  name: string;
+  watchlist: Partial<Watchlist>;
 }): Promise<Watchlist> => {
   const params = {
-    name,
-    type: "AS",
+    name: watchlist.name,
+    type: watchlist.type,
+    portfolio: watchlist.portfolio,
     assets: [],
   };
 
@@ -159,4 +160,28 @@ export const addUserWatchlist = async ({
   const resp = await data.json();
 
   return resp;
+};
+
+export const deleteUserWatchlist = async ({
+  token,
+  wid,
+}: {
+  token: string;
+  wid: string;
+}): Promise<string> => {
+  const params = {
+    wid,
+  };
+
+  const data = await fetch(`${BASE_URL}user/watchlists/${wid}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(params),
+  });
+  const resp = await data.text();
+
+  return wid;
 };

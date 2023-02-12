@@ -99,6 +99,7 @@ class PublicWatchlistSerializer(serializers.ModelSerializer):
         model = Watchlist
         fields = [
             "pk",
+            "owner",
             "name",
             "type",
             "assets",

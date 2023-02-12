@@ -7,6 +7,7 @@ export enum WatchlistType {
 
 export interface Watchlist {
   pk: string;
+  owner?: string;
   name: string;
   type: WatchlistType;
   assets: string[];

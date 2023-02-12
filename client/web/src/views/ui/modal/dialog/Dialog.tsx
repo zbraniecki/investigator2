@@ -204,20 +204,26 @@ export function ModalDialog({ state, updateState }: Props) {
       //   : null;
       title = (
         <WatchlistDialogTitle
-	  watchlist={watchlist}
-	  setWatchlist={setWatchlist}
+          watchlist={watchlist}
+          setWatchlist={setWatchlist}
           onClose={handleCloseModal}
         />
       );
       content = (
         <WatchlistDialogContent
           watchlist={watchlist}
+          setWatchlist={setWatchlist}
           publicWatchlists={publicWatchlists}
           userWatchlists={userWatchlists}
-	  portfolios={portfolios}
+          portfolios={portfolios}
         />
       );
-      actions = <WatchlistDialogActions handleCloseModal={handleCloseModal} watchlist={watchlist} />;
+      actions = (
+        <WatchlistDialogActions
+          handleCloseModal={handleCloseModal}
+          watchlist={watchlist}
+        />
+      );
       break;
     }
   }

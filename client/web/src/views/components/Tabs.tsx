@@ -79,7 +79,7 @@ export function TabRow({
       }}
     >
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="tabs"  direction="horizontal">
+        <Droppable droppableId="tabs" direction="horizontal">
           {(props: any) => (
             <Tabs ref={props.innerRef} {...props.droppableProps} value={idx}>
               {tabs.map((tab, index) => (

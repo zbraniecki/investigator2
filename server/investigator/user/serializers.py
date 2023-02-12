@@ -61,7 +61,7 @@ class WatchlistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Watchlist
-        fields = ["pk", "name", "type", "assets", "portfolio", "dynamic"]
+        fields = ["pk", "owner", "name", "type", "assets", "portfolio", "dynamic"]
 
     def create(self, validated_data):
         user = self.context["request"].user

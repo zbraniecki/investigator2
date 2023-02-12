@@ -22,6 +22,7 @@ import {
   useAppDispatch,
   getSession,
   setUserWatchlistsThunk,
+  deleteUserWatchlistThunk,
 } from "../../../store";
 import { TabInfo } from "../../components/Tabs";
 import { DialogType } from "../../ui/modal/dialog";
@@ -284,6 +285,18 @@ export function Watchlists() {
     );
   }
 
+  function handleDeleteTab(wid: string) {
+    setModifyTabAnchor(null);
+
+    assert(state.users);
+    dispatch(
+      deleteUserWatchlistThunk({
+        token: session.token,
+        wid,
+      })
+    );
+  }
+
   function handleReorderTabs(newTabs: TabInfo[]) {
     const wids = newTabs.map((tab) => tab.id);
     dispatch(
@@ -314,8 +327,10 @@ export function Watchlists() {
       />
       <ModifyTabMenu
         anchor={modifyTabAnchor}
+	watchlists={state.watchlists}
         handleClose={handleCloseModifyTab}
         handleRemoveTab={handleRemoveTab}
+        handleDeleteTab={handleDeleteTab}
       />
     </>
   );

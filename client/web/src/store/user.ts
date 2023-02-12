@@ -11,6 +11,7 @@ import {
   updateUserInfo,
   setUserWatchlists,
   addUserWatchlist,
+  deleteUserWatchlist,
 } from "../api/user";
 import {
   fetchHoldingsThunk,
@@ -67,6 +68,11 @@ export const setUserWatchlistsThunk = createAsyncThunk(
 export const addUserWatchlistThunk = createAsyncThunk(
   "user/addUserWatchlist",
   addUserWatchlist
+);
+
+export const deleteUserWatchlistThunk = createAsyncThunk(
+  "user/deleteUserWatchlist",
+  deleteUserWatchlist
 );
 
 interface AccountState {
@@ -200,7 +206,7 @@ const userSlice = createSlice({
       const watchlist = action.payload;
 
       if (!state.watchlists) {
-	state.watchlists = {};
+        state.watchlists = {};
       }
       state.watchlists[watchlist.pk] = watchlist;
 
@@ -210,6 +216,21 @@ const userSlice = createSlice({
       const user = state.users[userPk];
       assert(user);
       user.visible_lists.watchlists.push(watchlist.pk);
+    });
+    builder.addCase(deleteUserWatchlistThunk.fulfilled, (state, action) => {
+      const wid = action.payload;
+
+      if (!state.watchlists) {
+	return;
+      }
+      delete state.watchlists[wid];
+
+      const userPk = state.session.user_pk;
+      assert(userPk);
+      assert(state.users);
+      const user = state.users[userPk];
+      assert(user);
+      user.visible_lists.watchlists = user.visible_lists.watchlists.filter(id => id != wid);
     });
   },
 });

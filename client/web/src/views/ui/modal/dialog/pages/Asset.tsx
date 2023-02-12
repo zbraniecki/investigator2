@@ -222,7 +222,7 @@ export function AssetDialogContent({
               <TableRow>
                 <TableCell>Market Cap Δ %</TableCell>
                 <TableCell>
-                  {percent(asset.info.market_cap_change_percentage_24h)}
+                  {percent(asset.info.market_cap_change_percentage_24h / 100)}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -243,9 +243,9 @@ export function AssetDialogContent({
                 }}
               >
                 <TableCell>Supply</TableCell>
-                    <Tooltip title={supply ? percent(supply / 100) : ""}>
-                <TableCell>
-                  {supply !== undefined && (
+                <Tooltip title={supply ? percent(supply / 100) : ""}>
+                  <TableCell>
+                    {supply !== undefined && (
                       <LinearProgress
                         variant="determinate"
                         value={supply}
@@ -255,9 +255,9 @@ export function AssetDialogContent({
                           color: "#999999",
                         }}
                       />
-                  )}
-                </TableCell>
-                    </Tooltip>
+                    )}
+                  </TableCell>
+                </Tooltip>
               </TableRow>
             </TableBody>
           </Table>
@@ -282,15 +282,21 @@ export function AssetDialogContent({
                 spacing={1}
                 sx={{ justifyContent: "flex-end" }}
               >
-		<Link href={`https://coinmarketcap.com/currencies/${asset.info.api_id}`}>
-		coinmarketcap
-		</Link>
-		<Link href={`https://www.coingecko.com/en/coins/${asset.info.api_id}`}>
-		coingecko
-		</Link>
-		<Link href={`https://thecoinperspective.com/compare/${asset.info.api_id}`}>
-		thecoinperspective
-		</Link>
+                <Link
+                  href={`https://coinmarketcap.com/currencies/${asset.info.api_id}`}
+                >
+                  coinmarketcap
+                </Link>
+                <Link
+                  href={`https://www.coingecko.com/en/coins/${asset.info.api_id}`}
+                >
+                  coingecko
+                </Link>
+                <Link
+                  href={`https://thecoinperspective.com/compare/${asset.info.api_id}`}
+                >
+                  thecoinperspective
+                </Link>
               </Stack>
             </TableCell>
           </TableRow>
@@ -311,7 +317,12 @@ export function AssetDialogContent({
                 sx={{ justifyContent: "flex-end" }}
               >
                 {tags.map((tag) => (
-                  <Chip key={`tag-chip-${tag.pk}`} label={tag.name} variant="outlined" size="small" />
+                  <Chip
+                    key={`tag-chip-${tag.pk}`}
+                    label={tag.name}
+                    variant="outlined"
+                    size="small"
+                  />
                 ))}
               </Stack>
             </TableCell>

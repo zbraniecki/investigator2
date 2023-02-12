@@ -18,7 +18,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import TextField from '@mui/material/TextField';
+import TextField from "@mui/material/TextField";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import {
   Asset,
@@ -44,24 +44,30 @@ interface TitleProps {
   onClose: any;
 }
 
-export function WatchlistDialogTitle({ watchlist, setWatchlist, onClose }: TitleProps) {
+export function WatchlistDialogTitle({
+  watchlist,
+  setWatchlist,
+  onClose,
+}: TitleProps) {
   const firstLetter = watchlist.name ? watchlist.name[0].toUpperCase() : "";
 
   const handleNameChange = (event: any) => {
-    watchlist.name = event.target.value;
-    setWatchlist(watchlist);
+    let newWatchlist = Object.fromEntries(Object.entries(watchlist));
+    newWatchlist.name = event.target.value;
+    setWatchlist(newWatchlist);
   };
 
   return (
     <Stack direction="row">
       <Avatar sx={{ bgcolor: orange[500], mr: 2 }}>{firstLetter}</Avatar>
       <Stack>
-	    <TextField 
-	      id="watchlist-name"
-	      label="Name"
-	      value={watchlist.name}
-	      onChange={handleNameChange}
-	      variant="standard" />
+        <TextField
+          id="watchlist-name"
+          label="Name"
+          value={watchlist.name || ""}
+          onChange={handleNameChange}
+          variant="standard"
+        />
       </Stack>
       <Box sx={{ flex: 1 }} />
       <IconButton onClick={onClose}>
@@ -73,6 +79,7 @@ export function WatchlistDialogTitle({ watchlist, setWatchlist, onClose }: Title
 
 interface ContentProps {
   watchlist: Partial<Watchlist>;
+  setWatchlist: any;
   publicWatchlists: Record<string, Watchlist>;
   userWatchlists: Record<string, Watchlist>;
   portfolios: Record<string, Portfolio>;
@@ -80,19 +87,21 @@ interface ContentProps {
 
 export function WatchlistDialogContent({
   watchlist,
+  setWatchlist,
   publicWatchlists,
   userWatchlists,
   portfolios,
 }: ContentProps) {
-  const [wType, setWType] = React.useState(WatchlistType.Portfolio);
-  const [wPortfolio, setWPortfolio] = React.useState("");
-
   const handleSetWType = (event: SelectChangeEvent) => {
-    setWType(event.target.value as WatchlistType);
+    let newWatchlist = Object.fromEntries(Object.entries(watchlist));
+    newWatchlist.type = event.target.value as WatchlistType;
+    setWatchlist(newWatchlist);
   };
 
   const handleSetWPortfolio = (event: SelectChangeEvent) => {
-    setWPortfolio(event.target.value);
+    let newWatchlist = Object.fromEntries(Object.entries(watchlist));
+    newWatchlist.portfolio = event.target.value;
+    setWatchlist(newWatchlist);
   };
 
   return (
@@ -102,7 +111,7 @@ export function WatchlistDialogContent({
           <InputLabel id="watchlist-type-select">Watchlist Type</InputLabel>
           <Select
             labelId="watchlist-type-select"
-            value={wType}
+            value={watchlist.type || ""}
             autoWidth
             label="Watchlist Type"
             onChange={handleSetWType}
@@ -116,14 +125,14 @@ export function WatchlistDialogContent({
           <InputLabel id="watchlist-type-select">Portfolio</InputLabel>
           <Select
             labelId="watchlist-portfolio-select"
-            value={wPortfolio}
+            value={watchlist.portfolio || ""}
             autoWidth
             label="Portfolio"
             onChange={handleSetWPortfolio}
           >
-	  {Object.values(portfolios).map((portfolio) => (
-            <MenuItem value={WatchlistType.Assets}>{portfolio.name}</MenuItem>
-	  ))}
+            {Object.values(portfolios).map((portfolio) => (
+              <MenuItem key={`watchlist-add-portfolio-${portfolio.pk}`} value={portfolio.pk}>{portfolio.name}</MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>
@@ -136,7 +145,10 @@ interface ActionProps {
   handleCloseModal: any;
 }
 
-export function WatchlistDialogActions({ watchlist, handleCloseModal }: ActionProps) {
+export function WatchlistDialogActions({
+  watchlist,
+  handleCloseModal,
+}: ActionProps) {
   const dispatch = useAppDispatch();
 
   const session = useSelector(getSession);
@@ -145,7 +157,7 @@ export function WatchlistDialogActions({ watchlist, handleCloseModal }: ActionPr
     dispatch(
       addUserWatchlistThunk({
         token: session.token,
-	name: watchlist.name,
+	watchlist,
       })
     );
     handleCloseModal();
