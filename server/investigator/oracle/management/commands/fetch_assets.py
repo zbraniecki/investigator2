@@ -179,7 +179,9 @@ def fetch_crypto_assets(active=False, dry=False):
 
     asset_list = Asset.objects.filter(asset_class=crypto).order_by("symbol")
 
+    asset_list = list(filter(lambda asset: getattr(asset, current_api["id"]) is not None , asset_list))
     assets = {getattr(asset, current_api["id"]): asset for asset in asset_list}
+
     assert len(asset_list) == len(assets.keys())
 
     asset_ids = list(assets.keys())
