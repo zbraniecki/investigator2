@@ -105,7 +105,9 @@ export function ModifyTabMenu({
   handleDeleteTab,
 }: ModifyProps) {
   const open = Boolean(anchor);
-  const {watchlist, anchorEl} = anchor ? { watchlist: watchlists[anchor[0]], anchorEl: anchor[1] } : { watchlist: null, anchorEl: null};
+  const { watchlist, anchorEl } = anchor
+    ? { watchlist: watchlists[anchor[0]], anchorEl: anchor[1] }
+    : { watchlist: null, anchorEl: null };
 
   const handleRemove = () => {
     assert(anchor);
@@ -117,12 +119,20 @@ export function ModifyTabMenu({
     handleDeleteTab(anchor[0]);
   };
 
-  let items: React.ReactNode[] = [];
+  const items: React.ReactNode[] = [];
   if (watchlist) {
     if (watchlist.owner) {
-      items.push((<MenuItem key="tab-menu-delete" onClick={handleDelete}>Delete</MenuItem>));
+      items.push(
+        <MenuItem key="tab-menu-delete" onClick={handleDelete}>
+          Delete
+        </MenuItem>
+      );
     } else {
-      items.push((<MenuItem key="tab-menu-remove" onClick={handleRemove}>Remove</MenuItem>));
+      items.push(
+        <MenuItem key="tab-menu-remove" onClick={handleRemove}>
+          Remove
+        </MenuItem>
+      );
     }
   }
 
@@ -133,9 +143,7 @@ export function ModifyTabMenu({
       open={open}
       onClose={handleClose}
     >
-      {items.map(item => (
-        item
-      ))}
+      {items.map((item) => item)}
     </Menu>
   );
 }

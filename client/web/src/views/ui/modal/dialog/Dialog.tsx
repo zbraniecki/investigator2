@@ -85,12 +85,31 @@ interface Props {
   updateState: any;
 }
 
+function getHoldingFromState(
+  state: DialogState,
+  holdings: Record<string, Holding>
+): Partial<Holding> {
+  if (state.meta?.holding) {
+    return holdings[state.meta?.holding];
+  }
+  return {};
+}
+
 export function ModalDialog({ state, updateState }: Props) {
+  const holdings = useSelector(getHoldings);
+
+  const [holding, setHolding] = React.useState(
+    getHoldingFromState(state, holdings)
+  );
   const [watchlist, setWatchlist] = React.useState({} as Partial<Watchlist>);
+
+  React.useEffect(() => {
+    setWatchlist({});
+    setHolding(getHoldingFromState(state, holdings));
+  }, [state]);
 
   const assets = useSelector(getAssets);
   const tags = useSelector(getTags);
-  const holdings = useSelector(getHoldings);
   const accounts = useSelector(getAccounts);
   const services = useSelector(getServices);
   const publicWatchlists = useSelector(getPublicWatchlists);
@@ -141,20 +160,23 @@ export function ModalDialog({ state, updateState }: Props) {
       break;
     }
     case DialogType.Holding: {
-      const hid = state.meta?.holding;
-      assert(hid);
-      const holding = holdings[hid];
-      const asset = assets[holding.asset];
-      const account = accounts[holding.account];
-      const assetTags = [...asset.tags].map((tid: string) => tags[tid]);
-      const assetHoldings = Object.values<Holding>(holdings).filter(
-        (holding: Holding) => holding.asset === asset.pk
-      );
+      const asset = holding?.asset && assets[holding.asset];
+      const account = holding?.account && accounts[holding.account];
+      const assetTags =
+        asset && [...asset.tags].map((tid: string) => tags[tid]);
+      const assetHoldings =
+        asset &&
+        Object.values<Holding>(holdings).filter(
+          (holding: Holding) => holding.asset === asset.pk
+        );
       title = (
         <HoldingDialogTitle
+          assets={assets}
+          accounts={accounts}
           account={account}
-          asset={asset}
           holding={holding}
+          setHolding={setHolding}
+          asset={asset}
           onClose={handleCloseModal}
           updateState={updateState}
         />
@@ -162,11 +184,18 @@ export function ModalDialog({ state, updateState }: Props) {
       content = (
         <HoldingDialogContent
           holding={holding}
+          setHolding={setHolding}
           tags={assetTags}
           assets={assets}
           holdings={assetHoldings}
           accounts={accounts}
           services={services}
+        />
+      );
+      actions = (
+        <HoldingDialogActions
+          handleCloseModal={handleCloseModal}
+          holding={holding}
         />
       );
       break;

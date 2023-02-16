@@ -327,7 +327,7 @@ export function Watchlists() {
       />
       <ModifyTabMenu
         anchor={modifyTabAnchor}
-	watchlists={state.watchlists}
+        watchlists={state.watchlists}
         handleClose={handleCloseModifyTab}
         handleRemoveTab={handleRemoveTab}
         handleDeleteTab={handleDeleteTab}

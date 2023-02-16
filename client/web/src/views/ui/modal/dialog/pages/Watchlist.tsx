@@ -52,7 +52,7 @@ export function WatchlistDialogTitle({
   const firstLetter = watchlist.name ? watchlist.name[0].toUpperCase() : "";
 
   const handleNameChange = (event: any) => {
-    let newWatchlist = Object.fromEntries(Object.entries(watchlist));
+    const newWatchlist = Object.fromEntries(Object.entries(watchlist));
     newWatchlist.name = event.target.value;
     setWatchlist(newWatchlist);
   };
@@ -93,13 +93,13 @@ export function WatchlistDialogContent({
   portfolios,
 }: ContentProps) {
   const handleSetWType = (event: SelectChangeEvent) => {
-    let newWatchlist = Object.fromEntries(Object.entries(watchlist));
+    const newWatchlist = Object.fromEntries(Object.entries(watchlist));
     newWatchlist.type = event.target.value as WatchlistType;
     setWatchlist(newWatchlist);
   };
 
   const handleSetWPortfolio = (event: SelectChangeEvent) => {
-    let newWatchlist = Object.fromEntries(Object.entries(watchlist));
+    const newWatchlist = Object.fromEntries(Object.entries(watchlist));
     newWatchlist.portfolio = event.target.value;
     setWatchlist(newWatchlist);
   };
@@ -131,7 +131,12 @@ export function WatchlistDialogContent({
             onChange={handleSetWPortfolio}
           >
             {Object.values(portfolios).map((portfolio) => (
-              <MenuItem key={`watchlist-add-portfolio-${portfolio.pk}`} value={portfolio.pk}>{portfolio.name}</MenuItem>
+              <MenuItem
+                key={`watchlist-add-portfolio-${portfolio.pk}`}
+                value={portfolio.pk}
+              >
+                {portfolio.name}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -157,7 +162,7 @@ export function WatchlistDialogActions({
     dispatch(
       addUserWatchlistThunk({
         token: session.token,
-	watchlist,
+        watchlist,
       })
     );
     handleCloseModal();

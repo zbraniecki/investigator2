@@ -36,14 +36,14 @@ export function collectPortfolioHoldings(
 ): Collection {
   const items: Set<Collection> = new Set(
     Object.values(portfolio.holdings)
-    .filter((hid) => {
-      assert(data.holdings[hid]);
-      return !skipEmpty || data.holdings[hid].quantity !== 0;
-    })
-    .map((hid) => ({
-      type: CollectionType.Holding,
-      pk: hid,
-    }))
+      .filter((hid) => {
+        assert(data.holdings[hid]);
+        return !skipEmpty || data.holdings[hid].quantity !== 0;
+      })
+      .map((hid) => ({
+        type: CollectionType.Holding,
+        pk: hid,
+      }))
   );
 
   Object.values(portfolio.portfolios).forEach((pid) => {
@@ -86,20 +86,20 @@ export function collectPortfolioHoldings(
     Object.values(data.accounts).forEach((account) => {
       account.holdings.forEach((hid) => {
         const holding = data.holdings[hid];
-	if (skipEmpty && holding.quantity === 0) {
-	  return;
-	}
+        if (skipEmpty && holding.quantity === 0) {
+          return;
+        }
         const asset = data.assets[holding.asset];
         if (portfolio.tags.has(asset.asset_class)) {
           result.add(hid);
-	  return;
+          return;
         }
         const intersect = [...asset.tags].filter((tag) =>
           portfolio.tags.has(tag)
         );
         if (intersect.length > 0) {
           result.add(hid);
-	  return;
+          
         }
       });
     });
@@ -129,14 +129,14 @@ export function collectAccountHoldings(
 ): Collection {
   const items: Set<Collection> = new Set(
     Object.values(account.holdings)
-    .filter((hid) => {
-      assert(data.holdings[hid]);
-      return !skipEmpty || data.holdings[hid].quantity !== 0;
-    })
-    .map((hid) => ({
-      type: CollectionType.Holding,
-      pk: hid,
-    }))
+      .filter((hid) => {
+        assert(data.holdings[hid]);
+        return !skipEmpty || data.holdings[hid].quantity !== 0;
+      })
+      .map((hid) => ({
+        type: CollectionType.Holding,
+        pk: hid,
+      }))
   );
 
   return {

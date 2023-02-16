@@ -243,7 +243,7 @@ export function preparePortfolioTableData(
     state,
     [CollectionType.Account, CollectionType.Portfolio],
     true,
-    null,
+    null
   );
 
   const groupedCollection = groupCollectionItems(

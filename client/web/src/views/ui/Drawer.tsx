@@ -2,15 +2,16 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Drawer from "@mui/material/Drawer";
-// import SpeedDial from "@mui/material/SpeedDial";
-// import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-// import SpeedDialAction from "@mui/material/SpeedDialAction";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
 import ListIcon from "@mui/icons-material/List";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import PieChartOutlineIcon from "@mui/icons-material/PieChartOutline";
 import { useMatch, NavLink } from "react-router-dom";
 import { MenuItem } from "./Menu";
+import { DialogType } from "./modal";
 
 interface Props {
   menuItems: Array<MenuItem>;
@@ -19,8 +20,8 @@ interface Props {
 
 export default function InvestigatorDrawer({
   menuItems,
-}: // updateDialogState,
-Props) {
+  updateDialogState,
+}: Props) {
   const index = Boolean(useMatch(`/`));
 
   function isSelected(item: MenuItem): boolean {
@@ -34,15 +35,10 @@ Props) {
   }
 
   const handleHoldingOpen = () => {
-    // updateDialogState({
-    //   open: true,
-    //   editable: {
-    //     quantity: true,
-    //     asset: true,
-    //     account: true,
-    //   },
-    //   selectedTab: DialogTab.Holding,
-    // });
+    updateDialogState({
+      type: DialogType.Holding,
+      meta: {},
+    });
   };
 
   const actions = [
@@ -83,7 +79,7 @@ Props) {
           </ListItemButton>
         ))}
       </List>
-      {/* <SpeedDial
+      <SpeedDial
         id="main-speed-dial"
         ariaLabel="SpeedDial basic example"
         sx={{ position: "absolute", bottom: 28, left: 0, zIndex: 100 }}
@@ -99,7 +95,7 @@ Props) {
             onClick={action.action}
           />
         ))}
-      </SpeedDial> */}
+      </SpeedDial>
     </Drawer>
   );
 }

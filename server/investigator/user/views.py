@@ -74,6 +74,10 @@ class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Account.objects.filter(owner=user).order_by("-id")
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """

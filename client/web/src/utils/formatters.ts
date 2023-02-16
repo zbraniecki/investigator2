@@ -5,8 +5,8 @@ const pfmt = new Intl.NumberFormat(undefined, {
 });
 
 const nfmt = new Intl.NumberFormat(undefined, {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 5,
 });
 
 const cfmt = new Intl.NumberFormat(undefined, {

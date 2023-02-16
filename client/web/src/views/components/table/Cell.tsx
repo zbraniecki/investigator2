@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
 import { CellAlign, Formatter, formatValue } from "./data/Column";
 import { CellData, CellValue } from "./data/Row";
+import { tryParseNumber } from "../../../utils/helpers";
 
 interface CellProps {
   id: string;
@@ -64,22 +65,6 @@ interface EditableCellProps {
 EditableCell.defaultProps = {
   formatter: undefined,
 };
-
-function tryParseNumber(input: string): number | undefined {
-  if (input.length === 0) {
-    return 0;
-  }
-
-  if (input === "-") {
-    return -0;
-  }
-  const i = input.replace(",", "");
-  const parsed = parseFloat(i.endsWith(".") ? `${i}0` : i);
-  if (Number.isNaN(parsed)) {
-    return undefined;
-  }
-  return parsed;
-}
 
 export function EditableCell({
   id,

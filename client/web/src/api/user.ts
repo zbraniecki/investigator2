@@ -1,7 +1,7 @@
 import { makeAsyncThunk, fetchEntries, fetchAuthEntriesType } from "./helpers";
 import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
-import { Watchlist, Portfolio, Account, User } from "../types";
+import { Watchlist, Portfolio, Account, User, Holding } from "../types";
 
 const fetchPortfolios = fetchEntries.bind(undefined, "user/portfolios/", {
   tags: (input: Array<string>) => new Set(input),
@@ -184,4 +184,31 @@ export const deleteUserWatchlist = async ({
   const resp = await data.text();
 
   return wid;
+};
+
+export const addHolding = async ({
+  token,
+  holding,
+}: {
+  token: string;
+  holding: Partial<Holding>;
+}): Promise<Holding> => {
+  const params = {
+    asset: holding.asset,
+    account: holding.account,
+    quantity: holding.quantity,
+    owner: holding.owner,
+  };
+
+  const data = await fetch(`${BASE_URL}user/holdings/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
+    },
+    body: JSON.stringify(params),
+  });
+  const resp = await data.json();
+
+  return resp;
 };
