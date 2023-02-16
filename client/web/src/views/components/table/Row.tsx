@@ -206,6 +206,7 @@ export function Row({ id, data, tableMeta, minWidths }: Props) {
             const cell = data.cells[column.key];
             const hideValue = column.sensitive && tableMeta.hideSensitive;
             if (
+	      data.children === undefined &&
               column.editable &&
               !hideValue &&
               cell &&
