@@ -145,7 +145,7 @@ export function prepareAccountsTableData(
   const portfolio = state.portfolios[pid];
   assert(portfolio);
 
-  const collection = collectPortfolioHoldings(portfolio, state, [], null);
+  const collection = collectPortfolioHoldings(portfolio, state, [], true, null);
 
   const groupedCollection = groupCollectionItems(
     collection,

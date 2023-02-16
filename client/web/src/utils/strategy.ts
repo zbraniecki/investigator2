@@ -272,7 +272,7 @@ export function prepareStrategyTableData(
   const portfolio = state.portfolios[strategy.portfolio];
   assert(portfolio);
 
-  const collection = collectPortfolioHoldings(portfolio, state, [], null);
+  const collection = collectPortfolioHoldings(portfolio, state, [], true, null);
 
   const groupedCollection = groupCollectionItems(
     collection,
