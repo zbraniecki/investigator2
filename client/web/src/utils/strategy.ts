@@ -151,6 +151,9 @@ function convertCollectionToTableRow(
 
       for (const tid of strategy.targets) {
         const target = state.targets[tid];
+	if (!target?.percent) {
+	  continue;
+	}
         if (!assetValues[target.asset]) {
           const asset = state.assets[target.asset];
           children.push({
