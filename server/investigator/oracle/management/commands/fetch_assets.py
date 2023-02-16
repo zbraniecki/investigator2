@@ -194,9 +194,11 @@ def fetch_crypto_assets(active=False, dry=False):
         for id, entry in result.items():
             for key, value in current_api["entry_map"].items():
                 if isinstance(value, list):
-                    setattr(assets[id], key, value[1](entry[value[0]]))
+                    v = value[1](entry[value[0]])
                 else:
-                    setattr(assets[id], key, entry[value])
+                    v = entry[value]
+                if v:
+                    setattr(assets[id], key, v)
 
     if not dry:
         Asset.objects.bulk_update(asset_list, current_api["entry_map"].keys())

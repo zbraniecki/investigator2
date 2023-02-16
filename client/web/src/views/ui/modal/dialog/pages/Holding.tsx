@@ -223,7 +223,7 @@ export function HoldingDialogContent({
                     textAlign: "center",
                   }}
                 >
-                  {holding?.quantity}
+                  {number(holding?.quantity)}
                 </Typography>
               ) : (
                 <InputBase
