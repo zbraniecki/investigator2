@@ -1,7 +1,7 @@
 import { makeAsyncThunk, fetchEntries, fetchAuthEntriesType } from "./helpers";
 import { BASE_URL } from "./main";
 import { assert } from "../utils/helpers";
-import { Watchlist, Portfolio, Account, User, Holding } from "../types";
+import { Watchlist, Portfolio, Account, User, Holding, Transaction } from "../types";
 
 const fetchPortfolios = fetchEntries.bind(undefined, "user/portfolios/", {
   tags: (input: Array<string>) => new Set(input),

@@ -189,7 +189,9 @@ const userSlice = createSlice({
     builder.addCase(createTransactionThunk.fulfilled, (state, action) => {
       const account = action.payload.account as string;
       if (state.accounts) {
-        state.accounts[account].transactions.push(action.payload);
+        let transaction = action.payload;
+        transaction.timestamp = new Date(transaction.timestamp);
+        state.accounts[account].transactions.push(transaction);
       }
     });
     builder.addCase(updateUserInfoThunk.fulfilled, (state, action) => {

@@ -26,6 +26,7 @@ import {
   Account,
   Holding,
   Service,
+  TransactionType,
   getTransactionTypeLabel,
 } from "../../../../../types";
 import { assert , tryParseNumber } from "../../../../../utils/helpers";
@@ -34,6 +35,7 @@ import {
   useAppDispatch,
   getSession,
   addHoldingThunk,
+  createTransactionThunk,
 } from "../../../../../store";
 import { DialogType } from "../Dialog";
 
@@ -459,8 +461,24 @@ export function HoldingDialogActions({
         token: session.token,
         holding: result,
       })
-    );
-    handleCloseModal();
+    ).unwrap()
+      .then((holding) => {
+        assert(holding.account);
+        dispatch(createTransactionThunk({
+          token: session.token,
+          input: {
+            account: holding.account,
+            holding: holding.pk,
+            asset: holding.asset,
+            type: TransactionType.Buy,
+            quantity: holding.quantity,
+            timestamp: new Date(),
+          },
+        })).unwrap()
+        .then(() => {
+          handleCloseModal();
+        });
+    });
   };
 
   return (
