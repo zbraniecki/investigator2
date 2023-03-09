@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
@@ -28,7 +28,60 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+
+
 export function SearchInput({ handleChange }: { handleChange: any }) {
+  const [focused, setFocused] = useState(false);
+  const inputRef = useRef<HTMLDivElement>(null);
+  const [inputValue, setInputValue] = useState('');
+
+  const handleKeyDown = (event: any) => {
+    if (event.shiftKey === true || event.metaKey === true || event.ctrlKey === true) {
+      return;
+    }
+    if (!focused && event.key === "s") {
+      setFocused(true);
+      event.preventDefault();
+      event.stopPropagation();
+    } else if (event.key === "Backspace") {
+      setInputValue('');
+    }
+  };
+
+  const handleInputKeyDown = (event: any) => {
+    if (event.shiftKey === true || event.metaKey === true || event.ctrlKey === true) {
+      return;
+    }
+    if (event.key === "Escape") {
+      setFocused(false);
+      event.stopPropagation();
+    }
+    event.stopPropagation();
+  };
+
+  useEffect(() => {
+    handleChange(inputValue);
+  }, [inputValue]);
+
+  useEffect(() => {
+    let input: HTMLInputElement = inputRef.current?.children[0] as HTMLInputElement;
+
+    if (focused) {
+      document.body.removeEventListener("keydown", handleKeyDown);
+      input.addEventListener("keydown", handleInputKeyDown);
+      input.focus();
+    } else {
+      document.body.addEventListener("keydown", handleKeyDown);
+      input.removeEventListener("keydown", handleInputKeyDown);
+      input.blur();
+    }
+  }, [focused]);
+
+  const updateInputValue = (event: any) => {
+    const query = event.target.value.trim();
+    setInputValue(query);
+  };
+
   return (
     <Search
       sx={{
@@ -48,7 +101,10 @@ export function SearchInput({ handleChange }: { handleChange: any }) {
           color: "rgba(100, 100, 100)",
         }}
       />
-      <StyledInputBase placeholder="Search" onChange={handleChange} />
+      <StyledInputBase
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        ref={inputRef} placeholder="Search" value={inputValue} onChange={updateInputValue} />
     </Search>
   );
 }

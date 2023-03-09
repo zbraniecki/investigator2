@@ -36,8 +36,7 @@ export function TabRow({
   handleModifyTab,
   handleReorderTabs,
 }: Props) {
-  const handleSearch = (event: any) => {
-    const query = event.target.value.trim();
+  const handleSearch = (query: string) => {
     if (query.length === 0) {
       setFilter(undefined);
     } else {
