@@ -5,6 +5,7 @@ from .models import (
     Tag,
     Asset,
     AssetInfo,
+    AssetTags,
     InflationChange,
     Provider,
     Service,
@@ -12,9 +13,13 @@ from .models import (
     PassiveChange,
 )
 
+class AssetTagsInline(admin.TabularInline):
+    model = AssetTags
+    extra = 2
 
 @admin.register(Asset)
 class AssetAdmin(admin.ModelAdmin):
+    inlines = (AssetTagsInline,)
     list_display = ("name", "symbol", "market_cap_rank")
     list_filter = ("tags", "active")
     search_fields = ["symbol", "name"]

@@ -82,7 +82,6 @@ def get_asset_slug(instance):
     id = instance.api_id if instance.api_id is not None else instance.symbol
     return f"{instance.asset_class.name}_{id}"
 
-
 class Asset(AssetInfo):
     objects = ActiveAssetManager()
     inactive_objects = InactiveAssetManager()
@@ -98,7 +97,7 @@ class Asset(AssetInfo):
     symbol = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     asset_class = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    tags = models.ManyToManyField(Tag, related_name="+", blank=True)
+    tags = models.ManyToManyField(Tag, related_name="+", blank=True, through='AssetTags')
     api_id = models.CharField(max_length=100, blank=True, null=True)
     active = models.BooleanField(default=False)
     market_cap_rank = models.IntegerField(blank=True, null=True)
@@ -125,6 +124,13 @@ class Asset(AssetInfo):
 
     def __str__(self):
         return f"{self.name} ({self.symbol})"
+
+class AssetTags(models.Model):
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        "user.User", on_delete=models.CASCADE, blank=True, null=True
+    )
 
 
 class InflationChange(models.Model):

@@ -324,6 +324,12 @@ export function AssetDialogContent({
                     size="small"
                   />
                 ))}
+                <Chip
+                  key={`tag-chip-new`}
+                  label="+"
+                  variant="outlined"
+                  size="small"
+                />
               </Stack>
             </TableCell>
           </TableRow>
