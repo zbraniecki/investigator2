@@ -39,10 +39,8 @@ export function SearchInput({ handleChange }: { handleChange: any }) {
     if (event.shiftKey === true || event.metaKey === true || event.ctrlKey === true) {
       return;
     }
-    if (!focused && event.key === "s") {
+    if (!focused && (event.keyCode >= 65 && event.keyCode <= 90)) { // a-z
       setFocused(true);
-      event.preventDefault();
-      event.stopPropagation();
     } else if (event.key === "Backspace") {
       setInputValue('');
     }
@@ -54,6 +52,7 @@ export function SearchInput({ handleChange }: { handleChange: any }) {
     }
     if (event.key === "Escape") {
       setFocused(false);
+      setInputValue('');
       event.stopPropagation();
     }
     event.stopPropagation();
