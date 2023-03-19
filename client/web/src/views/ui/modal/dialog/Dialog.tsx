@@ -141,7 +141,10 @@ export function ModalDialog({ state, updateState }: Props) {
       assert(aid);
       const asset = assets[aid];
       const assetTags: Array<Tag> = [tags[asset.asset_class]];
-      assetTags.push(...[...asset.tags].map((tid: string) => tags[tid]));
+      assetTags.push(
+        ...[...asset.tags]
+        .map((tid: string) => tags[tid])
+        .filter((tid: string | undefined) => tid !== undefined));
       const assetHoldings = Object.values<Holding>(holdings).filter(
         (holding: Holding) => holding.asset === asset.pk
       );

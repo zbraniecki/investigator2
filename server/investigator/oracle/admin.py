@@ -97,7 +97,7 @@ class PassiveAdmin(admin.ModelAdmin):
         "apy_max",
     )
     list_filter = ("service", "asset")
-    search_fields = ["service", "asset"]
+    search_fields = ["service__name", "asset__symbol"]
     ordering = (
         "service",
         "asset",

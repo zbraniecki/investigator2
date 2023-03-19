@@ -39,6 +39,9 @@ export function SearchInput({ handleChange }: { handleChange: any }) {
     if (event.shiftKey === true || event.metaKey === true || event.ctrlKey === true) {
       return;
     }
+    if (event.target.nodeName === "INPUT") {
+      return;
+    }
     if (!focused && (event.keyCode >= 65 && event.keyCode <= 90)) { // a-z
       setFocused(true);
     } else if (event.key === "Backspace") {

@@ -160,6 +160,10 @@ export function Row({ id, data, tableMeta, minWidths }: Props) {
           targetChanges
         );
       }
+      case "yield": {
+        const tid = data.cells.id.value;
+        console.log(tid);
+      }
       default: {
         return Promise.resolve();
       }

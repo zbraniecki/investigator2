@@ -94,6 +94,7 @@ const baseTableMeta: BaseTableMeta = {
       align: CellAlign.Right,
       sortDirection: SortDirection.Desc,
       formatter: Formatter.Percent,
+      editable: true,
       sensitive: true,
     },
     value: {

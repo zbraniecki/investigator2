@@ -145,6 +145,16 @@ function convertCollectionToTableRow(
         ? quantity / asset.info.circulating_supply
         : undefined;
 
+      const totalValue = asset.info.value * quantity;
+
+      const totalYield = children.reduce((total, row) => {
+        if (row.cells.yield && row.cells.value) {
+          const perc = row.cells.value / totalValue;
+          return total + row.cells.yield * perc;
+        }
+        return total;
+      }, 0);
+
       children.forEach((row) => {
         row.cells.name = undefined;
         row.cells.price = undefined;
@@ -159,7 +169,8 @@ function convertCollectionToTableRow(
           symbol: asset.symbol,
           price: asset.info.value,
           quantity,
-          value: asset.info.value * quantity,
+          value: totalValue,
+          yield: totalYield,
           mcap: asset.info.market_cap,
           circ_supply_share,
           minted_perc: asset.info.circulating_supply / asset.info.max_supply,
@@ -181,6 +192,9 @@ function convertCollectionToTableRow(
         ? holding.quantity / asset.info.circulating_supply
         : undefined;
 
+      let serviceAsset = service?.assets.find((a) => {
+        return a.asset_pk === asset.pk;
+      });
       return {
         cells: {
           id: holding.pk,
@@ -192,7 +206,7 @@ function convertCollectionToTableRow(
           quantity: holding.quantity,
           value: asset.info.value * holding.quantity,
           account: service?.provider_name,
-          // yield: serviceAsset?.apy,
+          yield: serviceAsset?.apy,
           mcap: asset.info.market_cap,
           circ_supply_share,
           minted_perc: asset.info.circulating_supply / asset.info.max_supply,

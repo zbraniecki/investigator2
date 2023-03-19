@@ -20,6 +20,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Tooltip from "@mui/material/Tooltip";
+import InputUnstyled from '@mui/base/InputUnstyled';
 import {
   Asset,
   Tag,
@@ -326,7 +327,23 @@ export function AssetDialogContent({
                 ))}
                 <Chip
                   key={`tag-chip-new`}
-                  label="+"
+                  sx={{
+                    "& input": {
+                      backgroundColor: "inherit",
+                      border: "0",
+                      outline: '0',
+                      color: 'white',
+                      width: '10px',
+                      transition: 'width 0.2s ease-in-out',
+                    },
+                    "& input:not([value=''])": {
+                      width: '100px',
+                    },
+                    ":hover input": {
+                      width: '100px',
+                    }
+                  }}
+                  label={<InputUnstyled />}
                   variant="outlined"
                   size="small"
                 />
