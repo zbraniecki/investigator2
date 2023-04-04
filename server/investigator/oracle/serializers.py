@@ -128,10 +128,10 @@ class PublicWatchlistSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ["pk", "name", "slug", "category"]
+        fields = ["pk", "name", "slug", "category", "owner"]
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ["pk", "name", "slug", "parent"]
+        fields = ["pk", "name", "slug", "parent", "owner"]

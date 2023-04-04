@@ -22,9 +22,12 @@ router.register(r"user/accounts", user_views.AccountViewSet)
 router.register(r"user/users", user_views.UserViewSet, "user")
 router.register(r"user/transactions", user_views.TransactionViewSet, "transaction")
 
-router.register(r"strategy/list", strategy_views.StrategyViewSet)
-router.register(r"strategy/targets", strategy_views.TargetViewSet)
-router.register(r"strategy/changes", strategy_views.TargetChangeViewSet)
+router.register(r"strategy/list", strategy_views.StrategyViewSet, "strategy")
+router.register(r"strategy/targets", strategy_views.TargetViewSet, "target")
+router.register(r"strategy/changes", strategy_views.TargetChangeViewSet, "target_change")
+
+router.register(r"tags", oracle_views.TagViewSet, "tag")
+router.register(r"categories", oracle_views.CategoryViewSet, "category")
 
 urlpatterns = [
     path("admin/", admin.site.urls),

@@ -157,6 +157,7 @@ def fetch_chunk_coingecko(chunk, idx):
     url = COINGECKO_URL.replace("%TICKERS%", tickers)
     try:
         resp = requests.get(url, headers=headers)
+        print(resp.text)
         result_list = resp.json()
     except Exception as e:
         print(f"Failed to receive results: {e}")

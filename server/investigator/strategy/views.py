@@ -7,18 +7,26 @@ from .serializers import StrategySerializer, TargetSerializer, TargetChangeSeria
 
 
 class StrategyViewSet(viewsets.ModelViewSet):
-    queryset = Strategy.objects.all().order_by("-name")
     serializer_class = StrategySerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Strategy.objects.filter(owner=user.id).order_by("-name")
 
 class TargetViewSet(viewsets.ModelViewSet):
-    queryset = Target.objects.all().order_by("-percent")
     serializer_class = TargetSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Target.objects.filter(strategy__owner=user.id).order_by("-percent")
+
 
 class TargetChangeViewSet(viewsets.ModelViewSet):
-    queryset = TargetChange.objects.all().order_by("-timestamp")
     serializer_class = TargetChangeSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return TargetChange.objects.filter(strategy__owner=user.id).order_by("-timestamp")

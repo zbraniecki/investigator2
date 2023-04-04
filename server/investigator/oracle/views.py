@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Q
 
 from .models import Category, Tag, Asset, AssetInfo, Service
 from investigator.user.models import Watchlist
@@ -58,7 +59,11 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
 
     def get_queryset(self):
-        queryset = Category.objects.filter(owner__isnull=True).order_by("-name")
+        user = self.request.user
+        if user.is_authenticated:
+            queryset = Category.objects.filter(Q(owner__isnull=True) | Q(owner=user)).order_by("-name")
+        else:
+            queryset = Category.objects.filter(owner__isnull=True).order_by("-name")
         return queryset
 
 
@@ -67,5 +72,8 @@ class TagViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Tag.objects.filter(owner__isnull=True).order_by("-name")
+        if user.is_authenticated:
+            queryset = Tag.objects.filter(Q(owner__isnull=True) | Q(owner=user)).order_by("-name")
+        else:
+            queryset = Tag.objects.filter(owner__isnull=True).order_by("-name")
         return queryset
