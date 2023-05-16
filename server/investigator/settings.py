@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "investigator.user",
     "investigator.strategy",
     "investigator.history",
+    "graphene_django",
 ]
 
 MIDDLEWARE = [
@@ -162,4 +163,12 @@ REST_FRAMEWORK = {
 
 REST_AUTH_SERIALIZERS = {
     "TOKEN_SERIALIZER": "investigator.user.serializers.MyCustomTokenSerializer",
+}
+
+GRAPHENE = {
+    "SCHEMA": "investigator.oracle.schema.schema"
+}
+
+GRAPHENE_DJANGO_CRUD = {
+    "CONVERT_ENUM_FIELDS": False,
 }
