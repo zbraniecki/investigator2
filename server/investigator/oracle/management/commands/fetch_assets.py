@@ -142,9 +142,9 @@ def fetch_chunk_tiingo(chunk, idx):
 def check_missing(chunk, result, id):
     received_ids = [item[id] for item in result]
     missing_ids = [id for id in chunk if id not in received_ids]
-    assert len(missing_ids) == 0
     if len(missing_ids) > 0:
         print(f"Warning: Missing {len(missing_ids)} IDS: {missing_ids}.")
+    assert len(missing_ids) == 0
 
 
 def fetch_chunk_coingecko(chunk, idx):

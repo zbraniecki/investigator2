@@ -3,7 +3,7 @@ from django.db.models import Q
 from graphene_django import DjangoObjectType, DjangoListField
 from graphene_django.forms.mutation import DjangoModelFormMutation
 from graphene_django_crud.types import DjangoCRUDObjectType, resolver_hints
-from investigator.user.models import User, Watchlist, WatchlistType as WatchlistTypeEnum
+from investigator.user.models import User, Watchlist, WatchlistType as WatchlistTypeEnum, Portfolio
 from investigator.oracle.models import Asset, AssetInfo, Tag
 from investigator.oracle.dynamic_lists import get_dynamic_assets
 
@@ -41,12 +41,24 @@ class WatchlistType(DjangoCRUDObjectType):
         else:
             return parent.assets
 
+class PortfolioType(DjangoCRUDObjectType):
+    class Meta:
+        model = Portfolio
+
+    @classmethod
+    def get_queryset(cls, parent, info, **kwargs):
+        query = Q(owner__isnull=True)
+        if info.context.user.is_authenticated:
+            query |= Q(owner=info.context.user.pk)
+        return Portfolio.objects.filter(query)
+
 class TagType(DjangoCRUDObjectType):
     class Meta:
         model = Tag
 
 class Query(graphene.ObjectType):
     watchlists = WatchlistType.BatchReadField()
+    portfolios = PortfolioType.BatchReadField()
     assets = AssetType.BatchReadField()
     tags = TagType.BatchReadField()
 
