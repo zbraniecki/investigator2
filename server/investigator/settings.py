@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "investigator.strategy",
     "investigator.history",
     "graphene_django",
+    'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
 ]
 
 MIDDLEWARE = [
@@ -144,6 +145,7 @@ SITE_ID = 1
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 AUTHENTICATION_BACKENDS = (
+    'graphql_jwt.backends.JSONWebTokenBackend',
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
@@ -166,7 +168,7 @@ REST_AUTH_SERIALIZERS = {
 }
 
 GRAPHENE = {
-    "SCHEMA": "investigator.oracle.schema.schema"
+    "SCHEMA": "investigator.oracle.schema.schema",
 }
 
 GRAPHENE_DJANGO_CRUD = {

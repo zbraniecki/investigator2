@@ -6,6 +6,7 @@ from investigator.user import views as user_views
 from investigator.strategy import views as strategy_views
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
+from graphql_jwt.middleware import JSONWebTokenMiddleware
 
 router = routers.DefaultRouter()
 router.register(r"oracle/assets", oracle_views.AssetViewSet, "asset")
@@ -33,7 +34,11 @@ router.register(r"categories", oracle_views.CategoryViewSet, "category")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path(r"graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    path("graphql",
+         csrf_exempt(
+            GraphQLView.as_view(graphiql=True, middleware=[JSONWebTokenMiddleware])
+         )
+    ),
     path("auth/", include("dj_rest_auth.urls")),
     path("", include(router.urls)),
 ]
