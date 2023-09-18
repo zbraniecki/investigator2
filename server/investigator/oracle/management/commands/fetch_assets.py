@@ -7,6 +7,7 @@ import json
 import os
 from pprint import pprint
 from alpaca.trading.client import TradingClient
+from investigator.oracle.private_settings import PRIVATE_SETTINGS
 
 
 def map_as_percent(value):
@@ -100,8 +101,8 @@ def fetch_chunk_alpaca(chunk, idx):
         "https://data.alpaca.markets/v1beta2/crypto/latest/trades?symbols=%TICKERS%"
     )
     headers = {
-        "Apca-Api-Key-Id": "PKLQ431QZN3W6CHQD1ZP",
-        "Apca-Api-Secret-Key": "PyfXfdeAiVbmczwJnOQBk4zpDImeHPBV4NljOtTB",
+        "Apca-Api-Key-Id": PRIVATE_SETTINGS["ALPACA_KEY"],
+        "Apca-Api-Secret-Key": PRIVATE_SETTINGS["ALPACA_PASSWORD"],
     }
 
     tickers = ",".join([f"{id}/{BASE_CURRENCY}".upper() for id in chunk])
