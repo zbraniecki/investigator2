@@ -20,7 +20,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Tooltip from "@mui/material/Tooltip";
-import InputUnstyled from '@mui/base/InputUnstyled';
+import { InputUnstyled } from '@mui/core';
 import {
   Asset,
   Tag,
