@@ -114,6 +114,10 @@ class WatchlistAdmin(admin.ModelAdmin):
     pass
     list_display = ("name", "owner")
 
+@admin.register(WatchlistUI)
+class WatchlistUIAdmin(admin.ModelAdmin):
+    pass
+    list_display = ("watchlist", "user", "visible_order")
+
 admin.site.register(PortfolioUI)
-admin.site.register(WatchlistUI)
 admin.site.register(StrategyUI)

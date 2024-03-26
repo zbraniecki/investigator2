@@ -7,7 +7,7 @@ import json
 import os
 from pprint import pprint
 from alpaca.trading.client import TradingClient
-from investigator.oracle.private_settings import PRIVATE_SETTINGS
+from investigator.private_settings import PRIVATE_SETTINGS
 
 
 def map_as_percent(value):
@@ -162,14 +162,18 @@ def fetch_chunk_coingecko(chunk, idx):
         result_list = resp.json()
     except Exception as e:
         print(f"Failed to receive results: {e}")
-        return {}
+        return None
+
+    if "status" in result_list:
+        if result_list["status"]["error_code"] == 429:
+            print("EXCEEDED RATE LIMIT")
+            return None
 
     current_api = APIS[CURRENT_API]
     check_missing(chunk, result_list, current_api["resp_id"])
 
     result = {entry[current_api["resp_id"]]: entry for entry in result_list}
     assert len(result_list) == len(result.keys())
-    # pprint(result)
     return result
 
 
@@ -193,6 +197,8 @@ def fetch_crypto_assets(active=False, dry=False):
     for idx in range(0, len(chunks)):
         print(f"Fetching chunk {idx}: {chunks[idx]}")
         result = fetch_chunk_coingecko(chunks[idx], idx)
+        if result == None:
+            break
         for id, entry in result.items():
             for key, value in current_api["entry_map"].items():
                 if isinstance(value, list):

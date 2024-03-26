@@ -129,3 +129,6 @@ class WatchlistUI(models.Model):
     watchlist = models.ForeignKey(Watchlist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     visible_order = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.watchlist} ({self.user}, {self.visible_order})"

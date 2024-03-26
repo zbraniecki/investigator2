@@ -1,5 +1,6 @@
 import graphene
 import graphql_jwt
+from datetime import datetime
 from django.db.models import Q
 from graphene_django import DjangoObjectType, DjangoListField
 from graphene_django.forms.mutation import DjangoModelFormMutation
@@ -73,17 +74,29 @@ class Query(graphene.ObjectType):
     users = UserType.BatchReadField()
     watchlist_uis = WatchlistUIType.BatchReadField()
 
-    # user = UserType.ReadField()
+class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
+    user = graphene.Field(UserType)
 
+    @classmethod
+    def resolve(cls, root, info, **kwargs):
+        return cls(user=info.context.user)
 
+class MyVerify(graphql_jwt.Verify):
+    user = graphene.Field(UserType)
 
+    @classmethod
+    def verify(cls, root, info, token, **kwargs):
+        payload = graphql_jwt.utils.get_payload(token, info.context)
+        user = graphql_jwt.utils.get_user_by_payload(payload)
+        return cls(payload=payload, user=user)
+        
 class Mutation(graphene.ObjectType):
     watchlist_create = WatchlistType.CreateField()
     watchlist_update = WatchlistType.UpdateField()
     watchlist_delete = WatchlistType.DeleteField()
 
-    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
-    verify_token = graphql_jwt.Verify.Field()
+    token_auth = ObtainJSONWebToken.Field()
+    verify_token = MyVerify.Field()
     refresh_token = graphql_jwt.Refresh.Field()
 
 schema = graphene.Schema(
