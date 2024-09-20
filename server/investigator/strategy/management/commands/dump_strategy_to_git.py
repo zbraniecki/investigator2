@@ -60,6 +60,8 @@ class Command(BaseCommand):
 
         result = []
         for target in strat.targets.all().order_by("asset__symbol"):
+            if target.percent == 0.0:
+                continue
             contains = []
             for asset in target.contains.all().order_by("symbol"):
                 contains.append(asset.symbol)
