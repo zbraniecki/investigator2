@@ -151,9 +151,10 @@ function convertCollectionToTableRow(
 
       for (const tid of strategy.targets) {
         const target = state.targets[tid];
-	if (!target?.percent) {
-	  continue;
-	}
+        if (!target?.percent) {
+          continue;
+        }
+
         if (!assetValues[target.asset]) {
           const asset = state.assets[target.asset];
           children.push({
@@ -202,10 +203,15 @@ function convertCollectionToTableRow(
         row.cells.deltaUsd = deltaUsd;
       });
 
+      const hasTarget = (str: StrategyTableRow) => str.cells.target !== undefined && str.cells.target !== 0;
+
       const ungroupedChildren = children.filter(
-        (item) => item.cells.target === undefined
-      );
-      children = children.filter((item) => item.cells.target !== undefined);
+        (item) => !hasTarget(item),
+      ).map((item) => {
+        item.cells.target = undefined;
+        return item;
+      });
+      children = children.filter((item) => hasTarget(item));
 
       const ungroupedChildrenTotal = ungroupedChildren.reduce((total, item) => {
         assert(item.cells.current);

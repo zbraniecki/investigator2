@@ -214,8 +214,7 @@ export function Row({ id, data, tableMeta, minWidths }: Props) {
               column.editable &&
               !hideValue &&
               cell &&
-              data.cells.id &&
-              !outletContext.smallScreen
+              data.cells.id
             ) {
               return (
                 <EditableCell

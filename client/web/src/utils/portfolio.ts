@@ -141,8 +141,8 @@ function convertCollectionToTableRow(
         assert(row.cells.quantity !== undefined);
         return total + row.cells.quantity;
       }, 0);
-      const circ_supply_share = asset.info.circulating_supply
-        ? quantity / asset.info.circulating_supply
+      const circ_supply_share = asset.info.max_supply
+        ? quantity / asset.info.max_supply
         : undefined;
 
       const totalValue = asset.info.value * quantity;
@@ -188,8 +188,8 @@ function convertCollectionToTableRow(
         : undefined;
       const service = account ? state.services[account.service] : undefined;
 
-      const circ_supply_share = asset.info.circulating_supply
-        ? holding.quantity / asset.info.circulating_supply
+      const circ_supply_share = asset.info.max_supply
+        ? holding.quantity / asset.info.max_supply
         : undefined;
 
       let serviceAsset = service?.assets.find((a) => {
